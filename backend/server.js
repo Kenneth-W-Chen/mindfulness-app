@@ -1,32 +1,70 @@
-const mongoose = require("mongoose");
+const express = require("express");
+const bodyParser = require("body-parser");
+const db = require("./database/database"); // Adjust the path to point to the database folder
 
-// Replace with your connection string
-const uri =
-  "mongodb+srv://kindkeido0208:jJlCewTIdisyGms8@tweenmindfulness.jyi8c.mongodb.net/?retryWrites=true&w=majority&appName=TweenMindfulness";
+const app = express();
+const port = 3000;
 
-// Connect to MongoDB Atlas
-mongoose
-  .connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB Atlas connected"))
-  .catch((err) => console.error("Error connecting to MongoDB Atlas:", err));
+// Middleware to parse JSON request bodies
+app.use(bodyParser.json());
 
-const ItemSchema = new mongoose.Schema({
-  name: String,
-  description: String,
+// API routes
+
+// Fetch all activities
+app.get("/activities", (req, res) => {
+  db.all("SELECT * FROM activities", [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ activities: rows }); // Send the list of activities in JSON format
+  });
 });
 
-const Item = mongoose.model("Item", ItemSchema);
+// Add a new activity
+app.post("/activities", (req, res) => {
+  const { name, description, mood } = req.body; // Destructure request body
+  const query = `INSERT INTO activities (name, description, mood) VALUES (?, ?, ?)`;
 
-// Example of creating a new document
-const newItem = new Item({
-  name: "Test Item",
-  description: "This is a test item",
+  db.run(query, [name, description, mood], function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ id: this.lastID }); // Send back the ID of the newly inserted row
+  });
 });
 
-newItem
-  .save()
-  .then(() => console.log("Item saved"))
-  .catch((err) => console.error("Error saving item:", err));
+// Update an existing activity
+app.put("/activities/:id", (req, res) => {
+  const { id } = req.params; // Get the activity ID from the URL
+  const { name, description, mood } = req.body; // Destructure request body
+  const query = `UPDATE activities SET name = ?, description = ?, mood = ? WHERE id = ?`;
+
+  db.run(query, [name, description, mood, id], function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ changes: this.changes }); // Send the number of rows updated
+  });
+});
+
+// Delete an activity
+app.delete("/activities/:id", (req, res) => {
+  const { id } = req.params; // Get the activity ID from the URL
+  const query = `DELETE FROM activities WHERE id = ?`;
+
+  db.run(query, [id], function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ changes: this.changes }); // Send the number of rows deleted
+  });
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
