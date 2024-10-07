@@ -6,6 +6,7 @@ class Storage {
   static const _activityTable = 'activities';
   static const _activityLogTable = 'activity_logs';
   static const _preferencesTable = 'preferences';
+  static const _achievementsTable = 'achievements';
 
   Storage._create(Database db) {
     _db = db;
@@ -21,6 +22,29 @@ class Storage {
   /// Closes the database connection. Only use if the `Storage` object won't be used again afterwards (i.e., app close or reset)
   void close() async {
     await _db.close();
+  }
+
+  /**
+   * Achievements functions
+   */
+
+  /// Returns true if an achievement has been completed
+  Future<bool> isAchievementCompleted(Achievement achievement) async{
+    return (await getAchievementCompletionDate(achievement)) != null;
+  }
+
+  /// Returns the date the achievement was completed
+  Future<DateTime?> getAchievementCompletionDate(Achievement achievement) async{
+    var completionDate = ((await _db.query(_achievementsTable, columns: ['completion_date'], where: 'name = ?', whereArgs: [achievement.name], limit: 1))[0]['completion_date']);
+    if(completionDate == null) {
+      return null;
+    }
+    return (completionDate as int).epochDaysToDateTime();
+  }
+
+  /// Marks an achievement as completed using the current date.
+  void setAchievementCompleted(Achievement achievement) async{
+    await _db.update(_achievementsTable, {'completion_date': DateTime.now().daysSinceEpoch()}, where: 'name = ?', whereArgs: [achievement.name]);
   }
 
   /**
@@ -128,22 +152,42 @@ class Storage {
         '? ('
         'id INTEGER PRIMARY KEY NOT NULL,'
         'activity_id INTEGER NOT NULL,'
-        'completion_date INT NOT NULL,'
+        'completion_date INT NOT NULL,' // measured in days since Unix epoch
         'info TEXT NULL,'
         'FOREIGN KEY(activity_id)'
         'REFERENCES activities(id)', [_activityLogTable]);
 
+    /// Create achievements table
+    batch.execute('CREATE TABLE'
+        '? ('
+        'id INTEGER PRIMARY KEY NOT NULL,'
+        'name CHAR(50) NOT NULL,' // name of the achievement
+        'completion_date INT NULL' // measured in days since Unix epoch
+      , [_achievementsTable]
+    );
+
     /// Insert default preferences into the preferences table
     for (PreferenceName preferenceName in PreferenceName.values) {
+      if(preferenceName.value == -1) continue;
+
       batch.insert(_preferencesTable,
           {'name': preferenceName.name, 'value': preferenceName.defaultValue});
     }
 
     /// Insert activities into the activities table
     for (ActivityName activityName in ActivityName.values) {
+      if(activityName.value == -1) continue;
+
       batch.insert(_activityTable, {'name': activityName.name});
     }
 
+    /// Insert achievements into the achievements table
+    for(Achievement achievement in Achievement.values){
+      if(achievement.value == -1) continue;
+      batch.insert(_achievementsTable, {'name': achievement.name, 'completion_date': null});
+    }
+
+    /// Run all SQL commands
     await batch.commit(noResult: true);
   }
 
@@ -193,4 +237,11 @@ enum ActivityName {
   final int value;
 
   const ActivityName(this.value);
+}
+
+enum Achievement{
+  all(-1);
+
+  final int value;
+  const Achievement(this.value);
 }
