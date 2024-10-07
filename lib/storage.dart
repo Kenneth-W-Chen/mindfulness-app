@@ -13,6 +13,10 @@ class Storage {
   }
 
   /// Creates a Storage object to interact with the database
+  /// Usage:
+  /// ```dart
+  /// Storage storage = await Storage.create();
+  /// ```
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(join(await getDatabasesPath(), dbName),
         onConfigure: _configureDb, onCreate: _initDb);
@@ -20,6 +24,10 @@ class Storage {
   }
 
   /// Closes the database connection. Only use if the `Storage` object won't be used again afterwards (i.e., app close or reset)
+  /// Usage:
+  /// ```dart
+  /// await storage.close();
+  /// ```
   void close() async {
     await _db.close();
   }
@@ -29,20 +37,50 @@ class Storage {
    */
 
   /// Returns true if an achievement has been completed
+  ///
+  /// Usage:
+  /// ```dart
+  /// if(await storage.isAchievementCompleted(Achievement.achievement_name)){
+  ///   // code to run if true
+  /// } else {
+  ///   // code to run if false
+  /// }
+  /// ```
   Future<bool> isAchievementCompleted(Achievement achievement) async{
-    return (await getAchievementCompletionDate(achievement)) != null;
+    return (await getAchievementsCompletionDate([achievement]))[achievement] != null;
   }
 
-  /// Returns the date the achievement was completed
-  Future<DateTime?> getAchievementCompletionDate(Achievement achievement) async{
-    var completionDate = ((await _db.query(_achievementsTable, columns: ['completion_date'], where: 'name = ?', whereArgs: [achievement.name], limit: 1))[0]['completion_date']);
-    if(completionDate == null) {
-      return null;
+  /// Returns the date the achievements were completed
+  ///
+  /// Usage:
+  /// ```dart
+  /// var dates = await storage.getAchievementsCompletionDate([Achievement.achievement_1, Achievement.achievement_2]);
+  /// print(dates[Achievement.achievement_1]); // outputs 'null' or something like '2024-10-03'
+  /// print(dates[Achievement.achievement_2]); // outputs 'null' or something like '2024-10-03'
+  /// ```
+  Future<Map<Achievement, DateTime?>> getAchievementsCompletionDate(List<Achievement> achievements) async{
+    List<Map<String, Object?>> rows = [];
+    if(achievements.contains(Achievement.all)){
+      rows = (await _db.query(_achievementsTable, columns: ['name', 'completion_date']));
+    } else {
+      var v = _db.enumListExplode(achievements);
+      rows = (await _db.query(_achievementsTable, columns: ['name', 'completion_date'], where: 'name in [${v[0]}]', whereArgs: v[1]));
     }
-    return (completionDate as int).epochDaysToDateTime();
+
+    Map<Achievement, DateTime?> completionDates = {};
+    for (var row in rows) {
+      completionDates[Achievement.values.firstWhere((e)=>e.name==row['name'])] = row['completion_date'] != null ? (row['completion_date'] as int).epochDaysToDateTime():null;
+    }
+
+    return completionDates;
   }
 
   /// Marks an achievement as completed using the current date.
+  ///
+  /// Usage:
+  /// ```dart
+  /// await storage.setAchievementCompleted(Achievement.achievement_name);
+  /// ```
   void setAchievementCompleted(Achievement achievement) async{
     await _db.update(_achievementsTable, {'completion_date': DateTime.now().daysSinceEpoch()}, where: 'name = ?', whereArgs: [achievement.name]);
   }
@@ -56,11 +94,12 @@ class Storage {
   /// If no activity logs exist, the list should(?) be empty
   /// Example:
   /// ```flutter
-  /// var results = storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
+  /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
   /// print(results[ActivityName.breathe][0]['name']); // outputs 'breathe'
   /// print(results[ActivityName.breathe][0]['completion_date]); // outputs something like '200002' (this is the number of days since the Unix epoch)
   /// ```
   Future<Map<ActivityName, List<Map<String, Object?>>>> getActivityLogs(
+      // todo: change return to give DateTime? instead of Object?
       List<ActivityName> activities) async {
     Map<ActivityName, List<Map<String, Object?>>> logs = {};
     for (var activity in activities) {
@@ -82,9 +121,18 @@ class Storage {
   }
 
   /// Adds a log to the activity logs
+  ///
   /// `name` - the name of the activity
+  ///
   /// `info` - info associated with the activity
-  /// Note: `completion_date` is automatically set to the days since Unix epoch
+  ///
+  /// *Note: `completion_date` is automatically set to the days since Unix epoch*
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  /// await storage.addActivityLog(ActivityName.breathe);
+  /// ```
   void addActivityLog(ActivityName name, String? info) async{
     int activityId = (await _db.query(_activityTable, columns: ['id'], where:'name = ?', whereArgs: [name.name]))[0]['id'] as int;
     await _db.insert(_activityLogTable,{'activity_id':activityId,'completion_date':DateTime.now().daysSinceEpoch(),'info':info});
@@ -95,8 +143,15 @@ class Storage {
    */
 
   /// Retrieves multiple preferences from the database. To retrieve all preferences, pass `PreferenceName.all` in `preferences`
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  /// var preferences = await storage.getPreferences([PreferenceName.all]); // returns all preferences
+  /// ```
   Future<List<Map<String, Object?>>?> getPreferences(
       List<PreferenceName> preferences) async {
+    //todo: return a Map<PreferenceName, int> instead of a list
     /// Return nothing if no preference requested
     if (preferences.isEmpty) return null;
 
@@ -106,16 +161,22 @@ class Storage {
     }
 
     /// Retrieves 1+ preferences from the table
-    var placeholders = List.filled(preferences.length, '?');
-    var args = preferences.map((pref) => pref.name).toList(growable: false);
+    var v = _db.enumListExplode(preferences);
     return await _db.query(_preferencesTable,
         columns: ['name', 'value'],
-        where: 'name in (${placeholders.join(',')})',
-        whereArgs: args);
+        where: 'name in (${v[0].join(',')})',
+        whereArgs: v[1]);
   }
 
   /// Updates multiple preferences
-  void updatePreferences({required Map<PreferenceName, int> toUpdate}) async {
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  /// // sets master volume to 60 and music volume to 100
+  /// await storage.updatePreferences({PreferenceName.master_volume: 60, PreferenceName.music_volume: 100});
+  /// ```
+  void updatePreferences(Map<PreferenceName, int> toUpdate) async {
     Batch batch = _db.batch();
     toUpdate.forEach((PreferenceName key, int value) {
       batch.update(_preferencesTable, <String, Object>{'value': value},
@@ -208,9 +269,18 @@ extension EpochExtensions on DateTime {
 
 extension DateTimeEpochExtensions on int{
 
-  // returns a DateTime object representing the days since the Unix epoch, assuming this is days
+  /// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
   DateTime epochDaysToDateTime(){
     return DateTime.utc(1970).add(Duration(days:this));
+  }
+}
+
+extension ListExplode on Database{
+  /// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
+  List<List<String>> enumListExplode(List<Enum> s){
+    var placeholders = List.filled(s.length, '?');
+    var args = s.map((s) => s.name).toList(growable: false);
+    return [placeholders, args];
   }
 }
 
