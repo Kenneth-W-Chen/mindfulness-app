@@ -90,8 +90,11 @@ class Storage {
    */
 
   /// Retrieves multiple activity logs
-  /// Return result is a `Map', with the key being the activity name and the value being a list of entries for that activity
+  ///
+  /// Return result is a `Map', with the key being an `ActivityName` and the value being a map. That map has a key of the field name (i.e., 'completion_date' and 'info') and the corresponding value.
+  ///
   /// If no activity logs exist, the list should(?) be empty
+  ///
   /// Example:
   /// ```flutter
   /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
@@ -197,6 +200,7 @@ class Storage {
    */
 
   /// Initializes the database and tables when first creating the database
+  ///
   /// This should not be called elsewhere
   static _initDb(Database db, int version) async {
     Batch batch = db.batch();
@@ -259,6 +263,10 @@ class Storage {
     await batch.commit(noResult: true);
   }
 
+  /// Database configuration options.
+  ///
+  /// Sets the following options:
+  /// * Enforce foreign keys
   static _configureDb(Database db) async {
     Batch batch = db.batch();
     batch.execute('PRAGMA foreign_keys = ON;');
@@ -269,6 +277,12 @@ class Storage {
 
 extension EpochExtensions on DateTime {
   /// Gives the number of full days since Unix epoch
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  /// print(DateTime.now().daysSinceEpoch()); // for October 8, 2024, this outputs 200004
+  /// ```
   int daysSinceEpoch() {
     return (millisecondsSinceEpoch / 86400000).floor();
   }
@@ -277,6 +291,12 @@ extension EpochExtensions on DateTime {
 extension DateTimeEpochExtensions on int{
 
   /// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  /// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
+  /// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
   DateTime epochDaysToDateTime(){
     return DateTime.utc(1970).add(Duration(days:this));
   }
@@ -284,6 +304,14 @@ extension DateTimeEpochExtensions on int{
 
 extension ListExplode on Database{
   /// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
+  ///
+  /// Usage:
+  /// ```dart
+  /// Database db = await openDatabase();
+  /// List<PreferenceName> preferences = [master_volume, max_volume, music_volume];
+  /// var exploded = db.enumListExplode(preferences);
+  /// db.query('table', where: 'name in ${exploded[0]}', whereArgs: exploded[1]);
+  /// ```
   List<List<String>> enumListExplode(List<Enum> s){
     var placeholders = List.filled(s.length, '?');
     var args = s.map((s) => s.name).toList(growable: false);
