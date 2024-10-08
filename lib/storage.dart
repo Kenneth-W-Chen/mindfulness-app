@@ -95,15 +95,13 @@ class Storage {
   /// Example:
   /// ```flutter
   /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
-  /// print(results[ActivityName.breathe][0]['name']); // outputs 'breathe'
-  /// print(results[ActivityName.breathe][0]['completion_date]); // outputs something like '200002' (this is the number of days since the Unix epoch)
+  /// print(results[ActivityName.breathe]['completion_date]); // outputs something like '2024-10-08'
   /// ```
-  Future<Map<ActivityName, List<Map<String, Object?>>>> getActivityLogs(
-      // todo: change return to give DateTime? instead of Object?
+  Future<Map<ActivityName, Map<String,Object?>>> getActivityLogs(
       List<ActivityName> activities) async {
-    Map<ActivityName, List<Map<String, Object?>>> logs = {};
+    Map<ActivityName, Map<String,Object?>> logs = {};
     for (var activity in activities) {
-      logs[activity] = await _db.rawQuery('SELECT '
+      var row = (await _db.rawQuery('SELECT '
             'name, '
             'completion_date, '
             'info'
@@ -114,7 +112,8 @@ class Storage {
             'ON'
             'activities.id = activity_id'
             'WHERE'
-            'name = ?', [_activityTable,_activityLogTable,activity.name]);
+            'name = ?', [_activityTable,_activityLogTable,activity.name]))[0];
+      logs[activity] = {'completion_date': (row['completion_date'] as int).epochDaysToDateTime(), 'info':row['info']};
     }
 
     return logs;
@@ -144,28 +143,36 @@ class Storage {
 
   /// Retrieves multiple preferences from the database. To retrieve all preferences, pass `PreferenceName.all` in `preferences`
   ///
+  /// Returns null if an empty list is passed.
+  ///
   /// Usage:
   ///
   /// ```dart
   /// var preferences = await storage.getPreferences([PreferenceName.all]); // returns all preferences
   /// ```
-  Future<List<Map<String, Object?>>?> getPreferences(
+  Future<Map<PreferenceName, int>?> getPreferences(
       List<PreferenceName> preferences) async {
-    //todo: return a Map<PreferenceName, int> instead of a list
     /// Return nothing if no preference requested
     if (preferences.isEmpty) return null;
+    List<Map<String, Object?>> rows;
 
     /// Return all preferences if 'all' was passed
     if (preferences.contains(PreferenceName.all)) {
-      return await _db.query(_preferencesTable, columns: ['name', 'value']);
-    }
-
+       rows = await _db.query(_preferencesTable, columns: ['name', 'value']);
+    } else {
     /// Retrieves 1+ preferences from the table
-    var v = _db.enumListExplode(preferences);
-    return await _db.query(_preferencesTable,
+      var v = _db.enumListExplode(preferences);
+      rows = await _db.query(_preferencesTable,
         columns: ['name', 'value'],
         where: 'name in (${v[0].join(',')})',
         whereArgs: v[1]);
+    }
+
+    Map<PreferenceName, int> v = {};
+    for(Map<String, Object?> row in rows){
+      v[PreferenceName.values.firstWhere((e)=>e.name==row['name'])] = row['value'] as int;
+    }
+    return v;
   }
 
   /// Updates multiple preferences
@@ -284,12 +291,13 @@ extension ListExplode on Database{
   }
 }
 
+
 enum PreferenceName {
   all(-1, -1),
-  // these are example preferences
-  master_volume(0, 100),
-  music_volume(1, 100),
-  sound_fx_volume(2, 100);
+
+  master_volume(0, 100), // ignore: constant_identifier_names
+  music_volume(1, 100), // ignore: constant_identifier_names
+  sound_fx_volume(2, 100); // ignore: constant_identifier_names
 
   /// enum value
   final int value;
