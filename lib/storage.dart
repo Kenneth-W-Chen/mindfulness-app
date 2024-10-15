@@ -22,7 +22,7 @@ class Storage {
   /// ```
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(join(await getDatabasesPath(), dbName),
-        version: 1, onConfigure: _configureDb, onCreate: _initDb);
+        onConfigure: _configureDb, onCreate: _initDb);
     return Storage._create(db);
   }
 
@@ -230,6 +230,7 @@ class Storage {
     Batch batch = db.batch();
 
     /// Create preferences table
+<<<<<<< HEAD
 batch.execute('CREATE TABLE $_preferencesTable ('
     'id INTEGER PRIMARY KEY NOT NULL,'
     'name CHAR(25) NOT NULL,'
@@ -255,6 +256,40 @@ batch.execute('CREATE TABLE $_achievementsTable ('
     'name CHAR(50) NOT NULL,'
     'completion_date INT NULL'
     ');');
+=======
+    batch.execute('CREATE TABLE'
+        '? ('
+        'id INTEGER PRIMARY KEY NOT NULL,'
+        'name CHAR(25) NOT NULL,'
+        'value INT NOT NULL'
+        ');', [_preferencesTable]);
+
+    /// Create activities table
+    batch.execute('CREATE TABLE'
+        '? ('
+        'id INTEGER PRIMARY KEY NOT NULL,'
+        'name CHAR(25) NOT NULL;',[_activityTable]);
+
+    /// Create activity log table
+    batch.execute('CREATE TABLE'
+        '? ('
+        'id INTEGER PRIMARY KEY NOT NULL,'
+        'activity_id INTEGER NOT NULL,'
+        'completion_date INT NOT NULL,' // measured in days since Unix epoch
+        'info TEXT NULL,'
+        'FOREIGN KEY(activity_id)'
+        'REFERENCES activities(id)', [_activityLogTable]);
+
+    /// Create achievements table
+    batch.execute('CREATE TABLE'
+        '? ('
+        'id INTEGER PRIMARY KEY NOT NULL,'
+        'name CHAR(50) NOT NULL,' // name of the achievement
+        'completion_date INT NULL' // measured in days since Unix epoch
+      , [_achievementsTable]
+    );
+
+>>>>>>> parent of 50d3e09 (SQL syntax fixes on storage.dart, schema versioning, and CRUD testing)
     /// Insert default preferences into the preferences table
     for (PreferenceName preferenceName in PreferenceName.values) {
       if(preferenceName.value == -1) continue;

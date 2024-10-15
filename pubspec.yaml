@@ -49,8 +49,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+<<<<<<< HEAD
   sqflite_common_ffi: ^2.3.3+1 #For database testing on a desktop environment
   
+=======
+
+>>>>>>> parent of 50d3e09 (SQL syntax fixes on storage.dart, schema versioning, and CRUD testing)
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
