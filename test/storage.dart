@@ -35,36 +35,6 @@ class Storage {
     return Storage(db);
   }
 
-  // Method to set (insert or update) a preference
-  Future<void> setPreference(PreferenceName name, bool value) async {
-    await _db.insert(
-      'preferences',
-      {
-        'name': name.toString(),
-        'value': value ? 'true' : 'false',
-      },
-      conflictAlgorithm:
-          ConflictAlgorithm.replace, // Replace if the preference already exists
-    );
-  }
-
-  // Method to retrieve preferences
-  Future<Map<PreferenceName, bool>?> getPreferences(
-      List<PreferenceName> names) async {
-    final preferences = await _db.query(
-      'preferences',
-      where: 'name IN (${names.map((e) => "'${e.toString()}'").join(', ')})',
-    );
-
-    if (preferences.isEmpty) return null;
-
-    return {
-      for (var pref in preferences)
-        PreferenceName.values.firstWhere((e) => e.toString() == pref['name']):
-            pref['value'] == 'true'
-    };
-  }
-
   // Insert an activity log
   Future<void> insertActivityLog(ActivityName name, DateTime timestamp) async {
     await _db.insert(
@@ -140,11 +110,4 @@ enum Achievement {
   breathingExercise,
   meditationStreak,
   all, // Include other achievements as necessary
-}
-
-// Enum for Preferences
-enum PreferenceName {
-  dailyReminder,
-  soundEnabled,
-  all, // Add other preferences as necessary
 }
