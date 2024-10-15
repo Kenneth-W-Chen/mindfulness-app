@@ -1,150 +1,126 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart'; // For path handling
+import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // For desktop testing using SQLite FFI
+import './storage.dart'; // Import your Storage class
 
-class Storage {
-  final Database _db;
+void main() {
+  setUpAll(() {
+    sqfliteFfiInit(); // Initialize FFI for database
+    databaseFactory =
+        databaseFactoryFfi; // Set the database factory to the FFI factory
+  });
 
-  Storage(this._db);
+  // Test for creation and closing of the database
+  test('CREATION AND CLOSE TEST', () async {
+    // Specify the path for the test database
+    String dbPath = join(await getDatabasesPath(), 'test_storage.db');
 
-  static Future<Storage> create({required String dbName}) async {
-    final db = await openDatabase(
-      dbName,
-      onCreate: (db, version) async {
-        // Create the preferences table
-        await db.execute('''CREATE TABLE IF NOT EXISTS preferences (
-            name TEXT PRIMARY KEY,
-            value TEXT
-          )''');
+    // Create the Storage instance
+    Storage storage = await Storage.create(dbName: dbPath);
 
-        // Create the activity logs table
-        await db.execute('''CREATE TABLE IF NOT EXISTS activity_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            timestamp TEXT
-          )''');
+    // Ensure the Storage instance is not null
+    expect(storage, isNotNull);
 
-        // Create the achievements table
-        await db.execute('''CREATE TABLE IF NOT EXISTS achievements (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            completion_date TEXT
-          )''');
-      },
-      version: 1,
-    );
-    return Storage(db);
-  }
+    // Check if the correct database path is being used
+    expect(dbPath.contains('test_storage.db'), true);
 
-  // Method to set (insert or update) a preference
-  Future<void> setPreference(PreferenceName name, bool value) async {
-    await _db.insert(
-      'preferences',
-      {
-        'name': name.toString(),
-        'value': value ? 'true' : 'false',
-      },
-      conflictAlgorithm:
-          ConflictAlgorithm.replace, // Replace if the preference already exists
-    );
-  }
+    // Close the database
+    storage.close();
+  });
 
-  // Method to retrieve preferences
-  Future<Map<PreferenceName, bool>?> getPreferences(
-      List<PreferenceName> names) async {
-    final preferences = await _db.query(
-      'preferences',
-      where: 'name IN (${names.map((e) => "'${e.toString()}'").join(', ')})',
-    );
+  // Test for inserting and retrieving activity logs
+  test('ACTIVITY LOG TEST', () async {
+    String dbPath = join(await getDatabasesPath(), 'test_storage.db');
+    Storage storage = await Storage.create(dbName: dbPath);
 
-    if (preferences.isEmpty) return null;
+    // Insert a new activity log
+    await storage.insertActivityLog(
+        ActivityName.breathe, DateTime.now().toIso8601String());
 
-    return {
-      for (var pref in preferences)
-        PreferenceName.values.firstWhere((e) => e.toString() == pref['name']):
-            pref['value'] == 'true'
-    };
-  }
+    // Retrieve the activity logs
+    var logs = await storage.getActivityLogs([ActivityName.breathe]);
+    expect(logs.isNotEmpty, true);
 
-  // Insert an activity log
-  Future<void> insertActivityLog(ActivityName name, DateTime timestamp) async {
-    await _db.insert(
-      'activity_logs',
-      {
-        'name': name.toString(),
-        'timestamp': timestamp.toIso8601String(),
-      },
-      conflictAlgorithm:
-          ConflictAlgorithm.ignore, // Avoid inserting duplicate logs
-    );
-  }
+    // Print activity logs table
+    await printActivityLogsTable(storage);
 
-  // Retrieve activity logs
-  Future<List<Map<String, dynamic>>> getActivityLogs(
-      List<ActivityName> names) async {
-    return await _db.query(
-      'activity_logs',
-      where: 'name IN (${names.map((e) => "'${e.toString()}'").join(', ')})',
-    );
-  }
+    storage.close();
+  });
 
-  // Insert an achievement
-  Future<void> insertAchievement(
-      Achievement achievement, DateTime completionDate) async {
-    await _db.insert(
-      'achievements',
-      {
-        'name': achievement.toString(),
-        'completion_date': completionDate.toIso8601String(),
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
+  // Test for inserting and retrieving preferences
+  test('PREFERENCES TEST', () async {
+    String dbPath = join(await getDatabasesPath(), 'test_storage.db');
+    Storage storage = await Storage.create(dbName: dbPath);
 
-  // Retrieve achievements and their completion dates
-  Future<Map<Achievement, DateTime>> getAchievementsCompletionDate(
-      List<Achievement> achievements) async {
-    final result = await _db.query(
-      'achievements',
-      where:
-          'name IN (${achievements.map((e) => "'${e.toString()}'").join(', ')})',
-    );
+    // Insert or update a preference
+    await storage.setPreference(PreferenceName.dailyReminder, true);
 
-    if (result.isEmpty) {
-      return {};
-    }
+    // Retrieve preferences
+    var preferences =
+        await storage.getPreferences([PreferenceName.dailyReminder]);
+    expect(preferences?[PreferenceName.dailyReminder], true);
 
-    // Convert result to Map<Achievement, DateTime> with proper casting
-    return {
-      for (var row in result)
-        Achievement.values
-                .firstWhere((e) => e.toString() == (row['name'] as String)):
-            DateTime.parse(row['completion_date'] as String)
-    };
-  }
+    // Print preferences table
+    await printPreferencesTable(storage);
 
-  // Close the database
-  Future<void> close() async {
-    await _db.close();
-  }
+    storage.close();
+  });
+
+  // Test for retrieving achievements
+  test('ACHIEVEMENTS TEST', () async {
+    String dbPath = join(await getDatabasesPath(), 'test_storage.db');
+    Storage storage = await Storage.create(dbName: dbPath);
+
+    // Insert an achievement (if your storage allows this)
+    await storage.insertAchievement(
+        Achievement.breathingExercise, DateTime.now());
+
+    // Retrieve achievements
+    var achievements = await storage
+        .getAchievementsCompletionDate([Achievement.breathingExercise]);
+    expect(achievements.isNotEmpty, true);
+
+    // Print achievements table
+    await printAchievementsTable(storage);
+
+    storage.close();
+  });
 }
 
-// Enum for ActivityName
-enum ActivityName {
-  breathe,
-  meditate,
-  all,
+/// Prints the activities table using the existing method
+Future<void> printActivitiesTable(Storage storage) async {
+  var activityLogs =
+      await storage.getActivityLogs([ActivityName.breathe, ActivityName.all]);
+  print('Activities Table:');
+  activityLogs.forEach((activity, details) {
+    print('$activity -> $details');
+  });
 }
 
-// Enum for Achievements
-enum Achievement {
-  breathingExercise,
-  meditationStreak,
-  all, // Include other achievements as necessary
+/// Prints the activity logs table
+Future<void> printActivityLogsTable(Storage storage) async {
+  var activityLogs = await storage.getActivityLogs([ActivityName.breathe]);
+  print('Activity Logs Table:');
+  activityLogs.forEach((activity, details) {
+    print('$activity -> $details');
+  });
 }
 
-// Enum for Preferences
-enum PreferenceName {
-  dailyReminder,
-  soundEnabled,
-  all, // Add other preferences as necessary
+/// Prints the preferences table
+Future<void> printPreferencesTable(Storage storage) async {
+  var preferences = await storage.getPreferences([PreferenceName.all]);
+  print('Preferences Table:');
+  preferences?.forEach((preference, value) {
+    print('$preference -> $value');
+  });
+}
+
+/// Prints the achievements table
+Future<void> printAchievementsTable(Storage storage) async {
+  var achievements =
+      await storage.getAchievementsCompletionDate([Achievement.all]);
+  print('Achievements Table:');
+  achievements.forEach((achievement, date) {
+    print('$achievement -> $date');
+  });
 }
