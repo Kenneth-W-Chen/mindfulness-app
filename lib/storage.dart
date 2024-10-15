@@ -41,13 +41,30 @@ class Storage {
     await _db.close();
   }
 
+  /**
+   * Achievements functions
+   */
   // Achievements functions
-
+  ///
+  /// Usage:
+  /// ```dart
+  /// if(await storage.isAchievementCompleted(Achievement.achievement_name)){
+  ///   // code to run if true
+  /// } else {
+  ///   // code to run if false
+  /// }
+  /// ```
   /// Returns true if an achievement has been completed
   Future<bool> isAchievementCompleted(Achievement achievement) async {
     return (await getAchievementsCompletionDate([achievement]))[achievement] != null;
   }
-
+  ///
+  /// Usage:
+  /// ```dart
+  /// var dates = await storage.getAchievementsCompletionDate([Achievement.achievement_1, Achievement.achievement_2]);
+  /// print(dates[Achievement.achievement_1]); // outputs 'null' or something like '2024-10-03'
+  /// print(dates[Achievement.achievement_2]); // outputs 'null' or something like '2024-10-03'
+  /// ```
   /// Returns the date the achievements were completed
   Future<Map<Achievement, DateTime?>> getAchievementsCompletionDate(List<Achievement> achievements) async {
     List<Map<String, Object?>> rows = [];
@@ -71,7 +88,11 @@ class Storage {
 
     return completionDates;
   }
-
+  ///
+  /// Usage:
+  /// ```dart
+  /// await storage.setAchievementCompleted(Achievement.achievement_name);
+  /// ```
   /// Marks an achievement as completed using the current date.
   Future<void> setAchievementCompleted(Achievement achievement) async {
     await _db.update(
@@ -87,7 +108,15 @@ class Storage {
   }
 
   // Activity log functions
-
+    ///
+  /// Return result is a `Map', with the key being an `ActivityName` and the value being a map. That map has a key of the field name (i.e., 'completion_date' and 'info') and the corresponding value.
+  ///
+  /// If no activity logs exist, the list should(?) be empty
+  ///
+  /// Example:
+  /// ```flutter
+  /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
+  /// print(results[ActivityName.breathe]['completion_date]); // outputs something like '2024-10-08'
   /// Retrieves multiple activity logs
   Future<Map<ActivityName, Map<String, Object?>>> getActivityLogs(List<ActivityName> activities) async {
     Map<ActivityName, Map<String, Object?>> logs = {};
@@ -120,6 +149,18 @@ class Storage {
   }
 
   /// Adds a log to the activity logs
+  ///   ///
+  /// `name` - the name of the activity
+  ///
+  /// `info` - info associated with the activity
+  ///
+  /// *Note: `completion_date` is automatically set to the days since Unix epoch*
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  /// await storage.addActivityLog(ActivityName.breathe);
+  /// ```
   Future<void> addActivityLog(ActivityName name, String? info) async {
     int activityId = (await _db.query(
       _activityTable,
@@ -268,13 +309,28 @@ extension EpochExtensions on DateTime {
     return (millisecondsSinceEpoch / 86400000).floor();
   }
 }
-
+  /// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  /// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
+  /// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
 extension DateTimeEpochExtensions on int {
   DateTime epochDaysToDateTime() {
     return DateTime.utc(1970).add(Duration(days: this));
   }
 }
 
+  /// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
+  ///
+  /// Usage:
+  /// ```dart
+  /// Database db = await openDatabase();
+  /// List<PreferenceName> preferences = [master_volume, max_volume, music_volume];
+  /// var exploded = db.enumListExplode(preferences);
+  /// db.query('table', where: 'name in ${exploded[0]}', whereArgs: exploded[1]);
+  /// ```
 extension ListExplode on Database {
   List<List<String>> enumListExplode(List<Enum> s) {
     var placeholders = List.filled(s.length, '?');
