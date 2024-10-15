@@ -50,8 +50,6 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
   sqflite_common_ffi: ^2.3.3+1 #For database testing on a desktop environment
-  
-
 
 
 # For information on the generic Dart part of this file, see the
