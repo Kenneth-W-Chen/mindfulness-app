@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   sqflite: ^2.3.3+2
   path: ^1.9.0
+  meta: ^1.7.0
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +50,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
   sqflite_common_ffi: ^2.3.3+1 #For database testing on a desktop environment
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

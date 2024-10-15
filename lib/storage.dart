@@ -1,8 +1,11 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' show join;
 
 class Storage {
   late Database _db;
+  @visibleForTesting
+  Database get testDb => _db;
   static const _activityTable = 'activities';
   static const _activityLogTable = 'activity_logs';
   static const _preferencesTable = 'preferences';
@@ -81,10 +84,13 @@ class Storage {
   /// ```dart
   /// await storage.setAchievementCompleted(Achievement.achievement_name);
   /// ```
-  void setAchievementCompleted(Achievement achievement) async{
+  Future<void> setAchievementCompleted(Achievement achievement) async{
     await _db.update(_achievementsTable, {'completion_date': DateTime.now().daysSinceEpoch()}, where: 'name = ?', whereArgs: [achievement.name]);
   }
 
+  Future<void> deleteAchievement(Achievement achievement) async {
+    await _db.delete(_achievementsTable, where: 'name = ?', whereArgs: [achievement.name]);
+  }
   /**
    * Activity log functions
    */
@@ -100,23 +106,29 @@ class Storage {
   /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
   /// print(results[ActivityName.breathe]['completion_date]); // outputs something like '2024-10-08'
   /// ```
-  Future<Map<ActivityName, Map<String,Object?>>> getActivityLogs(
-      List<ActivityName> activities) async {
+  Future<Map<ActivityName, Map<String,Object?>>> getActivityLogs(List<ActivityName> activities) async {
     Map<ActivityName, Map<String,Object?>> logs = {};
+
     for (var activity in activities) {
-      var row = (await _db.rawQuery('SELECT '
-            'name, '
-            'completion_date, '
-            'info'
-            'FROM'
-            '?'
-            'INNER JOIN'
-            '?'
-            'ON'
-            'activities.id = activity_id'
-            'WHERE'
-            'name = ?', [_activityTable,_activityLogTable,activity.name]))[0];
-      logs[activity] = {'completion_date': (row['completion_date'] as int).epochDaysToDateTime(), 'info':row['info']};
+      var rows = await _db.rawQuery(
+          'SELECT name, completion_date, info FROM $_activityLogTable '
+          'INNER JOIN $_activityTable ON $_activityTable.id = $_activityLogTable.activity_id '
+          'WHERE $_activityTable.name = ?', [activity.name]);
+
+      // Only process if rows are found
+      if (rows.isNotEmpty) {
+        var row = rows[0]; // safely access the first row since we checked it's not empty
+        logs[activity] = {
+          'completion_date': (row['completion_date'] as int?)?.epochDaysToDateTime(),
+          'info': row['info']
+        };
+      } else {
+        // Add an empty log entry if no result is found
+        logs[activity] = {
+          'completion_date': null,
+          'info': null
+        };
+      }
     }
 
     return logs;
@@ -135,10 +147,17 @@ class Storage {
   /// ```dart
   /// await storage.addActivityLog(ActivityName.breathe);
   /// ```
-  void addActivityLog(ActivityName name, String? info) async{
+  Future<void> addActivityLog(ActivityName name, String? info) async{
     int activityId = (await _db.query(_activityTable, columns: ['id'], where:'name = ?', whereArgs: [name.name]))[0]['id'] as int;
     await _db.insert(_activityLogTable,{'activity_id':activityId,'completion_date':DateTime.now().daysSinceEpoch(),'info':info});
   }
+  /// Delete an activity log entry
+  Future<void> deleteActivityLog(ActivityName activityName) async {
+    int activityId = (await _db.query(_activityTable,
+        columns: ['id'], where: 'name = ?', whereArgs: [activityName.name]))[0]['id'] as int;
+    await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
+  }
+
 
   /**
    * Preferences functions
@@ -186,7 +205,7 @@ class Storage {
   /// // sets master volume to 60 and music volume to 100
   /// await storage.updatePreferences({PreferenceName.master_volume: 60, PreferenceName.music_volume: 100});
   /// ```
-  void updatePreferences(Map<PreferenceName, int> toUpdate) async {
+  Future<void> updatePreferences(Map<PreferenceName, int> toUpdate) async {
     Batch batch = _db.batch();
     toUpdate.forEach((PreferenceName key, int value) {
       batch.update(_preferencesTable, <String, Object>{'value': value},
@@ -194,6 +213,11 @@ class Storage {
     });
     await batch.commit(noResult: true);
   }
+
+  Future<void> deletePreference(PreferenceName preference) async {
+    await _db.delete(_preferencesTable, where: 'name = ?', whereArgs: [preference.name]);
+  }
+
 
   /**
    * DB setup functions
@@ -219,10 +243,11 @@ batch.execute('CREATE TABLE $_activityTable ('
 
 batch.execute('CREATE TABLE $_activityLogTable ('
     'id INTEGER PRIMARY KEY NOT NULL,'
-    'activity_id INTEGER NOT NULL,'
-    'completion_date INT NOT NULL,'
+    'activity_id INTEGER NOT NULL ON CONFLICT ROLLBACK,'
+    'completion_date INT NOT NULL ON CONFLICT ROLLBACK,'
     'info TEXT NULL,'
-    'FOREIGN KEY(activity_id) REFERENCES $_activityTable(id)'
+    'FOREIGN KEY(activity_id) REFERENCES $_activityTable(id),'
+    'CHECK (info != "INVALID_LOG") ON CONFLICT ROLLBACK'
     ');');
 
 batch.execute('CREATE TABLE $_achievementsTable ('
