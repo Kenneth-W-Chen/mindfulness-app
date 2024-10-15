@@ -230,7 +230,7 @@ class Storage {
     Batch batch = db.batch();
 
     /// Create preferences table
-<<<<<<< HEAD
+
 batch.execute('CREATE TABLE $_preferencesTable ('
     'id INTEGER PRIMARY KEY NOT NULL,'
     'name CHAR(25) NOT NULL,'
@@ -256,7 +256,7 @@ batch.execute('CREATE TABLE $_achievementsTable ('
     'name CHAR(50) NOT NULL,'
     'completion_date INT NULL'
     ');');
-=======
+
     batch.execute('CREATE TABLE'
         '? ('
         'id INTEGER PRIMARY KEY NOT NULL,'
@@ -289,7 +289,6 @@ batch.execute('CREATE TABLE $_achievementsTable ('
       , [_achievementsTable]
     );
 
->>>>>>> parent of 50d3e09 (SQL syntax fixes on storage.dart, schema versioning, and CRUD testing)
     /// Insert default preferences into the preferences table
     for (PreferenceName preferenceName in PreferenceName.values) {
       if(preferenceName.value == -1) continue;
