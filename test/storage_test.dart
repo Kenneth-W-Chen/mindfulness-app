@@ -90,7 +90,7 @@ void main() {
 /// Prints the activities table using the existing method
 Future<void> printActivitiesTable(Storage storage) async {
   var activityLogs =
-      await storage.getActivityLogs([ActivityName.breathe, ActivityName.all]);
+      await storage.getActivityLogs([ActivityName.breathe, ActivityName.all]); 
   print('Activities Table:');
   activityLogs.forEach((activity, details) {
     print('$activity -> $details');
