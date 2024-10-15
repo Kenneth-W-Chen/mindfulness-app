@@ -44,8 +44,8 @@ class Storage {
   /**
    * Achievements functions
    */
-  // Achievements functions
-  ///
+
+  /// Returns true if an achievement has been completed
   /// Usage:
   /// ```dart
   /// if(await storage.isAchievementCompleted(Achievement.achievement_name)){
@@ -54,18 +54,17 @@ class Storage {
   ///   // code to run if false
   /// }
   /// ```
-  /// Returns true if an achievement has been completed
   Future<bool> isAchievementCompleted(Achievement achievement) async {
     return (await getAchievementsCompletionDate([achievement]))[achievement] != null;
   }
-  ///
+
+  /// Returns the date the achievements were completed
   /// Usage:
   /// ```dart
   /// var dates = await storage.getAchievementsCompletionDate([Achievement.achievement_1, Achievement.achievement_2]);
   /// print(dates[Achievement.achievement_1]); // outputs 'null' or something like '2024-10-03'
   /// print(dates[Achievement.achievement_2]); // outputs 'null' or something like '2024-10-03'
   /// ```
-  /// Returns the date the achievements were completed
   Future<Map<Achievement, DateTime?>> getAchievementsCompletionDate(List<Achievement> achievements) async {
     List<Map<String, Object?>> rows = [];
     if (achievements.contains(Achievement.all)) {
@@ -88,12 +87,12 @@ class Storage {
 
     return completionDates;
   }
-  ///
+
+  /// Marks an achievement as completed using the current date.
   /// Usage:
   /// ```dart
   /// await storage.setAchievementCompleted(Achievement.achievement_name);
   /// ```
-  /// Marks an achievement as completed using the current date.
   Future<void> setAchievementCompleted(Achievement achievement) async {
     await _db.update(
       _achievementsTable,
@@ -107,8 +106,11 @@ class Storage {
     await _db.delete(_achievementsTable, where: 'name = ?', whereArgs: [achievement.name]);
   }
 
-  // Activity log functions
-    ///
+  /** Activity log functions
+   *
+   **/
+
+  /// Retrieves multiple activity logs
   /// Return result is a `Map', with the key being an `ActivityName` and the value being a map. That map has a key of the field name (i.e., 'completion_date' and 'info') and the corresponding value.
   ///
   /// If no activity logs exist, the list should(?) be empty
@@ -117,7 +119,7 @@ class Storage {
   /// ```flutter
   /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
   /// print(results[ActivityName.breathe]['completion_date]); // outputs something like '2024-10-08'
-  /// Retrieves multiple activity logs
+  /// ```
   Future<Map<ActivityName, Map<String, Object?>>> getActivityLogs(List<ActivityName> activities) async {
     Map<ActivityName, Map<String, Object?>> logs = {};
 
@@ -149,9 +151,7 @@ class Storage {
   }
 
   /// Adds a log to the activity logs
-  ///   ///
   /// `name` - the name of the activity
-  ///
   /// `info` - info associated with the activity
   ///
   /// *Note: `completion_date` is automatically set to the days since Unix epoch*
@@ -159,7 +159,7 @@ class Storage {
   /// Usage:
   ///
   /// ```dart
-  /// await storage.addActivityLog(ActivityName.breathe);
+  ///  await storage.addActivityLog(ActivityName.breathe);
   /// ```
   Future<void> addActivityLog(ActivityName name, String? info) async {
     int activityId = (await _db.query(
@@ -190,7 +190,9 @@ class Storage {
     await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
   }
 
-  // Preferences functions
+  /**
+   *  Preferences functions
+   */
 
   /// Retrieves multiple preferences from the database. To retrieve all preferences, pass `PreferenceName.all` in `preferences`
   Future<Map<PreferenceName, int>?> getPreferences(List<PreferenceName> preferences) async {
@@ -230,11 +232,14 @@ class Storage {
     await batch.commit(noResult: true);
   }
 
+  /// For testing only
   Future<void> deletePreference(PreferenceName preference) async {
     await _db.delete(_preferencesTable, where: 'name = ?', whereArgs: [preference.name]);
   }
 
-  // DB setup functions
+  /**
+   * DB setup functions
+   */
 
   /// Initializes the database and tables when first creating the database
   static Future<void> _initDb(Database db, int version) async {
@@ -316,6 +321,7 @@ extension EpochExtensions on DateTime {
   /// ```dart
   /// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
   /// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
+  /// ```
 extension DateTimeEpochExtensions on int {
   DateTime epochDaysToDateTime() {
     return DateTime.utc(1970).add(Duration(days: this));
