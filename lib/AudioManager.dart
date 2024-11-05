@@ -4,19 +4,20 @@ import 'storage.dart';  // For database interactions
 
 class AudioManager {
   final AudioPlayer audioPlayer = AudioPlayer();
+  final Storage storage;  // Made public by removing the underscore
   bool loop = false;
   double volume = 1.0;
 
   // Constructor with initialization logic
-  AudioManager() {
+  AudioManager(this.storage) {
     _initializeAudio();
   }
 
-  // Initialize audio preferences and setup using storage.dart
+  // Initialize audio preferences and setup using Storage instance
   Future<void> _initializeAudio() async {
     try {
       // Fetch volume preference from storage
-      Map<PreferenceName, int>? preferences = await Storage.getPreferences([PreferenceName.master_volume]);
+      Map<PreferenceName, int>? preferences = await storage.getPreferences([PreferenceName.master_volume]);
       if (preferences != null && preferences.containsKey(PreferenceName.master_volume)) {
         volume = preferences[PreferenceName.master_volume]! / 100.0;  // Assuming volume is stored as an integer percentage
       }
@@ -27,8 +28,8 @@ class AudioManager {
   }
 
   Future<void> initializeAudioSession(int sessionId, String name) async {
-    // Use storage.dart to handle session initialization
-    await Storage.insertSession(sessionId, name);
+    // Use storage to handle session initialization
+    await storage.insertSession(sessionId, name);
     debugPrint("Session $sessionId initialized with name: $name.");
   }
 
@@ -66,7 +67,7 @@ class AudioManager {
     await audioPlayer.setVolume(volume);
     try {
       // Save volume preference in storage
-      await Storage.updatePreferences({PreferenceName.master_volume: (volume * 100).round()});
+      await storage.updatePreferences({PreferenceName.master_volume: (volume * 100).round()});
       debugPrint("Volume set to ${(volume * 100).toStringAsFixed(0)}% and saved to preferences.");
     } catch (error) {
       debugPrint("Error saving volume preference: $error");
@@ -74,8 +75,8 @@ class AudioManager {
   }
 
   Future<void> addMindfulnessCue(int sessionId, int timeSec, String message) async {
-    // Insert cue using storage.dart
-    await Storage.insertCue(sessionId, timeSec, message);
+    // Insert cue using storage
+    await storage.insertCue(sessionId, timeSec, message);
     debugPrint("Cue added for session $sessionId at $timeSec seconds: $message");
   }
 
@@ -84,10 +85,11 @@ class AudioManager {
   }
 
   Future<List<Map<String, dynamic>>> getMindfulnessCues(int sessionId) async {
-    // Fetch cues for a session using storage.dart
-    return await Storage.getCuesForSession(sessionId) ?? [];
+    // Fetch cues for a session using storage
+    return await storage.getCuesForSession(sessionId) ?? [];
   }
-   // Dispose of audio resources
+
+  // Dispose of audio resources
   Future<void> dispose() async {
     await audioPlayer.dispose();
     debugPrint("Audio Manager disposed and resources released.");
