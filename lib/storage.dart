@@ -274,7 +274,20 @@ class Storage {
         'name CHAR(50) NOT NULL,'
         'completion_date INT NULL'
         ');');
+// Create sessions table
+  batch.execute('CREATE TABLE IF NOT EXISTS sessions ('
+      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+      'name TEXT NOT NULL'
+      ');');
 
+  // Create cues table
+  batch.execute('CREATE TABLE IF NOT EXISTS cues ('
+      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+      'session_id INTEGER NOT NULL,'
+      'time_sec INTEGER NOT NULL,'
+      'message TEXT NOT NULL,'
+      'FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE'
+      ');');
     // Insert default preferences into the preferences table
     for (PreferenceName preferenceName in PreferenceName.values) {
       if (preferenceName.value == -1) continue;

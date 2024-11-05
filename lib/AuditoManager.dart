@@ -1,21 +1,29 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';  // For debugPrint
-import 'storage.dart';  // Assumed to handle all database interactions
+import 'storage.dart';  // For database interactions
 
-class MindfulnessAudioManager {
-  final AudioPlayer _audioPlayer = AudioPlayer();
+class AudioManager {
+  final AudioPlayer audioPlayer = AudioPlayer();
   bool loop = false;
   double volume = 1.0;
 
   // Constructor with initialization logic
-  MindfulnessAudioManager() {
+  AudioManager() {
     _initializeAudio();
   }
 
   // Initialize audio preferences and setup using storage.dart
   Future<void> _initializeAudio() async {
-    volume = await Storage.getVolumePreference() ?? 1.0;  // Load volume from preferences
-    debugPrint("Audio Manager initialized with volume: $volume");
+    try {
+      // Fetch volume preference from storage
+      Map<PreferenceName, int>? preferences = await Storage.getPreferences([PreferenceName.master_volume]);
+      if (preferences != null && preferences.containsKey(PreferenceName.master_volume)) {
+        volume = preferences[PreferenceName.master_volume]! / 100.0;  // Assuming volume is stored as an integer percentage
+      }
+      debugPrint("Audio Manager initialized with volume: $volume");
+    } catch (error) {
+      debugPrint("Error initializing audio preferences: $error");
+    }
   }
 
   Future<void> initializeAudioSession(int sessionId, String name) async {
@@ -26,10 +34,10 @@ class MindfulnessAudioManager {
 
   Future<void> playAudio(String audioFile, {bool loop = false}) async {
     this.loop = loop;
-    await _audioPlayer.setVolume(volume);
-    await _audioPlayer.play(AssetSource(audioFile), isLocal: true);
+    await audioPlayer.setVolume(volume);
+    await audioPlayer.play(AssetSource(audioFile), isLocal: true);
 
-    _audioPlayer.onPlayerComplete.listen((_) {
+    audioPlayer.onPlayerComplete.listen((_) {
       if (loop) {
         playAudio(audioFile, loop: true);  // Re-trigger play for looping
       }
@@ -39,25 +47,30 @@ class MindfulnessAudioManager {
   }
 
   Future<void> pauseAudio() async {
-    await _audioPlayer.pause();
+    await audioPlayer.pause();
     debugPrint("Audio paused.");
   }
 
   Future<void> resumeAudio() async {
-    await _audioPlayer.resume();
+    await audioPlayer.resume();
     debugPrint("Audio resumed.");
   }
 
   Future<void> stopAudio() async {
-    await _audioPlayer.stop();
+    await audioPlayer.stop();
     debugPrint("Audio stopped.");
   }
 
   Future<void> adjustVolume(double level) async {
     volume = level.clamp(0.0, 1.0);
-    await _audioPlayer.setVolume(volume);
-    await Storage.setVolumePreference(volume);  // Save volume preference through storage.dart
-    debugPrint("Volume set to ${(volume * 100).toStringAsFixed(0)}% and saved to preferences.");
+    await audioPlayer.setVolume(volume);
+    try {
+      // Save volume preference in storage
+      await Storage.updatePreferences({PreferenceName.master_volume: (volume * 100).round()});
+      debugPrint("Volume set to ${(volume * 100).toStringAsFixed(0)}% and saved to preferences.");
+    } catch (error) {
+      debugPrint("Error saving volume preference: $error");
+    }
   }
 
   Future<void> addMindfulnessCue(int sessionId, int timeSec, String message) async {
@@ -67,11 +80,16 @@ class MindfulnessAudioManager {
   }
 
   Future<int> fetchAudioDuration(String audioFile) async {
-    return await _audioPlayer.getDuration() ?? 0; // Returns duration in milliseconds
+    return await audioPlayer.getDuration() ?? 0; // Returns duration in milliseconds
   }
 
   Future<List<Map<String, dynamic>>> getMindfulnessCues(int sessionId) async {
     // Fetch cues for a session using storage.dart
     return await Storage.getCuesForSession(sessionId) ?? [];
+  }
+   // Dispose of audio resources
+  Future<void> dispose() async {
+    await audioPlayer.dispose();
+    debugPrint("Audio Manager disposed and resources released.");
   }
 }
