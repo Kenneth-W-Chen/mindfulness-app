@@ -34,18 +34,19 @@ class AudioManager {
   }
 
   Future<void> playAudio(String audioFile, {bool loop = false}) async {
-    this.loop = loop;
-    await audioPlayer.setVolume(volume);
-    await audioPlayer.play(AssetSource(audioFile), isLocal: true);
+  await audioPlayer.setVolume(volume);
 
-    audioPlayer.onPlayerComplete.listen((_) {
-      if (loop) {
-        playAudio(audioFile, loop: true);  // Re-trigger play for looping
-      }
-    });
+  // Set the audio source as an asset file
+  await audioPlayer.setSource(AssetSource(audioFile));
 
-    debugPrint("Playing audio: $audioFile");
-  }
+  // Set looping if required
+  await audioPlayer.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
+
+  // Start playing the audio
+  await audioPlayer.resume();
+
+  debugPrint("Playing audio: $audioFile with loop set to $loop");
+}
 
   Future<void> pauseAudio() async {
     await audioPlayer.pause();
@@ -81,8 +82,16 @@ class AudioManager {
   }
 
   Future<int> fetchAudioDuration(String audioFile) async {
-    return await audioPlayer.getDuration() ?? 0; // Returns duration in milliseconds
-  }
+  // Load the audio file without playing it
+  await audioPlayer.setSource(AssetSource(audioFile));
+  
+  // Wait briefly to ensure the audio file is loaded
+  await Future.delayed(Duration(milliseconds: 100));
+
+  // Now retrieve the duration
+  int? duration = await audioPlayer.getDuration();
+  return duration ?? 0; // Return duration in milliseconds or 0 if unavailable
+}
 
   Future<List<Map<String, dynamic>>> getMindfulnessCues(int sessionId) async {
     // Fetch cues for a session using storage
