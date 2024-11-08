@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'placeholder_screen.dart'; // Import placeholder screen
+import 'placeholder_screen.dart';
+import 'TranquilForestLandingPage.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,61 +16,60 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.black,
       ),
-      body: Column(
-        children: [
-          _buildHeroBanner(),
-          Expanded(
-            child: ListView(
-              children: [
-                _buildIslandTile(
-                  title: 'Misty Mountain',
-                  icon: Icons.terrain,
-                  description: 'Climb to new heights with breathing exercises.',
-                  startColor: const Color(0xFFD1C4E9),
-                  endColor: const Color(0xFFFFE0B2),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PlaceholderScreen(message: 'Misty Mountain - Island in Progress'),
-                      ),
-                    );
-                  },
-                ),
-                _buildIslandTile(
-                  title: 'Serene Beach',
-                  icon: Icons.beach_access,
-                  description: 'Relax with guided visualizations.',
-                  startColor: const Color(0xFFFFE0B2),
-                  endColor: const Color(0xFFB2EBF2),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PlaceholderScreen(message: 'Serene Beach - Island in Progress'),
-                      ),
-                    );
-                  },
-                ),
-                _buildIslandTile(
-                  title: 'Tranquil Forest',
-                  icon: Icons.nature,
-                  description: 'Find calm with nature sounds.',
-                  startColor: const Color(0xFFB2EBF2),
-                  endColor: const Color(0xFFA5D6A7),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PlaceholderScreen(message: 'Tranquil Forest - Island in Progress'),
-                      ),
-                    );
-                  },
-                ),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildHeroBanner(),
+            _buildIslandTile(
+              title: 'Misty Mountain',
+              icon: Icons.terrain,
+              description: 'Climb to new heights with breathing exercises.',
+              startColor: const Color(0xFFD1C4E9),
+              endColor: const Color(0xFFFFE0B2),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PlaceholderScreen(
+                        message: 'Misty Mountain - Island in Progress'),
+                  ),
+                );
+              },
             ),
-          ),
-        ],
+            _buildIslandTile(
+              title: 'Serene Beach',
+              icon: Icons.beach_access,
+              description: 'Relax with guided visualizations.',
+              startColor: const Color(0xFFFFE0B2),
+              endColor: const Color(0xFFB2EBF2),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PlaceholderScreen(
+                        message: 'Serene Beach - Island in Progress'),
+                  ),
+                );
+              },
+            ),
+            _buildIslandTile(
+              title: 'Tranquil Forest',
+              icon: Icons.nature,
+              description: 'Find calm with nature sounds.',
+              startColor: const Color(0xFFB2EBF2),
+              endColor: const Color(0xFFA5D6A7),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        TranquilForestLandingPage(), // Navigate to correct page
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
@@ -102,48 +102,56 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildHeroBanner() {
     return Container(
-      height: 150,
-      padding: const EdgeInsets.all(16.0),
+      height: 180,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.blueAccent, Colors.cyanAccent],
+        gradient: LinearGradient(
+          colors: [Colors.teal[700]!, Colors.black54],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Row(
-        children: [
-          Icon(
-            Icons.wb_sunny,
-            size: 60,
-            color: Colors.white,
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Welcome to CalmQuest!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'Embark on a mindfulness journey!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 4),
           ),
         ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Welcome to CalmQuest Islands',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: Colors.black.withOpacity(0.5),
+                    offset: Offset(3, 3),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 6),
+            Text(
+              'Your journey to mindfulness begins here.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white70,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -159,28 +167,28 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.all(8.0),
-        padding: const EdgeInsets.all(16.0),
-        height: 120,
+        margin: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(18.0),
+        height: 140,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [startColor, endColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
             BoxShadow(
               offset: Offset(4, 4),
-              blurRadius: 8,
-              color: Colors.black26,
+              blurRadius: 12,
+              color: Colors.black12,
             ),
           ],
         ),
         child: Row(
           children: [
             Icon(icon, size: 50, color: Colors.white),
-            const SizedBox(width: 16),
+            SizedBox(width: 18),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,12 +197,12 @@ class HomeScreen extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 6),
                   Text(
                     description,
                     style: const TextStyle(
