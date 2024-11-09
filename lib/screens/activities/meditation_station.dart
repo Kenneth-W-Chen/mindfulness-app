@@ -42,13 +42,13 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> asyncInit() async {
     DateTime? completion_date = (await storage.getActivityLogs(
-        [ActivityName.meditation_station]))[ActivityName.meditation_station]![0]
+        [ActivityName.values[1]]))[ActivityName.values[1]]![0]
     ['completion_date'] as DateTime?;
     DateTime now = DateTime.now().toUtc();
     now = DateTime.utc(now.year, now.month, now.day);
     if (completion_date == null || now.isAfter(completion_date)) {
       completionTimer = Timer(Duration(seconds: 30), () {
-        storage.addActivityLog(ActivityName.meditation_station, audioFilePath);
+        storage.addActivityLog(ActivityName.values[1], audioFilePath);
       });
     }
     _audioManager.playAudio(audioFilePath, loop: true);
@@ -64,41 +64,49 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Audio Player"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                if (_audioManager.audioPlayer.state == PlayerState.playing) {
-                  _audioManager.pauseAudio();
-                } else {
-                  _audioManager.resumeAudio();
-                }
-                setState(() {
-
-                });
-              },
-              child: _audioManager.audioPlayer.state == PlayerState.paused ? const Text('Resume'):const Text('Pause'),
-            ),
-            ElevatedButton(
-              onPressed: _audioManager.stopAudio,
-              child: const Text("Stop"),
-            ),
-          ],
+        appBar: AppBar(
+          title: Text("Meditation Station",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: 1.2,
+              )),
+          backgroundColor: Colors.deepPurple[800],
+          elevation: 0,
         ),
-      ),
-    );
+        body: Container(
+          decoration: BoxDecoration(color:Colors.deepPurple[600]),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (_audioManager.audioPlayer.state ==
+                        PlayerState.playing) {
+                      _audioManager.pauseAudio();
+                    } else {
+                      _audioManager.resumeAudio();
+                    }
+                    setState(() {});
+                  },
+                  child: _audioManager.audioPlayer.state == PlayerState.paused
+                      ? const Text('Resume')
+                      : const Text('Pause'),
+                ),
+                ElevatedButton(
+                  onPressed: _audioManager.stopAudio,
+                  child: const Text("Stop"),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }
 
 class MeditationStation extends StatefulWidget {
-  const MeditationStation({super.key, required this.title});
-
-  final String title;
+  const MeditationStation({super.key});
 
   @override
   State<MeditationStation> createState() => _MeditationStationState();
@@ -135,60 +143,72 @@ class _MeditationStationState extends State<MeditationStation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("Meditation Station",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              letterSpacing: 1.2,
+            )),
+        backgroundColor: Colors.deepPurple[800],
+        elevation: 0,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 200,
-              height: 100,
-              decoration: BoxDecoration(
-                color: const Color(0xffEBEDFE),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: DropdownButton<String>(
-                  value: _dropdownValue,
-                  icon: const Icon(Icons.menu),
-                  style: const TextStyle(color: Colors.black),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.black,
+      body: Container(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 200,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: DropdownButton<String>(
+                    value: _dropdownValue,
+                    icon: const Icon(Icons.menu),
+                    style: const TextStyle(color: Colors.black),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.white,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _dropdownValue = newValue!;
+                      });
+                    },
+                    items:
+                    audioList?.map<DropdownMenuItem<String>>((String val) {
+                      return DropdownMenuItem(
+                          value: val,
+                          child: Text(path
+                              .basenameWithoutExtension(val)
+                              .replaceAll('_', ' ')));
+                    }).toList() ??
+                        [],
+                    dropdownColor: Colors.deepPurpleAccent[100],
                   ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _dropdownValue = newValue!;
-                    });
-                  },
-                  items: audioList?.map<DropdownMenuItem<String>>((String val) {
-                    return DropdownMenuItem(
-                        value: val,
-                        child: Text(path
-                            .basenameWithoutExtension(val)
-                            .replaceAll('_', ' ')));
-                  }).toList() ??
-                      [],
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AudioPlayerScreen(
-                        audioFilePath: _dropdownValue,
-                        storage: storage,
-                      )),
-                );
-              },
-              child: const Text("Go to Audio Player"),
-            ),
-          ],
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AudioPlayerScreen(
+                          audioFilePath: _dropdownValue,
+                          storage: storage,
+                        )),
+                  );
+                },
+                child: const Text("Go to Audio Player"),
+              ),
+            ],
+          ),
         ),
+        decoration: BoxDecoration(color: Colors.deepPurple[600]),
       ),
     );
   }
