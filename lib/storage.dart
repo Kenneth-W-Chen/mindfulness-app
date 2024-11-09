@@ -82,7 +82,7 @@ class Storage {
     Map<Achievement, DateTime?> completionDates = {};
     for (var row in rows) {
       completionDates[Achievement.values.firstWhere((e) => e.name == row['name'])] =
-          row['completion_date'] != null ? (row['completion_date'] as int).epochDaysToDateTime() : null;
+      row['completion_date'] != null ? (row['completion_date'] as int).epochDaysToDateTime() : null;
     }
 
     return completionDates;
@@ -111,7 +111,7 @@ class Storage {
    **/
 
   /// Retrieves multiple activity logs
-  /// Return result is a `Map', with the key being an `ActivityName` and the value being a map. That map has a key of the field name (i.e., 'completion_date' and 'info') and the corresponding value.
+  /// Return result is a `Map', with the key being an `ActivityName` and the value being a list of maps. Each map has a key of the field name (i.e., 'completion_date' and 'info') and the corresponding value.
   ///
   /// If no activity logs exist, the list should(?) be empty
   ///
@@ -120,30 +120,32 @@ class Storage {
   /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
   /// print(results[ActivityName.breathe]['completion_date]); // outputs something like '2024-10-08'
   /// ```
-  Future<Map<ActivityName, Map<String, Object?>>> getActivityLogs(List<ActivityName> activities) async {
-    Map<ActivityName, Map<String, Object?>> logs = {};
+  Future<Map<ActivityName, List<Map<String, Object?>>>> getActivityLogs(List<ActivityName> activities) async {
+    Map<ActivityName, List<Map<String, Object?>>> logs = {};
 
     for (var activity in activities) {
       var rows = await _db.rawQuery(
         'SELECT name, completion_date, info FROM $_activityLogTable '
-        'INNER JOIN $_activityTable ON $_activityTable.id = $_activityLogTable.activity_id '
-        'WHERE $_activityTable.name = ?',
+            'INNER JOIN $_activityTable ON $_activityTable.id = $_activityLogTable.activity_id '
+            'WHERE $_activityTable.name = ? ORDER BY completion_date DESC',
         [activity.name],
       );
 
+      logs[activity] = [];
+
       // Only process if rows are found
       if (rows.isNotEmpty) {
-        var row = rows[0];
-        logs[activity] = {
-          'completion_date': (row['completion_date'] as int?)?.epochDaysToDateTime(),
-          'info': row['info']
-        };
+        rows.forEach((row){
+          logs[activity]!.add({
+            'completion_date':
+            (row['completion_date'] as int?)?.epochDaysToDateTime(),
+            'info': row['info']
+          });
+        });
+
       } else {
         // Add an empty log entry if no result is found
-        logs[activity] = {
-          'completion_date': null,
-          'info': null
-        };
+        logs[activity]!.add({'completion_date': null, 'info': null});
       }
     }
 
@@ -232,6 +234,7 @@ class Storage {
     await batch.commit(noResult: true);
   }
 
+
   /// For testing only
   Future<void> deletePreference(PreferenceName preference) async {
     await _db.delete(_preferencesTable, where: 'name = ?', whereArgs: [preference.name]);
@@ -314,29 +317,29 @@ extension EpochExtensions on DateTime {
     return (millisecondsSinceEpoch / 86400000).floor();
   }
 }
-  /// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
-  ///
-  /// Usage:
-  ///
-  /// ```dart
-  /// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
-  /// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
-  /// ```
+/// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
+///
+/// Usage:
+///
+/// ```dart
+/// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
+/// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
+/// ```
 extension DateTimeEpochExtensions on int {
   DateTime epochDaysToDateTime() {
     return DateTime.utc(1970).add(Duration(days: this));
   }
 }
 
-  /// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
-  ///
-  /// Usage:
-  /// ```dart
-  /// Database db = await openDatabase();
-  /// List<PreferenceName> preferences = [master_volume, max_volume, music_volume];
-  /// var exploded = db.enumListExplode(preferences);
-  /// db.query('table', where: 'name in ${exploded[0]}', whereArgs: exploded[1]);
-  /// ```
+/// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
+///
+/// Usage:
+/// ```dart
+/// Database db = await openDatabase();
+/// List<PreferenceName> preferences = [master_volume, max_volume, music_volume];
+/// var exploded = db.enumListExplode(preferences);
+/// db.query('table', where: 'name in ${exploded[0]}', whereArgs: exploded[1]);
+/// ```
 extension ListExplode on Database {
   List<List<String>> enumListExplode(List<Enum> s) {
     var placeholders = List.filled(s.length, '?');
@@ -360,7 +363,8 @@ enum PreferenceName {
 
 enum ActivityName {
   all(-1),
-  breathe(0);
+  meditation_station(0),
+  breathe(99);
 
   final int value;
 
