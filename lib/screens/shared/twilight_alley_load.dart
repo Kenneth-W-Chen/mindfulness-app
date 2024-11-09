@@ -31,6 +31,18 @@ class _TwilightAlleyLoadState extends State<TwilightAlleyLoad> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Twilight Alley',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            letterSpacing: 1.2,
+          ),
+        ),
+        backgroundColor: Colors.deepPurple[800],
+        elevation: 0,
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,

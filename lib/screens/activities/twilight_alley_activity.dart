@@ -107,6 +107,18 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Twilight Alley',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            letterSpacing: 1.2,
+          ),
+        ),
+        backgroundColor: Colors.deepPurple[800],
+        elevation: 0,
+      ),
       body: Container(
         width: double.infinity, // Ensures the container covers full width
         height: double.infinity, // Ensures the container covers full height
@@ -212,27 +224,6 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.emoji_events),
-            label: 'Achievements',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pop(context);
-          }
-        },
       ),
     );
   }

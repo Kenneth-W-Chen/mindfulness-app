@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'screens/activities/meditation_station.dart';
+import 'screens/activities/twilight_alley_intro.dart';
 
 class TranquilForestLandingPage extends StatelessWidget {
   @override
@@ -49,13 +51,13 @@ class TranquilForestLandingPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Activity for Calm Sounds
-              _activityCard('Calm Sounds', context, Icons.headset,
-                  'Listen to calming sounds and nature noises.'),
+              // Activity for Meditation Station
+              _activityCard('Meditation Station', context, Icons.headset,
+                  'Listen to calming sounds and nature noises.', builder: (context)=> MeditationStation()),
 
               // Activity for Goal Setting
-              _activityCard('Goal Setting', context, Icons.flag,
-                  'Set your mindfulness goals.'),
+              _activityCard('Twilight Alley', context, Icons.flag,
+                  'Journal some of your thoughts', builder: (context)=> TwilightAlleyIntro()),
             ],
           ),
         ),
@@ -65,15 +67,22 @@ class TranquilForestLandingPage extends StatelessWidget {
 
   // Method to create activity cards with placeholders for future functionality
   Widget _activityCard(String activityName, BuildContext context, IconData icon,
-      String description) {
+      String description,
+      {Widget Function(BuildContext buildcontext)? builder = null}) {
     return GestureDetector(
-      onTap: () {
+      onTap: builder == null? () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('$activityName feature is under construction!'),
             duration: const Duration(seconds: 2),
           ),
         );
+      }:() {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: builder
+            ));
       },
       child: Card(
         color: Colors.white.withOpacity(0.9),
