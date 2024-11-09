@@ -27,7 +27,7 @@ void main(){
     expect(storage, isNotNull);
 
     expect(dbPath.contains('test_storage.db'), true);
-    
+
     storage.close();
 
 
@@ -122,7 +122,7 @@ void main(){
 
       // Check that no entries were committed (rolled back)
       var logs = await storage.getActivityLogs([ActivityName.breathe]);
-      expect(logs[ActivityName.breathe]!['completion_date'], isNull,
+      expect(logs[ActivityName.breathe]![0]['completion_date'], isNull,
           reason: "Expected no logs due to transaction rollback");
     }
 
@@ -140,8 +140,8 @@ void main(){
     // Directly execute the query you want to validate
     var result = await storage.testDb.rawQuery(
         'SELECT activities.name, activity_logs.completion_date FROM activities '
-        'INNER JOIN activity_logs ON activities.id = activity_logs.activity_id '
-        'WHERE activities.name = ?', [ActivityName.breathe.name]);
+            'INNER JOIN activity_logs ON activities.id = activity_logs.activity_id '
+            'WHERE activities.name = ?', [ActivityName.breathe.name]);
 
     // Expected result for comparison
     expect(result.length, 1, reason: "Expected exactly one log entry for 'breathe' activity");
@@ -156,7 +156,7 @@ void main(){
 
 
 
-  
+
 //END OF TEST SUITE*****************8
 }
 
