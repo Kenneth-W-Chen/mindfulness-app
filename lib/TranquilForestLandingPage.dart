@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/activities/meditation_station.dart';
+import 'screens/activities/twilight_alley_intro.dart';
 
 class TranquilForestLandingPage extends StatelessWidget {
   @override
@@ -52,11 +53,11 @@ class TranquilForestLandingPage extends StatelessWidget {
 
               // Activity for Meditation Station
               _activityCard('Meditation Station', context, Icons.headset,
-                  'Listen to calming sounds and nature noises.', builder: (context)=> MeditationStation(title: 'Calm Quest')),
+                  'Listen to calming sounds and nature noises.', builder: (context)=> MeditationStation()),
 
               // Activity for Goal Setting
-              _activityCard('Goal Setting', context, Icons.flag,
-                  'Set your mindfulness goals.'),
+              _activityCard('Twilight Alley', context, Icons.flag,
+                  'Journal some of your thoughts', builder: (context)=> TwilightAlleyIntro()),
             ],
           ),
         ),

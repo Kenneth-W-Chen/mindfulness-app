@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import '../mockhome_screen.dart'; // Correct relative import
 import '../shared/twilight_alley_load.dart'; // Correct relative path to the load screen
 import 'twilight_alley_activity.dart'; // Correct relative path to the activity
 
@@ -70,6 +69,18 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Twilight Alley',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            letterSpacing: 1.2,
+          ),
+        ),
+        backgroundColor: Colors.deepPurple[800],
+        elevation: 0,
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -188,30 +199,6 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.emoji_events),
-            label: 'Achievements',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MockHomeScreen()),
-            );
-          }
-        },
       ),
     );
   }
