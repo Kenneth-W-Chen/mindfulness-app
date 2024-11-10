@@ -82,15 +82,15 @@ class AudioManager {
   }
 
   Future<int> fetchAudioDuration(String audioFile) async {
-  // Load the audio file without playing it
+  // Set the audio source without playing it
   await audioPlayer.setSource(AssetSource(audioFile));
-  
+
   // Wait briefly to ensure the audio file is loaded
   await Future.delayed(Duration(milliseconds: 100));
 
   // Now retrieve the duration
-  int? duration = await audioPlayer.getDuration();
-  return duration ?? 0; // Return duration in milliseconds or 0 if unavailable
+  Duration? duration = await audioPlayer.getDuration();
+  return duration?.inMilliseconds ?? 0; // Convert Duration to milliseconds, or return 0 if null
 }
 
   Future<List<Map<String, dynamic>>> getMindfulnessCues(int sessionId) async {
