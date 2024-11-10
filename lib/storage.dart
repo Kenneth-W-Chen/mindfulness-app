@@ -233,6 +233,36 @@ class Storage {
     });
     await batch.commit(noResult: true);
   }
+/// Retrieves all cues for a specific session ID
+Future<List<Map<String, dynamic>>> getCuesForSession(int sessionId) async {
+  return await _db.query(
+    'cues',
+    where: 'session_id = ?',
+    whereArgs: [sessionId],
+  );
+}
+/// Inserts a new cue for a specific session
+Future<void> insertCue(int sessionId, int timeSec, String message) async {
+  await _db.insert(
+    'cues',
+    {
+      'session_id': sessionId,
+      'time_sec': timeSec,
+      'message': message,
+    },
+  );
+}
+/// Inserts a new session into the sessions table
+Future<void> insertSession(int sessionId, String name) async {
+  await _db.insert(
+    'sessions',
+    {
+      'id': sessionId,
+      'name': name,
+    },
+    conflictAlgorithm: ConflictAlgorithm.ignore,  // Ignores if session already exists
+  );
+}
 
 
   /// For testing only
@@ -277,7 +307,20 @@ class Storage {
         'name CHAR(50) NOT NULL,'
         'completion_date INT NULL'
         ');');
+// Create sessions table
+  batch.execute('CREATE TABLE IF NOT EXISTS sessions ('
+      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+      'name TEXT NOT NULL'
+      ');');
 
+  // Create cues table
+  batch.execute('CREATE TABLE IF NOT EXISTS cues ('
+      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+      'session_id INTEGER NOT NULL,'
+      'time_sec INTEGER NOT NULL,'
+      'message TEXT NOT NULL,'
+      'FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE'
+      ');');
     // Insert default preferences into the preferences table
     for (PreferenceName preferenceName in PreferenceName.values) {
       if (preferenceName.value == -1) continue;
