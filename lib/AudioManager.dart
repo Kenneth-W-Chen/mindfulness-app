@@ -1,10 +1,10 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart'; // For debugPrint
-import 'storage.dart'; // For database interactions
+import 'package:flutter/foundation.dart';  // For debugPrint
+import 'storage.dart';  // For database interactions
 
 class AudioManager {
   final AudioPlayer audioPlayer = AudioPlayer();
-  final Storage storage; // Made public by removing the underscore
+  final Storage storage;  // Made public by removing the underscore
   bool loop = false;
   double volume = 1.0;
 
@@ -17,12 +17,9 @@ class AudioManager {
   Future<void> _initializeAudio() async {
     try {
       // Fetch volume preference from storage
-      Map<PreferenceName, int>? preferences =
-          await storage.getPreferences([PreferenceName.master_volume]);
-      if (preferences != null &&
-          preferences.containsKey(PreferenceName.master_volume)) {
-        volume = preferences[PreferenceName.master_volume]! /
-            100.0; // Assuming volume is stored as an integer percentage
+      Map<PreferenceName, int>? preferences = await storage.getPreferences([PreferenceName.master_volume]);
+      if (preferences != null && preferences.containsKey(PreferenceName.master_volume)) {
+        volume = preferences[PreferenceName.master_volume]! / 100.0; // Assuming volume is stored as an integer percentage
       }
       if (kDebugMode) {
         debugPrint("Audio Manager initialized with volume: $volume");
@@ -47,8 +44,7 @@ class AudioManager {
     await audioPlayer.setSource(AssetSource(audioFile));
 
     // Set looping if required
-    await audioPlayer
-        .setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
+    await audioPlayer.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
 
     // Start playing the audio
     await audioPlayer.resume();
@@ -66,14 +62,14 @@ class AudioManager {
 
   Future<void> resumeAudio() async {
     await audioPlayer.resume();
-    if(kDebugMode) {
+    if (kDebugMode) {
       debugPrint("Audio resumed.");
     }
   }
 
   Future<void> stopAudio() async {
     await audioPlayer.stop();
-    if(kDebugMode) {
+    if (kDebugMode) {
       debugPrint("Audio stopped.");
     }
   }
@@ -83,24 +79,20 @@ class AudioManager {
     await audioPlayer.setVolume(volume);
     try {
       // Save volume preference in storage
-      await storage.updatePreferences(
-          {PreferenceName.master_volume: (volume * 100).round()});
-      if(kDebugMode) {
-        debugPrint(
-            "Volume set to ${(volume * 100).toStringAsFixed(0)}% and saved to preferences.");
+      await storage.updatePreferences({PreferenceName.master_volume: (volume * 100).round()});
+      if (kDebugMode) {
+        debugPrint("Volume set to ${(volume * 100).toStringAsFixed(0)}% and saved to preferences.");
       }
     } catch (error) {
       debugPrint("Error saving volume preference: $error");
     }
   }
 
-  Future<void> addMindfulnessCue(
-      int sessionId, int timeSec, String message) async {
+  Future<void> addMindfulnessCue(int sessionId, int timeSec, String message) async {
     // Insert cue using storage
     await storage.insertCue(sessionId, timeSec, message);
-    if(kDebugMode) {
-      debugPrint(
-          "Cue added for session $sessionId at $timeSec seconds: $message");
+    if (kDebugMode) {
+      debugPrint("Cue added for session $sessionId at $timeSec seconds: $message");
     }
   }
 
@@ -113,8 +105,7 @@ class AudioManager {
 
     // Now retrieve the duration
     Duration? duration = await audioPlayer.getDuration();
-    return duration?.inMilliseconds ??
-        0; // Convert Duration to milliseconds, or return 0 if null
+    return duration?.inMilliseconds ?? 0; // Convert Duration to milliseconds, or return 0 if null
   }
 
   Future<List<Map<String, dynamic>>> getMindfulnessCues(int sessionId) async {
@@ -125,7 +116,7 @@ class AudioManager {
   // Dispose of audio resources
   Future<void> dispose() async {
     await audioPlayer.dispose();
-    if(kDebugMode) {
+    if (kDebugMode) {
       debugPrint("Audio Manager disposed and resources released.");
     }
   }
