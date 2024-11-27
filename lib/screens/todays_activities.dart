@@ -32,7 +32,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen>{
     ActivityName.breathe: 'This activity is a work in progress!'
   };
 
-  List<ActivityName> activities = [];
+  List<Map<String,Object>> activities = [];
 
 
   _TodaysActivitiesScreenState();
@@ -82,8 +82,9 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen>{
               ),
               const SizedBox(height: 30),
               ...(activities.map(
-                      (activityName)=>
-                          activityCard(activityName.toString(), context, activityNameIcons[activityName]!, activityNameDescription[activityName]!, builder: (context)=> activityNameToFunction[activityName]!(), cardColor: Colors.white.withOpacity(0.9), shadowColor: Colors.black.withOpacity(0.3), iconBackgroundColor: Colors.amber[700], iconColor: Colors.white, textColor: Colors.amber[900], subTextColor: Colors.amber[800]             )))
+                      (activity)=>
+                          activityCard(activity['activity'].toString(), context, (activity['completed'] as bool)? Icons.check : activityNameIcons[activity['activity']]!, activityNameDescription[activity['activity']]! + ((activity['completed'] as bool)? '\nYou already completed this activity today.':''), builder: (context)=> activityNameToFunction[activity['activity']]!(),
+                              cardColor: (activity['completed'] as bool)?Colors.grey.withOpacity(0.9):Colors.white.withOpacity(0.9), shadowColor: Colors.black.withOpacity(0.3), iconBackgroundColor: Colors.amber[700], iconColor: Colors.white, textColor: Colors.amber[900], subTextColor: Colors.amber[800]             )))
             ],
           ),
         ),

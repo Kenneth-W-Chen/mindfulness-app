@@ -265,7 +265,7 @@ class Storage {
     }
 
     // convert the activity IDs to ActivityNames
-    List<Map<String,Object?>> rows = await _db.query(_dailyResetTable, columns: ['date', 'activity_1_id', 'activity_2_id', 'activity_3_id'], where: where, whereArgs: whereArgs, orderBy: 'date DESC',);
+    List<Map<String,Object?>> rows = await _db.query(_dailyResetTable, columns: ['date', 'activity_1_id', 'activity_2_id', 'activity_3_id', 'activity_completed'], where: where, whereArgs: whereArgs, orderBy: 'date DESC',);
     if(kDebugMode){
       debugPrint("Fetched ${rows.length} rows from the daily reset table.");
     }
@@ -275,7 +275,8 @@ class Storage {
         'date': (rows[i]['date'] as int).epochDaysToDateTime(),
         'activity_1':ActivityName.values[rows[i]['activity_1_id'] as int],
         'activity_2':ActivityName.values[rows[i]['activity_2_id'] as int],
-        'activity_3':ActivityName.values[rows[i]['activity_3_id'] as int]
+        'activity_3':ActivityName.values[rows[i]['activity_3_id'] as int],
+        'activity_completed':rows[i]['activity_completed']!
       });
     }
 
@@ -283,11 +284,12 @@ class Storage {
   }
 
   /// Resets daily data. Returns the list of ActivityNames selected
-  Future<List<ActivityName>> dailyReset() async{
+  Future<List<Map<String, Object>>> dailyReset() async{
     // try to fetch today's daily reset info to ensure it's not already in there
     List<Map<String,Object>?> latestReset = await getDailyResetInfo();
     if(latestReset.isNotEmpty && latestReset[0] != null){
-      return [latestReset[0]!['activity_1'] as ActivityName,latestReset[0]!['activity_2'] as ActivityName,latestReset[0]!['activity_3'] as ActivityName];
+      // return [latestReset[0]!['activity_1'] as ActivityName,latestReset[0]!['activity_2'] as ActivityName,latestReset[0]!['activity_3'] as ActivityName];
+      return [{'activity':latestReset[0]!['activity_1'] as ActivityName, 'completed': ((latestReset[0]!['activity_completed'] as int) & 1) ==1},{'activity':latestReset[0]!['activity_2'] as ActivityName, 'completed': ((latestReset[0]!['activity_completed'] as int) & 2) ==2},{'activity':latestReset[0]!['activity_3'] as ActivityName, 'completed': ((latestReset[0]!['activity_completed'] as int) & 4) ==4}];
     }
 
     //generate list of activities
@@ -301,7 +303,7 @@ class Storage {
       'activity_2_id':await getActivityId(activities[1]),
       'activity_3_id':await getActivityId(activities[2])
     });
-    return activities;
+    return List<Map<String,Object>>.generate(3, (int index)=>{'activity':activities[index],'completed':false});
   }
 
   /// Retrieves all cues for a specific session ID
