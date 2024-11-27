@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -246,7 +244,7 @@ class Storage {
   /// Retrieves multiple daily reset info from the database. Specify the date range by setting `startDate` and `endDate`.
   /// Dates will be sorted from newest to oldest (e.g., today's reset info will appear before yesterday's)
   /// If `startDate`/`endDate` is not specified, the current date will be used for the respective parameter.
-  Future<List<Map<String,Object?>>> getDailyResetInfo({DateTime? startDate, DateTime? endDate}) async{
+  Future<List<Map<String,Object>?>> getDailyResetInfo({DateTime? startDate, DateTime? endDate}) async{
     int startSinceEpoch = startDate != null ? startDate.daysSinceEpoch():DateTime.now().daysSinceEpoch();
     int endSinceEpoch = endDate != null ? endDate.daysSinceEpoch():DateTime.now().daysSinceEpoch();
 
@@ -269,29 +267,34 @@ class Storage {
     // convert the activity IDs to ActivityNames
     List<Map<String,Object?>> rows = await _db.query(_dailyResetTable, columns: ['date', 'activity_1_id', 'activity_2_id', 'activity_3_id'], where: where, whereArgs: whereArgs, orderBy: 'date DESC',);
     if(kDebugMode){
-      debugPrint("Fetched ${rows.length} rows from the daily reset table");
+      debugPrint("Fetched ${rows.length} rows from the daily reset table.");
     }
-
+    List<Map<String,Object>?> parsedRows = [];
     for(int i = 0; i < rows.length; i++){
-      rows[i]['activity_1_id'] = ActivityName.values[rows[i]['activity_1_id'] as int];
-      rows[i]['activity_2_id'] = ActivityName.values[rows[i]['activity_2_id'] as int];
-      rows[i]['activity_3_id'] = ActivityName.values[rows[i]['activity_3_id'] as int];
+      parsedRows.add(<String,Object>{
+        'date': (rows[i]['date'] as int).epochDaysToDateTime(),
+        'activity_1':ActivityName.values[rows[i]['activity_1_id'] as int],
+        'activity_2':ActivityName.values[rows[i]['activity_2_id'] as int],
+        'activity_3':ActivityName.values[rows[i]['activity_3_id'] as int]
+      });
     }
 
-    return rows;
+    return parsedRows;
   }
 
   /// Resets daily data. Returns the list of ActivityNames selected
   Future<List<ActivityName>> dailyReset() async{
     // try to fetch today's daily reset info to ensure it's not already in there
-    List<Map<String,Object?>> latestReset = await getDailyResetInfo();
-    if(latestReset.isNotEmpty){
-      return [latestReset[0]['activity_1_id'] as ActivityName,latestReset[0]['activity_2_id'] as ActivityName,latestReset[0]['activity_3_id'] as ActivityName,];
+    List<Map<String,Object>?> latestReset = await getDailyResetInfo();
+    if(latestReset.isNotEmpty && latestReset[0] != null){
+      return [latestReset[0]!['activity_1'] as ActivityName,latestReset[0]!['activity_2'] as ActivityName,latestReset[0]!['activity_3'] as ActivityName];
     }
 
     //generate list of activities
-    var rng = Random();
-    List<ActivityName> activities = List<ActivityName>.generate(3, (int index)=>ActivityName.values[rng.nextInt(ActivityName.values.length-1)+1], growable: false);
+    List<int> pickRand = List<int>.generate(ActivityName.values.length-1, (i)=>i+1);
+    pickRand.shuffle();
+    List<ActivityName> activities = List<ActivityName>.generate(3, (int index)=>ActivityName.values[pickRand[index]], growable: false);
+    debugPrint("${activities[0].name},${activities[1].name},${activities[2].name}");
     await _db.insert(_dailyResetTable, <String, Object>{
       'date': DateTime.now().daysSinceEpoch(),
       'activity_1_id':await getActivityId(activities[0]),
@@ -350,13 +353,15 @@ Future<void> insertSession(int sessionId, String name) async {
     batch.execute('CREATE TABLE $_preferencesTable ('
         'id INTEGER PRIMARY KEY NOT NULL,'
         'name CHAR(25) NOT NULL,'
-        'value INT NOT NULL'
+        'value INT NOT NULL,'
+        'UNIQUE(name)'
         ');');
 
     // Create activities table
     batch.execute('CREATE TABLE $_activityTable ('
         'id INTEGER PRIMARY KEY NOT NULL,'
-        'name CHAR(25) NOT NULL'
+        'name CHAR(25) NOT NULL,'
+        'UNIQUE(name)'
         ');');
 
     // Create activity logs table
@@ -373,7 +378,8 @@ Future<void> insertSession(int sessionId, String name) async {
     batch.execute('CREATE TABLE $_achievementsTable ('
         'id INTEGER PRIMARY KEY NOT NULL,'
         'name CHAR(50) NOT NULL,'
-        'completion_date INT NULL'
+        'completion_date INT NULL,'
+        'UNIQUE(name)'
         ');');
 
     // Create sessions table
@@ -411,20 +417,20 @@ Future<void> insertSession(int sessionId, String name) async {
       batch.insert(_preferencesTable, {
         'name': preferenceName.name,
         'value': preferenceName.defaultValue,
-      });
+      },  conflictAlgorithm: ConflictAlgorithm.ignore);
     }
 
     // Insert activities into the activities table
     for (ActivityName activityName in ActivityName.values) {
       if (activityName.value == -1) continue;
 
-      batch.insert(_activityTable, {'name': activityName.name});
+      batch.insert(_activityTable, {'name': activityName.name},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
 
     // Insert achievements into the achievements table
     for (Achievement achievement in Achievement.values) {
       if (achievement.value == -1) continue;
-      batch.insert(_achievementsTable, {'name': achievement.name, 'completion_date': null});
+      batch.insert(_achievementsTable, {'name': achievement.name, 'completion_date': null},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
 
     // Run all SQL commands
@@ -490,14 +496,14 @@ enum PreferenceName {
 enum ActivityName {
   all(-1),
   meditation_station(0),
-  twilight_alley(1);
-
+  twilight_alley(1),
+  breathe(2);
   final int value;
 
   const ActivityName(this.value);
   @override
   String toString(){
-    return name.split('_').map((s)=> {s = "${s[0].toUpperCase()}${s.substring(1)}"}).join(' ');
+    return name.split('_').map((s)=> s = "${s[0].toUpperCase()}${s.substring(1)}").join(' ');
   }
 }
 

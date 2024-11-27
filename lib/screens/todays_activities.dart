@@ -16,17 +16,20 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen>{
   static const Map<ActivityName, StatefulWidget Function()> activityNameToFunction = const{
     ActivityName.meditation_station:
     MeditationStation.new,
-    ActivityName.twilight_alley: TwilightAlleyIntro.new
+    ActivityName.twilight_alley: TwilightAlleyIntro.new,
+    ActivityName.breathe: MeditationStation.new
   };
 
   static const Map<ActivityName, IconData> activityNameIcons = const{
     ActivityName.meditation_station: Icons.headset,
     ActivityName.twilight_alley: Icons.flag,
+    ActivityName.breathe: Icons.phone_in_talk
   };
 
   static const Map<ActivityName, String> activityNameDescription = const{
     ActivityName.meditation_station: 'Listen to calming sounds and nature noises.',
     ActivityName.twilight_alley:                   'Journal some of your thoughts',
+    ActivityName.breathe: 'This activity is a work in progress!'
   };
 
   List<ActivityName> activities = [];
