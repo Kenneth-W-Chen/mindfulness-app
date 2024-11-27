@@ -55,12 +55,19 @@ class TranquilForestLandingPage extends StatelessWidget {
               // Activity for Meditation Station
               activityCard('Meditation Station', context, Icons.headset,
                   'Listen to calming sounds and nature noises.',
-                  builder: (context) => MeditationStation()),
+                  builder: (context) => MeditationStation(),
+                // colors
+                cardColor: Colors.white.withOpacity(0.9), shadowColor: Colors.black.withOpacity(0.3), iconBackgroundColor: Colors.teal[700],iconColor:  Colors.white, textColor: Colors.teal[700], subTextColor: Colors.teal[600]
+              ),
 
               // Activity for Goal Setting
               activityCard('Twilight Alley', context, Icons.flag,
                   'Journal some of your thoughts',
-                  builder: (context) => TwilightAlleyIntro()),
+                  builder: (context) => TwilightAlleyIntro(),
+                  // colors
+                  cardColor: Colors.white.withOpacity(0.9), shadowColor: Colors.black.withOpacity(0.3), iconBackgroundColor: Colors.teal[700],iconColor:  Colors.white, textColor: Colors.teal[700], subTextColor: Colors.teal[600]
+              ),
+
             ],
           ),
         ),
