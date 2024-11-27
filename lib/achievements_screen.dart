@@ -88,11 +88,14 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         ],
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: 1,
+        selectedIndex: 2,
         onItemTapped: (index) {
           if (index == 0) {
             Navigator.pushReplacementNamed(context, '/'); // Navigate to Home
-          } else if (index == 2) {
+          } else if(index == 1){
+            Navigator.pushReplacementNamed(context, '/todays_activities');
+          }
+          else if (index == 3) {
             Navigator.pushReplacementNamed(context, '/settings'); // Navigate to Settings
           }
         },

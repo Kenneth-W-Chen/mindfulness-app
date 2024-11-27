@@ -21,6 +21,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
           icon: Icon(Icons.home),
           label: 'Home',
         ),
+        BottomNavigationBarItem(icon: Icon(Icons.calendar_today),
+            label: 'Daily Activities'
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.emoji_events),
           label: 'Achievements',
@@ -30,10 +33,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'Settings',
         ),
       ],
+      type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.blueAccent,
       unselectedItemColor: Colors.grey,
       backgroundColor: Colors.black,
-      type: BottomNavigationBarType.fixed,
       iconSize: 30,
     );
   }

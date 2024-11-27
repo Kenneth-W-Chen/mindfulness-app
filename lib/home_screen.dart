@@ -80,6 +80,9 @@ class HomeScreen extends StatelessWidget {
             icon: Icon(Icons.home),
             label: 'Home',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_today),
+          label: 'Daily Activities'
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events),
             label: 'Achievements',
@@ -89,10 +92,14 @@ class HomeScreen extends StatelessWidget {
             label: 'Settings',
           ),
         ],
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
-          if (index == 1) {
+          if(index == 1){
+            Navigator.pushNamed(context,'/todays_activities');
+          }
+          else if (index == 2) {
             Navigator.pushNamed(context, '/achievements');
-          } else if (index == 2) {
+          } else if (index == 3) {
             Navigator.pushNamed(context, '/settings');
           }
         },

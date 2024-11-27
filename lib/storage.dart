@@ -30,7 +30,7 @@ class Storage {
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-      version: 1, // Ensure the version is specified
+      version: 2, // Ensure the version is specified
       onConfigure: _configureDb,
       onCreate: _initDb,
     );
@@ -294,9 +294,9 @@ class Storage {
     List<ActivityName> activities = List<ActivityName>.generate(3, (int index)=>ActivityName.values[rng.nextInt(ActivityName.values.length-1)+1], growable: false);
     await _db.insert(_dailyResetTable, <String, Object>{
       'date': DateTime.now().daysSinceEpoch(),
-      'activity_1_id':getActivityId(activities[0]),
-      'activity_2_id':getActivityId(activities[1]),
-      'activity_3_id':getActivityId(activities[2])
+      'activity_1_id':await getActivityId(activities[0]),
+      'activity_2_id':await getActivityId(activities[1]),
+      'activity_3_id':await getActivityId(activities[2])
     });
     return activities;
   }
@@ -398,9 +398,10 @@ Future<void> insertSession(int sessionId, String name) async {
         'activity_1_id INTEGER NOT NULL,'
         'activity_2_id INTEGER NOT NULL,'
         'activity_3_id INTEGER NOT NULL,'
-        'FOREGIN KEY(activity_1_id) REFERENCES $_activityTable(id),'
-        'FOREGIN KEY(activity_2_id) REFERENCES $_activityTable(id),'
-        'FOREGIN KEY(activity_3_id) REFERENCES $_activityTable(id)'
+        'activity_completed INTEGER NOT NULL DEFAULT 0,'
+        'FOREIGN KEY(activity_1_id) REFERENCES $_activityTable(id),'
+        'FOREIGN KEY(activity_2_id) REFERENCES $_activityTable(id),'
+        'FOREIGN KEY(activity_3_id) REFERENCES $_activityTable(id)'
         ');');
 
     // Insert default preferences into the preferences table
@@ -489,12 +490,15 @@ enum PreferenceName {
 enum ActivityName {
   all(-1),
   meditation_station(0),
-  twilight_alley(1),
-  breathe(99);
+  twilight_alley(1);
 
   final int value;
 
   const ActivityName(this.value);
+  @override
+  String toString(){
+    return name.split('_').map((s)=> {s = "${s[0].toUpperCase()}${s.substring(1)}"}).join(' ');
+  }
 }
 
 enum Achievement {
