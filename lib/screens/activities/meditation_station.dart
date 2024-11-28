@@ -1,18 +1,18 @@
 import 'dart:async';
 
+import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import '../../storage.dart';
 import '../../AudioManager.dart';
 import 'package:path/path.dart' as path;
-import 'dart:developer';
 
 class AudioPlayerScreen extends StatefulWidget {
   const AudioPlayerScreen(
       {Key? key,
-        required String this.audioFilePath,
-        required Storage this.storage})
+      required String this.audioFilePath,
+      required Storage this.storage})
       : super(key: key);
   final String audioFilePath;
   final Storage storage;
@@ -26,6 +26,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   late AudioManager _audioManager;
   final Storage storage;
   bool isPlaying = false;
+  bool _activityCompleted = false;
   final String audioFilePath;
 
   _AudioPlayerScreenState(
@@ -42,13 +43,26 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> asyncInit() async {
     DateTime? completion_date = (await storage.getActivityLogs(
-        [ActivityName.values[1]]))[ActivityName.values[1]]![0]
-    ['completion_date'] as DateTime?;
+            [ActivityName.values[1]]))[ActivityName.values[1]]![0]
+        ['completion_date'] as DateTime?;
     DateTime now = DateTime.now().toUtc();
     now = DateTime.utc(now.year, now.month, now.day);
     if (completion_date == null || now.isAfter(completion_date)) {
       completionTimer = Timer(Duration(seconds: 30), () {
+        debugPrint('Activity completed');
+        _activityCompleted = true;
         storage.addActivityLog(ActivityName.values[1], audioFilePath);
+        setState(() {
+
+        });
+      });
+    } else{
+      completionTimer = Timer(Duration(seconds: 3), () {
+        debugPrint('Activity completed');
+        _activityCompleted = true;
+        setState(() {
+
+        });
       });
     }
     _audioManager.playAudio(audioFilePath, loop: true);
@@ -64,18 +78,10 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Meditation Station",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-                letterSpacing: 1.2,
-              )),
-          backgroundColor: Colors.deepPurple[800],
-          elevation: 0,
-        ),
+        appBar: activityAppBar('Meditation Station', Colors.deepPurple[800]!,
+            context, _activityCompleted),
         body: Container(
-          decoration: BoxDecoration(color:Colors.deepPurple[600]),
+          decoration: BoxDecoration(color: Colors.deepPurple[600]),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -116,6 +122,7 @@ class _MeditationStationState extends State<MeditationStation> {
   late String _dropdownValue;
   late Storage storage;
   List<String>? audioList;
+  bool _activityCompleted = false;
 
   @override
   void initState() {
@@ -142,16 +149,8 @@ class _MeditationStationState extends State<MeditationStation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Meditation Station",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              letterSpacing: 1.2,
-            )),
-        backgroundColor: Colors.deepPurple[800],
-        elevation: 0,
-      ),
+      appBar: activityAppBar('Meditation Station', Colors.deepPurple[800]!,
+          context, _activityCompleted),
       body: Container(
         child: Center(
           child: Column(
@@ -179,14 +178,14 @@ class _MeditationStationState extends State<MeditationStation> {
                       });
                     },
                     items:
-                    audioList?.map<DropdownMenuItem<String>>((String val) {
-                      return DropdownMenuItem(
-                          value: val,
-                          child: Text(path
-                              .basenameWithoutExtension(val)
-                              .replaceAll('_', ' ')));
-                    }).toList() ??
-                        [],
+                        audioList?.map<DropdownMenuItem<String>>((String val) {
+                              return DropdownMenuItem(
+                                  value: val,
+                                  child: Text(path
+                                      .basenameWithoutExtension(val)
+                                      .replaceAll('_', ' ')));
+                            }).toList() ??
+                            [],
                     dropdownColor: Colors.deepPurpleAccent[100],
                   ),
                 ),
@@ -198,10 +197,13 @@ class _MeditationStationState extends State<MeditationStation> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AudioPlayerScreen(
-                          audioFilePath: _dropdownValue,
-                          storage: storage,
-                        )),
-                  );
+                              audioFilePath: _dropdownValue,
+                              storage: storage,
+                            )),
+                  ).then((value) {
+                    _activityCompleted = value as bool;
+                    setState(() {});
+                  });
                 },
                 child: const Text("Go to Audio Player"),
               ),

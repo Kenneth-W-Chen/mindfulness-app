@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 Widget activityCard(String activityName, BuildContext context, IconData icon, String description,
     {
       Widget Function(BuildContext buildcontext)? builder = null,
-      Color? cardColor, Color? shadowColor, Color? textColor, Color? subTextColor, Color? iconColor, Color? iconBackgroundColor
+      Color? cardColor, Color? shadowColor, Color? textColor, Color? subTextColor, Color? iconColor, Color? iconBackgroundColor,
+      Function(dynamic)? onPop
     }
     ) {
   return GestureDetector(
@@ -16,12 +17,12 @@ Widget activityCard(String activityName, BuildContext context, IconData icon, St
         ),
       );
     }:() {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: builder
-          ));
-    },
+      if(onPop == null) {
+              Navigator.push(context, MaterialPageRoute(builder: builder));
+            } else{
+        Navigator.push(context,MaterialPageRoute(builder:builder)).then(onPop);
+      }
+          },
     child: Card(
       color: cardColor,
       margin: const EdgeInsets.only(bottom: 20),

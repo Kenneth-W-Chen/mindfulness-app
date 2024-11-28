@@ -4,53 +4,54 @@ import '../storage.dart';
 import 'activities/meditation_station.dart';
 import 'activities/twilight_alley_intro.dart';
 
-class TodaysActivitiesScreen extends StatefulWidget{
+class TodaysActivitiesScreen extends StatefulWidget {
   const TodaysActivitiesScreen({super.key});
+
   @override
   State<TodaysActivitiesScreen> createState() => _TodaysActivitiesScreenState();
 }
 
-class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen>{
+class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
   late Storage storage;
 
-  static const Map<ActivityName, StatefulWidget Function()> activityNameToFunction = const{
-    ActivityName.meditation_station:
-    MeditationStation.new,
+  static const Map<ActivityName, StatefulWidget Function()>
+      activityNameToFunction = const {
+    ActivityName.meditation_station: MeditationStation.new,
     ActivityName.twilight_alley: TwilightAlleyIntro.new,
     ActivityName.breathe: MeditationStation.new
   };
 
-  static const Map<ActivityName, IconData> activityNameIcons = const{
+  static const Map<ActivityName, IconData> activityNameIcons = const {
     ActivityName.meditation_station: Icons.headset,
     ActivityName.twilight_alley: Icons.flag,
     ActivityName.breathe: Icons.phone_in_talk
   };
 
-  static const Map<ActivityName, String> activityNameDescription = const{
-    ActivityName.meditation_station: 'Listen to calming sounds and nature noises.',
-    ActivityName.twilight_alley:                   'Journal some of your thoughts',
+  static const Map<ActivityName, String> activityNameDescription = const {
+    ActivityName.meditation_station:
+        'Listen to calming sounds and nature noises.',
+    ActivityName.twilight_alley: 'Journal some of your thoughts',
     ActivityName.breathe: 'This activity is a work in progress!'
   };
 
-  List<Map<String,Object>> activities = [];
-
+  List<Map<String, Object>> activities = [];
 
   _TodaysActivitiesScreenState();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     asyncInit();
   }
 
-  Future<void> asyncInit() async{
+  Future<void> asyncInit() async {
     storage = await Storage.create();
     activities = await storage.dailyReset();
-    setState((){});
+    setState(() {});
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -81,10 +82,35 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen>{
                 ),
               ),
               const SizedBox(height: 30),
-              ...(activities.map(
-                      (activity)=>
-                          activityCard(activity['activity'].toString(), context, (activity['completed'] as bool)? Icons.check : activityNameIcons[activity['activity']]!, activityNameDescription[activity['activity']]! + ((activity['completed'] as bool)? '\nYou already completed this activity today.':''), builder: (context)=> activityNameToFunction[activity['activity']]!(),
-                              cardColor: (activity['completed'] as bool)?Colors.grey.withOpacity(0.9):Colors.white.withOpacity(0.9), shadowColor: Colors.black.withOpacity(0.3), iconBackgroundColor: Colors.amber[700], iconColor: Colors.white, textColor: Colors.amber[900], subTextColor: Colors.amber[800]             )))
+              ...(List<Widget>.generate(activities.length, (int index) {
+                var activity = activities[index];
+                return activityCard(
+                    activity['activity'].toString(),
+                    context,
+                    (activity['completed'] as bool)
+                        ? Icons.check
+                        : activityNameIcons[activity['activity']]!,
+                    activityNameDescription[activity['activity']]! +
+                        ((activity['completed'] as bool)
+                            ? '\nYou already completed this activity today.'
+                            : ''),
+                    builder: (context) =>
+                        activityNameToFunction[activity['activity']]!(),
+                    cardColor: (activity['completed'] as bool)
+                        ? Colors.grey.withOpacity(0.9)
+                        : Colors.white.withOpacity(0.9),
+                    shadowColor: Colors.black.withOpacity(0.3),
+                    iconBackgroundColor: Colors.amber[700],
+                    iconColor: Colors.white,
+                    textColor: Colors.amber[900],
+                    subTextColor: Colors.amber[800],
+                    onPop: (value) {
+                      storage.setDailyCompleted(index + 1);
+                      activities[index]['completed'] = value as bool;
+                      debugPrint("Set activity $index completion to ${value as bool?'true':'false'}");
+                      setState(() {});
+                    });
+              }))
             ],
           ),
         ),

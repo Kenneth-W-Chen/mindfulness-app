@@ -1,3 +1,4 @@
+import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'twilight_alley_intro.dart'; // Ensure the import path is correct
@@ -15,6 +16,7 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
   late AnimationController _leftStarController;
   late AnimationController _rightStarController;
   late Animation<double> _fadeAnimation;
+  bool _activityCompleted = false;
   final List<String> _prompts = [
     "What made you smile today?",
     "What is something you're grateful for?",
@@ -77,6 +79,7 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
         _isPromptVisible = true;
       });
     } else {
+      _activityCompleted = true;
       // Logic for end of prompts (e.g., navigate to a summary page)
       showDialog(
         context: context,
@@ -88,12 +91,14 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
+                  Navigator.pop(context,true);
+                  /*Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const TwilightAlleyIntro(),
                     ),
-                  );
+                  );*/
                 },
                 child: const Text("OK"),
               ),
@@ -107,18 +112,7 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Twilight Alley',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            letterSpacing: 1.2,
-          ),
-        ),
-        backgroundColor: Colors.deepPurple[800],
-        elevation: 0,
-      ),
+      appBar: activityAppBar('Twilight Alley', Colors.deepPurple[800]!, context, _activityCompleted),
       body: Container(
         width: double.infinity, // Ensures the container covers full width
         height: double.infinity, // Ensures the container covers full height

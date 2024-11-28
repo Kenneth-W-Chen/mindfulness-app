@@ -306,6 +306,13 @@ class Storage {
     return List<Map<String,Object>>.generate(3, (int index)=>{'activity':activities[index],'completed':false});
   }
 
+  Future<void> setDailyCompleted(int activityNumber) async{
+    var row = (await _db.query(_dailyResetTable,columns: ['activity_completed','id'], where: 'date == ?', whereArgs: [DateTime.now().daysSinceEpoch()], limit: 1))[0];
+    int completionInfo = row['activity_completed'] as int;
+    completionInfo |= (1 << (activityNumber-1));
+    await _db.update(_dailyResetTable, {'activity_completed': completionInfo}, where: 'id == ?', whereArgs: [row['id']]);
+  }
+
   /// Retrieves all cues for a specific session ID
 Future<List<Map<String, dynamic>>> getCuesForSession(int sessionId) async {
   return await _db.query(

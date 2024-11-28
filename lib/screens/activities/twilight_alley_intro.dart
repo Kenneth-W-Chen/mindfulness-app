@@ -1,3 +1,4 @@
+import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -13,6 +14,7 @@ class TwilightAlleyIntro extends StatefulWidget {
 
 class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
     with TickerProviderStateMixin {
+  bool _activityCompleted = false;
   bool _isTextVisible = false;
   bool _isMoonScaled = false;
   bool _isBlurbVisible = false;
@@ -66,21 +68,15 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
     super.dispose();
   }
 
+  Future<void> setActivityCompleted(Future<dynamic> val) async{
+    _activityCompleted = (await val) as bool;
+    debugPrint("Activity is ${_activityCompleted?'complete':'not complete'}");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Twilight Alley',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            letterSpacing: 1.2,
-          ),
-        ),
-        backgroundColor: Colors.deepPurple[800],
-        elevation: 0,
-      ),
+      appBar: activityAppBar('Twilight Alley', Colors.deepPurple[800]!, context, _activityCompleted),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -172,10 +168,10 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
                   MaterialPageRoute(builder: (context) => const TwilightAlleyLoad()),
                 );
                 Timer(const Duration(milliseconds: 3500), () {
-                  Navigator.pushReplacement(
+                  setActivityCompleted(Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const TwilightAlleyActivity()),
-                  );
+                  ));
                 });
               },
               child: const Text('Start'),
