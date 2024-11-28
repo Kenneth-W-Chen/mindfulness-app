@@ -54,7 +54,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         setState(() {});
       });
     } else{
-      completionTimer = Timer(Duration(seconds: 3), () {
+      completionTimer = Timer(Duration(seconds: 30), () {
         _activityCompleted = true;
         setState(() {});
       });
