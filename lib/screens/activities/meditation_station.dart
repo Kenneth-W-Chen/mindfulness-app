@@ -49,20 +49,14 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     now = DateTime.utc(now.year, now.month, now.day);
     if (completion_date == null || now.isAfter(completion_date)) {
       completionTimer = Timer(Duration(seconds: 30), () {
-        debugPrint('Activity completed');
         _activityCompleted = true;
         storage.addActivityLog(ActivityName.values[1], audioFilePath);
-        setState(() {
-
-        });
+        setState(() {});
       });
     } else{
       completionTimer = Timer(Duration(seconds: 3), () {
-        debugPrint('Activity completed');
         _activityCompleted = true;
-        setState(() {
-
-        });
+        setState(() {});
       });
     }
     _audioManager.playAudio(audioFilePath, loop: true);

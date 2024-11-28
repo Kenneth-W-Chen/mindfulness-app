@@ -266,9 +266,6 @@ class Storage {
 
     // convert the activity IDs to ActivityNames
     List<Map<String,Object?>> rows = await _db.query(_dailyResetTable, columns: ['date', 'activity_1_id', 'activity_2_id', 'activity_3_id', 'activity_completed'], where: where, whereArgs: whereArgs, orderBy: 'date DESC',);
-    if(kDebugMode){
-      debugPrint("Fetched ${rows.length} rows from the daily reset table.");
-    }
     List<Map<String,Object>?> parsedRows = [];
     for(int i = 0; i < rows.length; i++){
       parsedRows.add(<String,Object>{
@@ -296,7 +293,6 @@ class Storage {
     List<int> pickRand = List<int>.generate(ActivityName.values.length-1, (i)=>i+1);
     pickRand.shuffle();
     List<ActivityName> activities = List<ActivityName>.generate(3, (int index)=>ActivityName.values[pickRand[index]], growable: false);
-    debugPrint("${activities[0].name},${activities[1].name},${activities[2].name}");
     await _db.insert(_dailyResetTable, <String, Object>{
       'date': DateTime.now().daysSinceEpoch(),
       'activity_1_id':await getActivityId(activities[0]),

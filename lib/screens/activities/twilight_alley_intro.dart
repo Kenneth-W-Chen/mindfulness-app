@@ -70,7 +70,7 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
 
   Future<void> setActivityCompleted(Future<dynamic> val) async{
     _activityCompleted = (await val) as bool;
-    debugPrint("Activity is ${_activityCompleted?'complete':'not complete'}");
+    setState(() {});
   }
 
   @override
