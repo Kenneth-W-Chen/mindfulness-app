@@ -1,3 +1,4 @@
+import '../custom_bottom_navigation_bar.dart';
 import 'shared/activity_widget.dart';
 import 'package:flutter/material.dart';
 import '../storage.dart';
@@ -114,6 +115,19 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: 1,
+        onItemTapped: (index) {
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, '/'); // Navigate to Home
+          } else if(index == 2){
+            Navigator.pushReplacementNamed(context, '/achievements');
+          }
+          else if (index == 3) {
+            Navigator.pushReplacementNamed(context, '/settings'); // Navigate to Settings
+          }
+        },
       ),
     );
   }
