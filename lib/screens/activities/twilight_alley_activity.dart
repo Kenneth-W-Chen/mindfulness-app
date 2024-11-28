@@ -2,6 +2,7 @@ import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'twilight_alley_intro.dart'; // Ensure the import path is correct
+import '../../storage.dart';
 
 class TwilightAlleyActivity extends StatefulWidget {
   const TwilightAlleyActivity({Key? key}) : super(key: key);
@@ -80,6 +81,8 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
       });
     } else {
       _activityCompleted = true;
+      var storage = await Storage.create();
+      var future = storage.addActivityLog(ActivityName.twilight_alley, _userResponses.join('\n'));
       // Logic for end of prompts (e.g., navigate to a summary page)
       showDialog(
         context: context,
@@ -106,6 +109,7 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
           );
         },
       );
+      await future;
     }
   }
 
