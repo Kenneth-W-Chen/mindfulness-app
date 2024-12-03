@@ -133,7 +133,7 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
             _startPhraseAnimation();
           } else {
             // All phrases have been displayed; navigate back to intro screen
-            Navigator.pop(context);
+            Navigator.pop(context, true); // Pass back 'true' to indicate completion
           }
         });
       });
