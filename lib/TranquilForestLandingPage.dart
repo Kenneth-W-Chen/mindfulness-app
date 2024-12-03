@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/shared/activity_widget.dart';
 import 'screens/activities/meditation_station.dart';
 import 'screens/activities/twilight_alley_intro.dart';
+import 'screens/activities/calmingcliffintro.dart';
 
 class TranquilForestLandingPage extends StatelessWidget {
   @override
