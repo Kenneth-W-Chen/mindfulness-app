@@ -3,6 +3,7 @@ import 'home_screen.dart';
 import 'achievements_screen.dart';
 import 'settings_screen.dart';
 import 'screens/todays_activities.dart';
+
 import 'Mood Journal/mood_selection_screen.dart'; // Import Mood Selection Screen
 import 'storage.dart'; // Import the Storage class
 
@@ -20,6 +21,7 @@ class CalmQuestApp extends StatelessWidget {
 
   const CalmQuestApp({super.key, required this.storage});
 
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,6 +29,7 @@ class CalmQuestApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(),
+
         '/todays_activities': (context) => const TodaysActivitiesScreen(),
         '/achievements': (context) => const AchievementsScreen(),
         '/settings': (context) => const SettingsScreen(),
@@ -35,3 +38,4 @@ class CalmQuestApp extends StatelessWidget {
     );
   }
 }
+
