@@ -55,7 +55,8 @@ class Storage {
   /// }
   /// ```
   Future<bool> isAchievementCompleted(Achievement achievement) async {
-    return (await getAchievementsCompletionDate([achievement]))[achievement] != null;
+    return (await getAchievementsCompletionDate([achievement]))[achievement] !=
+        null;
   }
 
   /// Returns the date the achievements were completed
@@ -65,10 +66,12 @@ class Storage {
   /// print(dates[Achievement.achievement_1]); // outputs 'null' or something like '2024-10-03'
   /// print(dates[Achievement.achievement_2]); // outputs 'null' or something like '2024-10-03'
   /// ```
-  Future<Map<Achievement, DateTime?>> getAchievementsCompletionDate(List<Achievement> achievements) async {
+  Future<Map<Achievement, DateTime?>> getAchievementsCompletionDate(
+      List<Achievement> achievements) async {
     List<Map<String, Object?>> rows = [];
     if (achievements.contains(Achievement.all)) {
-      rows = await _db.query(_achievementsTable, columns: ['name', 'completion_date']);
+      rows = await _db
+          .query(_achievementsTable, columns: ['name', 'completion_date']);
     } else {
       var v = _db.enumListExplode(achievements);
       rows = await _db.query(
@@ -81,8 +84,11 @@ class Storage {
 
     Map<Achievement, DateTime?> completionDates = {};
     for (var row in rows) {
-      completionDates[Achievement.values.firstWhere((e) => e.name == row['name'])] =
-          row['completion_date'] != null ? (row['completion_date'] as int).epochDaysToDateTime() : null;
+      completionDates[
+              Achievement.values.firstWhere((e) => e.name == row['name'])] =
+          row['completion_date'] != null
+              ? (row['completion_date'] as int).epochDaysToDateTime()
+              : null;
     }
 
     return completionDates;
@@ -103,7 +109,8 @@ class Storage {
   }
 
   Future<void> deleteAchievement(Achievement achievement) async {
-    await _db.delete(_achievementsTable, where: 'name = ?', whereArgs: [achievement.name]);
+    await _db.delete(_achievementsTable,
+        where: 'name = ?', whereArgs: [achievement.name]);
   }
 
   /** Activity log functions
@@ -120,7 +127,8 @@ class Storage {
   /// var results = await storage.getActivityLogs([ActivityName.breathe, ActivityName.test]);
   /// print(results[ActivityName.breathe]['completion_date]); // outputs something like '2024-10-08'
   /// ```
-  Future<Map<ActivityName, Map<String, Object?>>> getActivityLogs(List<ActivityName> activities) async {
+  Future<Map<ActivityName, Map<String, Object?>>> getActivityLogs(
+      List<ActivityName> activities) async {
     Map<ActivityName, Map<String, Object?>> logs = {};
 
     for (var activity in activities) {
@@ -135,15 +143,13 @@ class Storage {
       if (rows.isNotEmpty) {
         var row = rows[0];
         logs[activity] = {
-          'completion_date': (row['completion_date'] as int?)?.epochDaysToDateTime(),
+          'completion_date':
+              (row['completion_date'] as int?)?.epochDaysToDateTime(),
           'info': row['info']
         };
       } else {
         // Add an empty log entry if no result is found
-        logs[activity] = {
-          'completion_date': null,
-          'info': null
-        };
+        logs[activity] = {'completion_date': null, 'info': null};
       }
     }
 
@@ -187,7 +193,29 @@ class Storage {
       where: 'name = ?',
       whereArgs: [activityName.name],
     ))[0]['id'] as int;
-    await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
+    await _db.delete(_activityLogTable,
+        where: 'activity_id = ?', whereArgs: [activityId]);
+  }
+
+  Future<void> insertMoodJournal(
+      String date, String mood, int intensity, String note) async {
+    await _db.insert(
+      'mood_journal',
+      {
+        'date': date,
+        'mood': mood,
+        'intensity': intensity,
+        'note': note,
+      },
+    );
+  }
+
+  /// Retrieves all mood journal entries from the database
+  Future<List<Map<String, dynamic>>> getAllMoodJournalEntries() async {
+    return await _db.query(
+      'mood_journals', // Table name for mood journals
+      orderBy: 'date DESC', // Sort entries by date in descending order
+    );
   }
 
   /**
@@ -195,7 +223,8 @@ class Storage {
    */
 
   /// Retrieves multiple preferences from the database. To retrieve all preferences, pass `PreferenceName.all` in `preferences`
-  Future<Map<PreferenceName, int>?> getPreferences(List<PreferenceName> preferences) async {
+  Future<Map<PreferenceName, int>?> getPreferences(
+      List<PreferenceName> preferences) async {
     if (preferences.isEmpty) return null;
     List<Map<String, Object?>> rows;
 
@@ -213,7 +242,8 @@ class Storage {
 
     Map<PreferenceName, int> v = {};
     for (Map<String, Object?> row in rows) {
-      v[PreferenceName.values.firstWhere((e) => e.name == row['name'])] = row['value'] as int;
+      v[PreferenceName.values.firstWhere((e) => e.name == row['name'])] =
+          row['value'] as int;
     }
     return v;
   }
@@ -231,40 +261,45 @@ class Storage {
     });
     await batch.commit(noResult: true);
   }
-/// Retrieves all cues for a specific session ID
-Future<List<Map<String, dynamic>>> getCuesForSession(int sessionId) async {
-  return await _db.query(
-    'cues',
-    where: 'session_id = ?',
-    whereArgs: [sessionId],
-  );
-}
-/// Inserts a new cue for a specific session
-Future<void> insertCue(int sessionId, int timeSec, String message) async {
-  await _db.insert(
-    'cues',
-    {
-      'session_id': sessionId,
-      'time_sec': timeSec,
-      'message': message,
-    },
-  );
-}
-/// Inserts a new session into the sessions table
-Future<void> insertSession(int sessionId, String name) async {
-  await _db.insert(
-    'sessions',
-    {
-      'id': sessionId,
-      'name': name,
-    },
-    conflictAlgorithm: ConflictAlgorithm.ignore,  // Ignores if session already exists
-  );
-}
+
+  /// Retrieves all cues for a specific session ID
+  Future<List<Map<String, dynamic>>> getCuesForSession(int sessionId) async {
+    return await _db.query(
+      'cues',
+      where: 'session_id = ?',
+      whereArgs: [sessionId],
+    );
+  }
+
+  /// Inserts a new cue for a specific session
+  Future<void> insertCue(int sessionId, int timeSec, String message) async {
+    await _db.insert(
+      'cues',
+      {
+        'session_id': sessionId,
+        'time_sec': timeSec,
+        'message': message,
+      },
+    );
+  }
+
+  /// Inserts a new session into the sessions table
+  Future<void> insertSession(int sessionId, String name) async {
+    await _db.insert(
+      'sessions',
+      {
+        'id': sessionId,
+        'name': name,
+      },
+      conflictAlgorithm:
+          ConflictAlgorithm.ignore, // Ignores if session already exists
+    );
+  }
 
   /// For testing only
   Future<void> deletePreference(PreferenceName preference) async {
-    await _db.delete(_preferencesTable, where: 'name = ?', whereArgs: [preference.name]);
+    await _db.delete(_preferencesTable,
+        where: 'name = ?', whereArgs: [preference.name]);
   }
 
   /**
@@ -305,19 +340,28 @@ Future<void> insertSession(int sessionId, String name) async {
         'completion_date INT NULL'
         ');');
 // Create sessions table
-  batch.execute('CREATE TABLE IF NOT EXISTS sessions ('
-      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
-      'name TEXT NOT NULL'
-      ');');
-
-  // Create cues table
-  batch.execute('CREATE TABLE IF NOT EXISTS cues ('
-      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
-      'session_id INTEGER NOT NULL,'
-      'time_sec INTEGER NOT NULL,'
-      'message TEXT NOT NULL,'
-      'FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE'
-      ');');
+    batch.execute('CREATE TABLE IF NOT EXISTS sessions ('
+        'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+        'name TEXT NOT NULL'
+        ');');
+    // Create mood journal table
+    batch.execute('''
+  CREATE TABLE IF NOT EXISTS mood_journals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, -- Unique identifier for each entry
+    date TEXT NOT NULL,                   -- Date of the journal entry
+    mood TEXT NOT NULL,                   -- Mood selected by the user
+    intensity INTEGER NOT NULL,           -- Intensity of the mood (e.g., scale of 1-5)
+    note TEXT                             -- Optional journal note
+  );
+''');
+    // Create cues table
+    batch.execute('CREATE TABLE IF NOT EXISTS cues ('
+        'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+        'session_id INTEGER NOT NULL,'
+        'time_sec INTEGER NOT NULL,'
+        'message TEXT NOT NULL,'
+        'FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE'
+        ');');
     // Insert default preferences into the preferences table
     for (PreferenceName preferenceName in PreferenceName.values) {
       if (preferenceName.value == -1) continue;
@@ -338,7 +382,8 @@ Future<void> insertSession(int sessionId, String name) async {
     // Insert achievements into the achievements table
     for (Achievement achievement in Achievement.values) {
       if (achievement.value == -1) continue;
-      batch.insert(_achievementsTable, {'name': achievement.name, 'completion_date': null});
+      batch.insert(_achievementsTable,
+          {'name': achievement.name, 'completion_date': null});
     }
 
     // Run all SQL commands
@@ -357,29 +402,30 @@ extension EpochExtensions on DateTime {
     return (millisecondsSinceEpoch / 86400000).floor();
   }
 }
-  /// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
-  ///
-  /// Usage:
-  ///
-  /// ```dart
-  /// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
-  /// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
-  /// ```
+
+/// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
+///
+/// Usage:
+///
+/// ```dart
+/// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
+/// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
+/// ```
 extension DateTimeEpochExtensions on int {
   DateTime epochDaysToDateTime() {
     return DateTime.utc(1970).add(Duration(days: this));
   }
 }
 
-  /// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
-  ///
-  /// Usage:
-  /// ```dart
-  /// Database db = await openDatabase();
-  /// List<PreferenceName> preferences = [master_volume, max_volume, music_volume];
-  /// var exploded = db.enumListExplode(preferences);
-  /// db.query('table', where: 'name in ${exploded[0]}', whereArgs: exploded[1]);
-  /// ```
+/// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
+///
+/// Usage:
+/// ```dart
+/// Database db = await openDatabase();
+/// List<PreferenceName> preferences = [master_volume, max_volume, music_volume];
+/// var exploded = db.enumListExplode(preferences);
+/// db.query('table', where: 'name in ${exploded[0]}', whereArgs: exploded[1]);
+/// ```
 extension ListExplode on Database {
   List<List<String>> enumListExplode(List<Enum> s) {
     var placeholders = List.filled(s.length, '?');

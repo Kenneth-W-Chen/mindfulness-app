@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'journal_list_screen.dart';
+import '../storage.dart';
 
 class JournalPromptScreen extends StatefulWidget {
   final Map<String, String> mood;
   final double intensity;
+  final Storage storage; // Added the storage instance
 
-  const JournalPromptScreen({Key? key, required this.mood, required this.intensity}) : super(key: key);
+  const JournalPromptScreen({
+    Key? key,
+    required this.mood,
+    required this.intensity,
+    required this.storage, // Added the storage instance
+  }) : super(key: key);
 
   @override
   _JournalPromptScreenState createState() => _JournalPromptScreenState();
@@ -29,16 +33,15 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
   }
 
   Future<void> saveEntry() async {
-    final prefs = await SharedPreferences.getInstance();
-    final entries = prefs.getStringList('mood_entries') ?? [];
-    final entry = {
-      'date': DateTime.now().toIso8601String(),
-      'mood': widget.mood['label'],
-      'intensity': widget.intensity,
-      'note': _controller.text,
-    };
-    entries.add(json.encode(entry));
-    await prefs.setStringList('mood_entries', entries);
+    final date = DateTime.now().toIso8601String();
+    await widget.storage.insertMoodJournal(
+      date,
+      widget.mood['label']!,
+      widget.intensity.toInt(),
+      _controller.text,
+    );
+    // Navigate back or to another screen after saving
+    Navigator.pop(context);
   }
 
   @override
@@ -81,13 +84,7 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
             ),
             const Spacer(),
             ElevatedButton(
-              onPressed: () async {
-                await saveEntry();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const JournalListScreen()),
-                );
-              },
+              onPressed: saveEntry,
               child: const Text('Save Entry'),
             ),
           ],
