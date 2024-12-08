@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../../../storage.dart';
 import 'journal_prompt_screen.dart';
+import 'mood_trends_screen.dart';
 
 class JournalListScreen extends StatefulWidget {
   final Storage storage;
@@ -52,6 +53,16 @@ class _JournalListScreenState extends State<JournalListScreen> {
                 ),
               ).then((_) => loadJournalEntries());
             },
+          ),
+          IconButton(
+            icon: const Text('Show Mood Trends'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MoodTrendsScreen(storage: widget.storage)),
+              );
+            }
           ),
         ],
       ),

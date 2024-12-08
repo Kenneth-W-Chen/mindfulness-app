@@ -1,3 +1,4 @@
+import 'package:calm_quest/screens/activities/Mood%20Journal/journal_list_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../storage.dart';
 
@@ -84,7 +85,10 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
             ),
             const Spacer(),
             ElevatedButton(
-              onPressed: saveEntry,
+              onPressed:  () async {
+                await saveEntry();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> JournalListScreen(storage: widget.storage)));
+              },
               child: const Text('Save Entry'),
             ),
           ],
