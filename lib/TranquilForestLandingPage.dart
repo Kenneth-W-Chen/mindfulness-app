@@ -3,6 +3,7 @@ import 'screens/shared/activity_widget.dart';
 import 'screens/activities/meditation_station.dart';
 import 'screens/activities/twilight_alley_intro.dart';
 import 'screens/activities/calmingcliffintro.dart';
+import 'screens/activities/Mood Journal/mood_selection_screen.dart';
 
 class TranquilForestLandingPage extends StatelessWidget {
   @override
@@ -77,6 +78,12 @@ class TranquilForestLandingPage extends StatelessWidget {
                   cardColor: Colors.white.withOpacity(0.9), shadowColor: Colors.black.withOpacity(0.3), iconBackgroundColor: Colors.teal[700],iconColor:  Colors.white, textColor: Colors.teal[700], subTextColor: Colors.teal[600]
               ),
 
+              activityCard('Mood Journal', context, Icons.book,
+                  'Talk about how you feel today',
+                  builder: (context) => MoodSelectionScreen(),
+                  // colors
+                  cardColor: Colors.white.withOpacity(0.9), shadowColor: Colors.black.withOpacity(0.3), iconBackgroundColor: Colors.teal[700],iconColor:  Colors.white, textColor: Colors.teal[700], subTextColor: Colors.teal[600]
+              ),
             ],
           ),
         ),

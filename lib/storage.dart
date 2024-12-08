@@ -15,6 +15,7 @@ class Storage {
   static const _preferencesTable = 'preferences';
   static const _achievementsTable = 'achievements';
   static const _dailyResetTable = 'last_daily_reset';
+  static const _moodJournalsTable = 'mood_journals';
 
   Storage._create(Database db) {
     _db = db;
@@ -28,7 +29,7 @@ class Storage {
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-      version: 2, // Ensure the version is specified
+      version: 2, // Updated version for schema changes
       onConfigure: _configureDb,
       onCreate: _initDb,
     );
@@ -155,6 +156,7 @@ class Storage {
     return logs;
   }
 
+
   /// Adds a log to the activity logs
   /// `name` - the name of the activity
   /// `info` - info associated with the activity
@@ -194,6 +196,37 @@ class Storage {
     int activityId = await getActivityId(activityName);
     await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
   }
+
+  /// Inserts a new mood journal entry into the database
+/// 
+/// Parameters:
+/// - `date`: The date of the journal entry as a `String` in ISO 8601 format.
+/// - `mood`: The mood selected by the user.
+/// - `intensity`: The intensity of the mood (e.g., a scale from 1 to 5).
+/// - `note`: An optional note provided by the user.
+Future<void> insertMoodJournal(
+    String date, String mood, int intensity, String note) async {
+  await _db.insert(
+    'mood_journals', // Table name
+    {
+      'date': date,            // The date of the journal entry
+      'mood': mood,            // The mood selected by the user
+      'intensity': intensity,  // The intensity of the mood
+      'note': note,            // Optional journal note
+    },
+    conflictAlgorithm: ConflictAlgorithm.replace, // Handle conflicts
+  );
+}
+/// Retrieves all mood journal entries from the database
+///
+/// Returns a list of maps where each map represents a journal entry
+/// with fields like 'id', 'date', 'mood', 'intensity', and 'note'.
+Future<List<Map<String, dynamic>>> getAllMoodJournalEntries() async {
+  return await _db.query(
+    'mood_journals',      // Table name
+    orderBy: 'date DESC', // Sort entries by date in descending order
+  );
+}
 
   /**
    *  Preferences functions
@@ -438,17 +471,26 @@ Future<void> insertSession(int sessionId, String name) async {
       batch.insert(_achievementsTable, {'name': achievement.name, 'completion_date': null},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
 
+    // Create mood journal table
+    batch.execute('CREATE TABLE $_moodJournalsTable ('
+        'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+        'date TEXT NOT NULL,'
+        'mood TEXT NOT NULL,'
+        'intensity INTEGER NOT NULL,'
+        'note TEXT'
+        ');');
+
     // Run all SQL commands
     await batch.commit(noResult: true);
   }
 
-  /// Database configuration options.
+  /// Configures the database
   static Future<void> _configureDb(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON;');
   }
 }
 
-// Extension methods for date and time conversions
+// Extensions for date and time conversions
 extension EpochExtensions on DateTime {
   int daysSinceEpoch() {
     return (millisecondsSinceEpoch / 86400000).floor();
