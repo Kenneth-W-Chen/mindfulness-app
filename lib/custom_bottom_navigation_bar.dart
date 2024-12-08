@@ -1,3 +1,4 @@
+// lib/custom_bottom_navigation_bar.dart
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -28,6 +29,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
           const BottomNavigationBarItem(
             icon: Icon(Icons.sailing), // Use the sailing icon
             label: 'Home',
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'Daily Activities'
           ),
           // Custom treasure chest icon
           BottomNavigationBarItem(

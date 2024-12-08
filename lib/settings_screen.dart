@@ -175,11 +175,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: 2, // Ensure Settings is selected
+        selectedIndex: 3, // Ensure Settings is selected
         onItemTapped: (index) {
           if (index == 0) {
             Navigator.pushReplacementNamed(context, '/'); // Navigate to Home
-          } else if (index == 1) {
+          } else if (index == 1){
+            Navigator.pushReplacementNamed(context, '/todays_activities');
+          } else if (index == 2) {
             Navigator.pushReplacementNamed(context, '/achievements'); // Navigate to Achievements
           }
         },

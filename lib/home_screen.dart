@@ -110,8 +110,10 @@ class HomeScreen extends StatelessWidget {
         selectedIndex: 0,
         onItemTapped: (index) {
           if (index == 1) {
-            Navigator.pushNamed(context, '/achievements');
+            Navigator.pushNamed(context, '/todays_activities');
           } else if (index == 2) {
+            Navigator.pushNamed(context, '/achievements');
+          } else if (index == 3) {
             Navigator.pushNamed(context, '/settings');
           }
         },
