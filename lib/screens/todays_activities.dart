@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../storage.dart';
 import 'activities/meditation_station.dart';
 import 'activities/twilight_alley_intro.dart';
+import 'package:calm_quest/breathing_activity.dart';
 
 
 class TodaysActivitiesScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
       activityNameToFunction = const {
     ActivityName.meditation_station: MeditationStation.new,
     ActivityName.twilight_alley: TwilightAlleyIntro.new,
-    ActivityName.breathe: MeditationStation.new
+    ActivityName.breathe: BreathingActivity.new
   };
 
   static const Map<ActivityName, IconData> activityNameIcons = const {
@@ -33,7 +34,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     ActivityName.meditation_station:
         'Listen to calming sounds and nature noises.',
     ActivityName.twilight_alley: 'Journal some of your thoughts',
-    ActivityName.breathe: 'This activity is a work in progress!'
+    ActivityName.breathe: 'Take a moment to recollect yourself'
   };
 
   List<Map<String, Object>> activities = [];

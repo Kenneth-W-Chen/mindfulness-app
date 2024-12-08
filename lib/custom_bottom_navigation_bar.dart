@@ -13,31 +13,48 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: selectedIndex,
-      onTap: onItemTapped,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF40C4FF), Color(0xFF80D8FF)], // Gradient colors
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.calendar_today),
-            label: 'Daily Activities'
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.emoji_events),
-          label: 'Achievements',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings',
-        ),
-      ],
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blueAccent,
-      unselectedItemColor: Colors.grey,
-      backgroundColor: Colors.black,
-      iconSize: 30,
+      ),
+      child: BottomNavigationBar(
+        currentIndex: selectedIndex,
+        onTap: onItemTapped,
+        items: [
+          // Native sailing icon
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.sailing), // Use the sailing icon
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'Daily Activities'
+          ),
+          // Custom treasure chest icon
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/treasure.png', // Custom treasure chest icon
+              width: 30,
+              height: 30,
+            ),
+            label: 'Achievements',
+          ),
+          // Settings icon remains as-is
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        backgroundColor: Colors.transparent,
+        type: BottomNavigationBarType.fixed,
+        iconSize: 30,
+      ),
     );
   }
 }
