@@ -156,7 +156,7 @@ class _BreathingActivityState extends State<BreathingActivity>
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFFF8DC), // Sandy color
