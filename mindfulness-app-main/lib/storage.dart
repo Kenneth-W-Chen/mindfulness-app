@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
 import 'package:flutter/foundation.dart';
-=======
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
 import 'package:sqflite/sqflite.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' show join;
@@ -18,35 +15,36 @@ class Storage {
   static const _preferencesTable = 'preferences';
   static const _achievementsTable = 'achievements';
   static const _dailyResetTable = 'last_daily_reset';
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
-=======
   static const _moodJournalsTable = 'mood_journals';
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
 
   Storage._create(Database db) {
     _db = db;
   }
 
   /// Creates a Storage object to interact with the database
+  /// Usage:
+  /// ```dart
+  /// Storage storage = await Storage.create();
+  /// ```
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
-      version: 2, // Ensure the version is specified
-=======
       version: 2, // Updated version for schema changes
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
       onConfigure: _configureDb,
       onCreate: _initDb,
     );
     return Storage._create(db);
   }
 
+  /// Closes the database connection. Only use if the `Storage` object won't be used again afterwards (i.e., app close or reset)
+  /// Usage:
+  /// ```dart
+  /// await storage.close();
+  /// ```
   Future<void> close() async {
     await _db.close();
   }
 
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
   /**
    * Achievements functions
    */
@@ -157,7 +155,49 @@ class Storage {
 
     return logs;
   }
-/// Inserts a new mood journal entry into the database
+
+
+  /// Adds a log to the activity logs
+  /// `name` - the name of the activity
+  /// `info` - info associated with the activity
+  ///
+  /// *Note: `completion_date` is automatically set to the days since Unix epoch*
+  ///
+  /// Usage:
+  ///
+  /// ```dart
+  ///  await storage.addActivityLog(ActivityName.breathe);
+  /// ```
+  Future<void> addActivityLog(ActivityName name, String? info) async {
+    int activityId = await getActivityId(name);
+
+    await _db.insert(
+      _activityLogTable,
+      {
+        'activity_id': activityId,
+        'completion_date': DateTime.now().daysSinceEpoch(),
+        'info': info,
+      },
+    );
+  }
+
+  Future<int> getActivityId(ActivityName name) async {
+    int activityId = (await _db.query(
+      _activityTable,
+      columns: ['id'],
+      where: 'name = ?',
+      whereArgs: [name.name],
+    ))[0]['id'] as int;
+    return activityId;
+  }
+
+  /// Delete an activity log entry
+  Future<void> deleteActivityLog(ActivityName activityName) async {
+    int activityId = await getActivityId(activityName);
+    await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
+  }
+
+  /// Inserts a new mood journal entry into the database
 /// 
 /// Parameters:
 /// - `date`: The date of the journal entry as a `String` in ISO 8601 format.
@@ -187,39 +227,6 @@ Future<List<Map<String, dynamic>>> getAllMoodJournalEntries() async {
     orderBy: 'date DESC', // Sort entries by date in descending order
   );
 }
-
-=======
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
-  /// Adds a log to the activity logs
-  Future<void> addActivityLog(ActivityName name, String? info) async {
-    int activityId = await getActivityId(name);
-
-    await _db.insert(
-      _activityLogTable,
-      {
-        'activity_id': activityId,
-        'completion_date': DateTime.now().daysSinceEpoch(),
-        'info': info,
-      },
-    );
-  }
-
-  Future<int> getActivityId(ActivityName name) async {
-    int activityId = (await _db.query(
-      _activityTable,
-      columns: ['id'],
-      where: 'name = ?',
-      whereArgs: [name.name],
-    ))[0]['id'] as int;
-    return activityId;
-  }
-
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
-  /// Delete an activity log entry
-  Future<void> deleteActivityLog(ActivityName activityName) async {
-    int activityId = await getActivityId(activityName);
-    await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
-  }
 
   /**
    *  Preferences functions
@@ -377,31 +384,6 @@ Future<void> insertSession(int sessionId, String name) async {
    */
 
   /// Initializes the database and tables when first creating the database
-=======
-  /// Inserts a new mood journal entry
-  Future<void> insertMoodJournal(
-      String date, String mood, int intensity, String note) async {
-    await _db.insert(
-      _moodJournalsTable,
-      {
-        'date': date,
-        'mood': mood,
-        'intensity': intensity,
-        'note': note,
-      },
-    );
-  }
-
-  /// Retrieves all mood journal entries from the database
-  Future<List<Map<String, dynamic>>> getAllMoodJournalEntries() async {
-    return await _db.query(
-      _moodJournalsTable,
-      orderBy: 'date DESC',
-    );
-  }
-
-  /// Initializes the database schema
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
   static Future<void> _initDb(Database db, int version) async {
     Batch batch = db.batch();
 
@@ -426,7 +408,8 @@ Future<void> insertSession(int sessionId, String name) async {
         'activity_id INTEGER NOT NULL,'
         'completion_date INT NOT NULL,'
         'info TEXT NULL,'
-        'FOREIGN KEY(activity_id) REFERENCES $_activityTable(id)'
+        'FOREIGN KEY(activity_id) REFERENCES $_activityTable(id),'
+        'CHECK (info != "INVALID_LOG") ON CONFLICT ROLLBACK'
         ');');
 
     // Create achievements table
@@ -437,7 +420,6 @@ Future<void> insertSession(int sessionId, String name) async {
         'UNIQUE(name)'
         ');');
 
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
     // Create sessions table
     batch.execute('CREATE TABLE IF NOT EXISTS sessions ('
       'id INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -489,8 +471,6 @@ Future<void> insertSession(int sessionId, String name) async {
       batch.insert(_achievementsTable, {'name': achievement.name, 'completion_date': null},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
 
-    // Run all SQL commands
-=======
     // Create mood journal table
     batch.execute('CREATE TABLE $_moodJournalsTable ('
         'id INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -500,7 +480,7 @@ Future<void> insertSession(int sessionId, String name) async {
         'note TEXT'
         ');');
 
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
+    // Run all SQL commands
     await batch.commit(noResult: true);
   }
 
@@ -516,7 +496,6 @@ extension EpochExtensions on DateTime {
     return (millisecondsSinceEpoch / 86400000).floor();
   }
 }
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
 /// Returns a DateTime object representing the days since the Unix epoch, assuming this is days
 ///
 /// Usage:
@@ -525,12 +504,26 @@ extension EpochExtensions on DateTime {
 /// 365.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1971
 /// 0.epochDaysToDateTime(); // gives a DateTime object representing January 1, 1970
 /// ```
-=======
-
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
 extension DateTimeEpochExtensions on int {
   DateTime epochDaysToDateTime() {
     return DateTime.utc(1970).add(Duration(days: this));
+  }
+}
+
+/// Returns the placeholders (?) and the args for a list of enums as [placeholders, args]
+///
+/// Usage:
+/// ```dart
+/// Database db = await openDatabase();
+/// List<PreferenceName> preferences = [master_volume, max_volume, music_volume];
+/// var exploded = db.enumListExplode(preferences);
+/// db.query('table', where: 'name in ${exploded[0]}', whereArgs: exploded[1]);
+/// ```
+extension ListExplode on Database {
+  List<List<String>> enumListExplode(List<Enum> s) {
+    var placeholders = List.filled(s.length, '?');
+    var args = s.map((s) => s.name).toList(growable: false);
+    return [placeholders, args];
   }
 }
 
@@ -549,15 +542,8 @@ enum PreferenceName {
 
 enum ActivityName {
   all(-1),
-<<<<<<< HEAD:mindfulness-app-main/lib/storage.dart
   meditation_station(0),
-  twilight_alley(1),
-  breathe(2);
-=======
-  breathe(0),
-  meditate(1);
-
->>>>>>> 1e35cfbb190effa617e67d72467b2656161d166b:lib/storage.dart
+  twilight_alley(1);
   final int value;
 
   const ActivityName(this.value);
