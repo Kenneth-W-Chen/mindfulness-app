@@ -23,7 +23,7 @@ class MoodJournal extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MoodSelectionScreen(storage: storage),
+      home: MoodSelectionScreen(),
     );
   }
 }

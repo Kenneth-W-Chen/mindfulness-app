@@ -3,10 +3,13 @@ import '../../../storage.dart';
 import 'journal_prompt_screen.dart';
 
 class MoodSelectionScreen extends StatefulWidget {
-  final Storage storage; // Accept the storage instance as a parameter
+  late Storage storage; // Accept the storage instance as a parameter
 
-  const MoodSelectionScreen({Key? key, required this.storage}) : super(key: key);
+  MoodSelectionScreen({Key? key}) : super(key: key){asyncInit();}
 
+  Future<void> asyncInit()  async {
+    storage = await Storage.create();
+  }
   @override
   _MoodSelectionScreenState createState() => _MoodSelectionScreenState();
 }
