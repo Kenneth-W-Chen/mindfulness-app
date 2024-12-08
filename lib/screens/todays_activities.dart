@@ -6,6 +6,7 @@ import 'activities/meditation_station.dart';
 import 'activities/twilight_alley_intro.dart';
 import 'package:calm_quest/breathing_activity.dart';
 
+
 class TodaysActivitiesScreen extends StatefulWidget {
   const TodaysActivitiesScreen({super.key});
 
