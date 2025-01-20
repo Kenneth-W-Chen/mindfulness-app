@@ -555,7 +555,7 @@ enum ActivityName {
   meditation_station(0),
   twilight_alley(1),
   breathe(2),
-  calimng_cliffs(3),
+  calming_cliffs(3),
   mood_journal(4);
   final int value;
 
