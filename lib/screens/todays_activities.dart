@@ -115,9 +115,11 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
                     textColor: Colors.amber[900],
                     subTextColor: Colors.amber[800],
                     onPop: (value) {
-                      storage.setDailyCompleted(index + 1);
-                      activities[index]['completed'] = value as bool;
-                      debugPrint("Set activity $index completion to ${value as bool?'true':'false'}");
+                      if(value as bool) {
+                        storage.setDailyCompleted(index + 1);
+                        activities[index]['completed'] = value;
+                      }
+                      debugPrint("Set activity $index completion to ${value?'true':'false'}");
                       setState(() {});
                     });
               }))
