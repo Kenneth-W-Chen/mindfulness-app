@@ -87,7 +87,7 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
             ElevatedButton(
               onPressed:  () async {
                 await saveEntry();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> JournalListScreen(storage: widget.storage)));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> JournalListScreen(storage: widget.storage)), result: true);
               },
               child: const Text('Save Entry'),
             ),

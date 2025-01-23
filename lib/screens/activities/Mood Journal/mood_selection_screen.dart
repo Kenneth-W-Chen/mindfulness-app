@@ -1,3 +1,4 @@
+import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import '../../../storage.dart';
 import 'journal_prompt_screen.dart';
@@ -30,9 +31,7 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Your Mood'),
-      ),
+      appBar: activityAppBar('Select Your Mood', Colors.white, context, false, backButtonColor: null),
       body: Column(
         children: [
           const SizedBox(height: 20),
