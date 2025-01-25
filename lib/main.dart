@@ -1,3 +1,4 @@
+import 'package:calm_quest/notifications.dart';
 import 'package:flutter/material.dart';
 import 'breathing_activity.dart';
 import 'achievements_screen.dart';
@@ -9,6 +10,7 @@ import 'placeholder_screen.dart';
 import 'home_screen.dart';
 
 void main() {
+  notifications.init();
   runApp(const CalmQuestApp());
 }
 
