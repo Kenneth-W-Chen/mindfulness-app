@@ -29,9 +29,10 @@ class Storage {
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-      version: 2, // Updated version for schema changes
+      version: 3, // Updated version for schema changes
       onConfigure: _configureDb,
       onCreate: _initDb,
+      onUpgrade: _updateDb
     );
     return Storage._create(db);
   }
@@ -484,6 +485,15 @@ Future<void> insertSession(int sessionId, String name) async {
     await batch.commit(noResult: true);
   }
 
+  static Future<void> _updateDb(Database db, int oldVersion, int newVersion) async{
+    Batch batch = db.batch();
+    if(oldVersion < 3){
+      batch.insert(_activityTable, {'name': 'calming_cliffs'},conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_activityTable, {'name': 'mood_journal'},conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
+    await batch.commit(noResult: true);
+  }
+
   /// Configures the database
   static Future<void> _configureDb(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON;');
@@ -544,7 +554,9 @@ enum ActivityName {
   all(-1),
   meditation_station(0),
   twilight_alley(1),
-  breathe(2);
+  breathe(2),
+  calming_cliffs(3),
+  mood_journal(4);
   final int value;
 
   const ActivityName(this.value);

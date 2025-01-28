@@ -1,11 +1,12 @@
 import '../custom_bottom_navigation_bar.dart';
+import 'activities/calmingcliffintro.dart';
 import 'shared/activity_widget.dart';
 import 'package:flutter/material.dart';
 import '../storage.dart';
 import 'activities/meditation_station.dart';
 import 'activities/twilight_alley_intro.dart';
 import 'package:calm_quest/breathing_activity.dart';
-
+import 'package:calm_quest/screens/activities/Mood%20Journal/mood_selection_screen.dart';
 
 class TodaysActivitiesScreen extends StatefulWidget {
   const TodaysActivitiesScreen({super.key});
@@ -21,20 +22,26 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
       activityNameToFunction = const {
     ActivityName.meditation_station: MeditationStation.new,
     ActivityName.twilight_alley: TwilightAlleyIntro.new,
-    ActivityName.breathe: BreathingActivity.new
+    ActivityName.breathe: BreathingActivity.new,
+    ActivityName.calming_cliffs: CalmingCliffsIntro.new,
+    ActivityName.mood_journal: MoodSelectionScreen.new
   };
 
   static const Map<ActivityName, IconData> activityNameIcons = const {
     ActivityName.meditation_station: Icons.headset,
     ActivityName.twilight_alley: Icons.flag,
-    ActivityName.breathe: Icons.phone_in_talk
+    ActivityName.breathe: Icons.phone_in_talk,
+    ActivityName.calming_cliffs: Icons.landscape,
+    ActivityName.mood_journal: Icons.book
   };
 
   static const Map<ActivityName, String> activityNameDescription = const {
     ActivityName.meditation_station:
         'Listen to calming sounds and nature noises.',
     ActivityName.twilight_alley: 'Journal some of your thoughts',
-    ActivityName.breathe: 'Take a moment to recollect yourself'
+    ActivityName.breathe: 'Take a moment to recollect yourself',
+    ActivityName.calming_cliffs: 'Calm yourself and realize that there is so much out there.',
+    ActivityName.mood_journal: 'Talk about how you feel today',
   };
 
   List<Map<String, Object>> activities = [];
@@ -108,9 +115,11 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
                     textColor: Colors.amber[900],
                     subTextColor: Colors.amber[800],
                     onPop: (value) {
-                      storage.setDailyCompleted(index + 1);
-                      activities[index]['completed'] = value as bool;
-                      debugPrint("Set activity $index completion to ${value as bool?'true':'false'}");
+                      if(value as bool) {
+                        storage.setDailyCompleted(index + 1);
+                        activities[index]['completed'] = value;
+                      }
+                      debugPrint("Set activity $index completion to ${value?'true':'false'}");
                       setState(() {});
                     });
               }))
