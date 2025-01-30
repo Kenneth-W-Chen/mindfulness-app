@@ -195,7 +195,7 @@ class _MeditationStationState extends State<MeditationStation> {
                               storage: storage,
                             )),
                   ).then((value) {
-                    _activityCompleted = value as bool;
+                    _activityCompleted = value as bool || _activityCompleted;
                     setState(() {});
                   });
                 },

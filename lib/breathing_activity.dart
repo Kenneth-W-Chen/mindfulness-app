@@ -12,9 +12,10 @@ class _BreathingActivityState extends State<BreathingActivity>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _breathingAnimation;
-
+  bool _activityCompleted = false;
   String _instruction = 'Inhale...';
   late Timer _breathingTimer;
+  late Timer completionTimer;
 
   @override
   void initState() {
@@ -32,7 +33,10 @@ class _BreathingActivityState extends State<BreathingActivity>
         curve: Curves.easeInOut,
       ),
     );
-
+    completionTimer = Timer(Duration(seconds: 30), () {
+      _activityCompleted = true;
+      setState(() {});
+    });
     _startBreathingSequence();
   }
 
@@ -156,7 +160,7 @@ class _BreathingActivityState extends State<BreathingActivity>
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context, true);
+                Navigator.pop(context, _activityCompleted);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFFF8DC), // Sandy color
@@ -167,7 +171,7 @@ class _BreathingActivityState extends State<BreathingActivity>
                 ),
               ),
               child: const Text(
-                'Back to Home',
+                'Back',
                 style: TextStyle(
                   color: Color(0xFF4682B4),
                   fontWeight: FontWeight.bold,

@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart';
 import 'package:timezone/data/latest_all.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:collection/src/iterable_extensions.dart';
 
 class notifications{
   static FlutterLocalNotificationsPlugin plugin = FlutterLocalNotificationsPlugin();
@@ -30,7 +31,13 @@ class notifications{
     ), androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle, uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, matchDateTimeComponents: matchDateTimeComponents);
   }
 
+  static Future<bool> isScheduled(NotificationIds id) async{
+    return (await plugin.pendingNotificationRequests()).firstWhereOrNull((e)=>e.id == id.value) != null;
+  }
 
+  static Future<bool> isActive(NotificationIds id) async{
+    return (await plugin.getActiveNotifications()).firstWhereOrNull((e)=>e.id == id.value) != null;
+  }
 }
 
 enum NotificationIds{
