@@ -10,8 +10,8 @@ import 'placeholder_screen.dart';
 import 'home_screen.dart';
 
 void main() {
-  notifications.init();
   runApp(const CalmQuestApp());
+  notifications.init();
 }
 
 class CalmQuestApp extends StatelessWidget {

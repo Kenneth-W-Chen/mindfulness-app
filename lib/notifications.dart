@@ -5,15 +5,16 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 
 class notifications{
   static FlutterLocalNotificationsPlugin plugin = FlutterLocalNotificationsPlugin();
-  static const InitializationSettings settings = InitializationSettings(android: AndroidInitializationSettings('app_icon'), iOS: DarwinInitializationSettings());
-
+  static const InitializationSettings settings = InitializationSettings(android: AndroidInitializationSettings('default_icon'), iOS: DarwinInitializationSettings());
+  static late Location timezone;
   notifications_(){}
 
 
   /// Initializes the notification system. Additionally, initializes the timezone database for usage with scheduled notifications.
   static Future<void> init() async{
     initializeTimeZones();
-    setLocalLocation(getLocation(await FlutterTimezone.getLocalTimezone()));
+    timezone = getLocation(await FlutterTimezone.getLocalTimezone());
+    setLocalLocation(timezone);
     await plugin.initialize(settings);
   }
 

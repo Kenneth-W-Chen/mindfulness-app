@@ -1,3 +1,7 @@
+import 'package:calm_quest/notifications.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import '../custom_bottom_navigation_bar.dart';
 import 'shared/activity_widget.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +9,9 @@ import '../storage.dart';
 import 'activities/meditation_station.dart';
 import 'activities/twilight_alley_intro.dart';
 import 'package:calm_quest/breathing_activity.dart';
+import 'package:timezone/timezone.dart';
+import 'package:timezone/data/latest_all.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 
 class TodaysActivitiesScreen extends StatefulWidget {
@@ -43,6 +50,14 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
 
   @override
   void initState() {
+    // if the program is being debugged, schedules a notification to occur 30 seconds from now daily (e.g., always at 10:00:30 everyday)
+    if(kDebugMode){
+      print('Adding notification');
+      notifications.schedule(122, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.now(notifications.timezone).add(const Duration(seconds: 30)), matchDateTimeComponents: DateTimeComponents.time);
+    } else{ // schedules a notification to occur every day at 10am
+      TZDateTime tomorrow = TZDateTime.now(notifications.timezone).add(const Duration(days:1));
+      notifications.schedule(123, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.local(tomorrow.year,tomorrow.month,tomorrow.day,10), matchDateTimeComponents: DateTimeComponents.time);
+    }
     super.initState();
     asyncInit();
   }
