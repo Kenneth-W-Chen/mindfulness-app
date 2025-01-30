@@ -29,4 +29,13 @@ class notifications{
       iOS: const DarwinNotificationDetails(presentBadge: false,presentBanner: false,presentList: false)
     ), androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle, uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, matchDateTimeComponents: matchDateTimeComponents);
   }
+
+
+}
+
+enum NotificationIds{
+  debugNotification(999),
+  dailyReset(123);
+  final int value;
+  const NotificationIds(this.value);
 }

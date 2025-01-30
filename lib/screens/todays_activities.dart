@@ -53,10 +53,10 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     // if the program is being debugged, schedules a notification to occur 30 seconds from now daily (e.g., always at 10:00:30 everyday)
     if(kDebugMode){
       print('Adding notification');
-      notifications.schedule(122, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.now(notifications.timezone).add(const Duration(seconds: 30)), matchDateTimeComponents: DateTimeComponents.time);
+      notifications.schedule(NotificationIds.debugNotification.value, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.now(notifications.timezone).add(const Duration(seconds: 30)), matchDateTimeComponents: DateTimeComponents.time);
     } else{ // schedules a notification to occur every day at 10am
       TZDateTime tomorrow = TZDateTime.now(notifications.timezone).add(const Duration(days:1));
-      notifications.schedule(123, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.local(tomorrow.year,tomorrow.month,tomorrow.day,10), matchDateTimeComponents: DateTimeComponents.time);
+      notifications.schedule(NotificationIds.dailyReset.value, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.local(tomorrow.year,tomorrow.month,tomorrow.day,10), matchDateTimeComponents: DateTimeComponents.time);
     }
     super.initState();
     asyncInit();
