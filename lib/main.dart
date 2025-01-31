@@ -1,3 +1,4 @@
+import 'package:calm_quest/notifications.dart';
 import 'package:flutter/material.dart';
 import 'breathing_activity.dart';
 import 'achievements_screen.dart';
@@ -10,6 +11,7 @@ import 'home_screen.dart';
 
 void main() {
   runApp(const CalmQuestApp());
+  notifications.init();
 }
 
 class CalmQuestApp extends StatelessWidget {

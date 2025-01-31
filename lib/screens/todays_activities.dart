@@ -1,3 +1,6 @@
+import 'package:calm_quest/notifications.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../custom_bottom_navigation_bar.dart';
 import 'activities/calmingcliffintro.dart';
 import 'shared/activity_widget.dart';
@@ -7,6 +10,10 @@ import 'activities/meditation_station.dart';
 import 'activities/twilight_alley_intro.dart';
 import 'package:calm_quest/breathing_activity.dart';
 import 'package:calm_quest/screens/activities/Mood%20Journal/mood_selection_screen.dart';
+import 'package:timezone/timezone.dart';
+import 'package:timezone/data/latest_all.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+
 
 class TodaysActivitiesScreen extends StatefulWidget {
   const TodaysActivitiesScreen({super.key});
@@ -55,9 +62,22 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
   }
 
   Future<void> asyncInit() async {
+    // Set up daily activities
     storage = await Storage.create();
     activities = await storage.dailyReset();
     setState(() {});
+    // Set up notifications
+    // if the program is being debugged, schedules a notification to occur 30 seconds from now daily (e.g., always at 10:00:30 everyday)
+    if(kDebugMode){
+      print('Adding notification');
+      notifications.schedule(NotificationIds.debugNotification.value, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.now(notifications.timezone).add(const Duration(seconds: 30)), matchDateTimeComponents: DateTimeComponents.time);
+    } else{ // schedule a notification to occur every day at 10am
+      // don't reschedule it if it's already been scheduled
+      if(!await notifications.isScheduled(NotificationIds.dailyReset)) return;
+      TZDateTime tomorrow = TZDateTime.now(notifications.timezone).add(const Duration(days:1));
+      notifications.schedule(NotificationIds.dailyReset.value, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.local(tomorrow.year,tomorrow.month,tomorrow.day,10), matchDateTimeComponents: DateTimeComponents.time);
+    }
+
   }
 
   @override
