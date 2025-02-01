@@ -102,6 +102,22 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child:
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    completionCard(true,'Su'),
+                    completionCard(false,'Mo'),
+                    completionCard(true,'Tu'),
+                    completionCard(false,'We'),
+                    completionCard(true,'Th'),
+                    completionCard(false,'Fr'),
+                    completionCard(true,'Sa'),
+                    ],
+                  )
+              ),
               const Text(
                 "Here are the activities for today!",
                 style: TextStyle(
@@ -160,6 +176,21 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
           }
         },
       ),
+    );
+  }
+
+  Card completionCard(bool completed, String day){
+    return Card(
+        child:
+            Padding(
+                padding: EdgeInsets.all(4.0),
+                child:
+        Column(
+          children: [
+            Icon(completed? Icons.check_box_outlined:Icons.square_outlined),
+            Text(day)
+          ],
+        ))
     );
   }
 }
