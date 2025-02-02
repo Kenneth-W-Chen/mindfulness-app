@@ -51,19 +51,33 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     ActivityName.mood_journal: 'Talk about how you feel today',
   };
 
+  List<bool> dayCompletedList = List<bool>.filled(7, false);
+
   List<Map<String, Object>> activities = [];
+  late int todayWeekday;
 
   _TodaysActivitiesScreenState();
 
   @override
   void initState() {
     super.initState();
+    todayWeekday = DateTime.now().weekday;
+    if(todayWeekday == 7) todayWeekday = 0;
+
     asyncInit();
   }
 
   Future<void> asyncInit() async {
-    // Set up daily activities
     storage = await Storage.create();
+
+    // set up completion indicator
+    List<Map<String,Object>?> completionInfo = await storage.getDailyResetInfo(startDate: DateTime.now().subtract(Duration(days: todayWeekday)));
+    for(int i = 0; i< completionInfo.length; i++){
+      if(completionInfo[i]==null || !completionInfo[i]!.containsKey('activity_completed')) continue;
+      dayCompletedList[todayWeekday-i] = ((completionInfo[i]!['activity_completed'] as int) & 7) == 7;
+    }
+
+    // Set up daily activities
     activities = await storage.dailyReset();
     setState(() {});
     // Set up notifications
@@ -108,13 +122,13 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                    completionCard(true,'Su'),
-                    completionCard(false,'Mo'),
-                    completionCard(true,'Tu'),
-                    completionCard(false,'We'),
-                    completionCard(true,'Th'),
-                    completionCard(false,'Fr'),
-                    completionCard(true,'Sa'),
+                      completionCard(dayCompletedList[0], 'Su'),
+                      completionCard(dayCompletedList[1], 'Mo'),
+                      completionCard(dayCompletedList[2], 'Tu'),
+                      completionCard(dayCompletedList[3], 'We'),
+                      completionCard(dayCompletedList[4], 'Th'),
+                      completionCard(dayCompletedList[5], 'Fr'),
+                      completionCard(dayCompletedList[6], 'Sa'),
                     ],
                   )
               ),
@@ -156,6 +170,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
                         activities[index]['completed'] = value;
                       }
                       debugPrint("Set activity $index completion to ${value?'true':'false'}");
+                      if(activities.every((e)=>e['completed']==true)) dayCompletedList[todayWeekday] = true;
                       setState(() {});
                     });
               }))
