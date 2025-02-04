@@ -70,15 +70,20 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
   Future<void> asyncInit() async {
     storage = await Storage.create();
 
-    // set up completion indicator
-    List<Map<String,Object>?> completionInfo = await storage.getDailyResetInfo(startDate: DateTime.now().subtract(Duration(days: todayWeekday)));
-    for(int i = 0; i< completionInfo.length; i++){
-      if(completionInfo[i]==null || !completionInfo[i]!.containsKey('activity_completed')) continue;
-      dayCompletedList[todayWeekday-i] = ((completionInfo[i]!['activity_completed'] as int) & 7) == 7;
-    }
-
     // Set up daily activities
     activities = await storage.dailyReset();
+
+    // set up completion indicator
+    List<Map<String,Object>?> completionInfo = await storage.getDailyResetInfo(startDate: DateTime.now().subtract(Duration(days: todayWeekday)));
+
+    for(int i = 0; i< completionInfo.length; i++){
+      if(completionInfo[i]==null || !completionInfo[i]!.containsKey('activity_completed')) continue;
+      int dayCompletedIndex = (completionInfo[i]!['date']! as DateTime).weekday;
+      if(dayCompletedIndex == 7) dayCompletedIndex = 0;
+      dayCompletedList[dayCompletedIndex] = ((completionInfo[i]!['activity_completed'] as int) & 7) == 7;
+    }
+
+
     setState(() {});
     // Set up notifications
     // if the program is being debugged, schedules a notification to occur 30 seconds from now daily (e.g., always at 10:00:30 everyday)
