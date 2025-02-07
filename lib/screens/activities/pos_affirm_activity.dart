@@ -1,0 +1,136 @@
+//import 'package:calm_quest/screens/shared/activity_app_bar.dart';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(QuoteApp());
+}
+
+class QuoteApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Positive Power-Ups',
+      home: QuoteScreen(),
+    );
+  }
+}
+
+class QuoteScreen extends StatefulWidget {
+  @override
+  _QuoteScreenState createState() => _QuoteScreenState();
+}
+
+class _QuoteScreenState extends State<QuoteScreen> {
+  final List<String> quotes = [
+    "I am loved and appreciated.",
+    "I am brave and strong.",
+    "I can do anything I set my mind to.",
+    "I am unique and special.",
+    "I am kind and honest.",
+    "I am a good friend.",
+    "I am worthy of happiness.",
+    "I have many talents and abilities.",
+    "I am smart and capable.",
+    "I choose to be happy and have fun.",
+    "I am loved just the way I am.",
+    "I am proud of who I am.",
+    "I can handle challenges with courage and determination.",
+    "I am full of creativity and imagination.",
+    "I can learn anything I want to learn.",
+    "I have the power to make a difference in the world.",
+    "I am confident and self-assured.",
+    "I am appreciated for being me.",
+    "I am grateful for my friends and family.",
+    "I am surrounded by love and support.",
+    "I am going to make today count.",
+    "I am positive and optimistic.",
+    "I am a good listener and helper.",
+    "I can handle challenges.",
+    "I always do my best.",
+    "I am always improving and growing.",
+    "I am a good role model for others.",
+    "I know it’s ok to make mistakes.",
+    "I have the power to control my thoughts and emotions.",
+    "I am a positive influence on those around me.",
+    "I am a great friend and make others feel loved and valued.",
+  ];
+
+  String currentQuote =
+      "Feeling overwhelmed? Tap to explore some positive affirmations to ground yourself.";
+
+  void refreshQuote() {
+    setState(() {
+      currentQuote = quotes[(quotes.length *
+              (DateTime.now().millisecondsSinceEpoch % 1000) ~/
+              1000) %
+          quotes.length];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Positive Power-Ups'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
+        backgroundColor:
+            Color.fromARGB(255, 98, 28, 111), // Solid color for AppBar
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 98, 28, 111),
+              Color.fromARGB(255, 134, 42, 35)
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '"$currentQuote"',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 25),
+                ElevatedButton(
+                  onPressed: refreshQuote,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0x682861),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  child: Text(
+                    'Reveal an affirmation',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -22,24 +22,61 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   Future<void> _loadAchievements() async {
     try {
       Storage storage = await Storage.create(); // Initialize storage
-      Map<Achievement, DateTime?> achievementsData = await storage.getAchievementsCompletionDate([Achievement.all]);
+      Map<Achievement, DateTime?> achievementsData =
+          await storage.getAchievementsCompletionDate([Achievement.all]);
 
-      List<Map<String, String>> loadedAchievements = achievementsData.entries.map((entry) {
+      List<Map<String, String>> loadedAchievements =
+          achievementsData.entries.map((entry) {
         return {
           'title': entry.key.name,
-          'description': entry.value != null ? 'Completed on ${entry.value}' : 'Not completed yet',
+          'description': entry.value != null
+              ? 'Completed on ${entry.value}'
+              : 'Not completed yet',
         };
       }).toList();
 
-      // Add placeholder achievement
-      loadedAchievements.insert(0, {
-        'title': 'Calming Shield',
-        'description': 'Achieved peace of mind.',
-      });
+      List<Map<String, String>> userAchievements = [
+        {
+          'title': 'Baby Steps',
+          'description': 'Complete your first activity. Completed on 2024-10-08'
+        },
+        {
+          'title': 'Peace of Mind',
+          'description':
+              'Use Positive Power Ups one time. Completed on 2024-10-23'
+        },
+        {
+          'title': 'Consistency is Key',
+          'description': 'Complete a 2 week streak. Completed on 2024-11-22'
+        },
+        {
+          'title': 'Calming Shield',
+          'description': 'Use Calming Cliffs one time. Completed on 2024-11-26'
+        },
+        {
+          'title': 'Well Rounded',
+          'description': 'Interact with all 3 terrains. Completed on 2025-1-01'
+        },
+        {
+          'title': 'Reflective Mindset',
+          'description': 'Write in the Mood Journal. Completed on 2025-1-15'
+        },
+        {
+          'title': 'Breath of Fresh Air',
+          'description': 'Stop by Meditation Station. Completed on 2025-10-02'
+        },
+        {
+          'title': 'Welcome to the Cove',
+          'description': 'Open the app. Completed on 2021-10-01'
+        },
+      ];
+
+      loadedAchievements.addAll(userAchievements);
 
       setState(() {
         achievements = loadedAchievements;
-        storageStatusMessage = "Achievements loaded successfully from the database!";
+        storageStatusMessage =
+            "Achievements loaded successfully from the database!";
       });
     } catch (e) {
       setState(() {
@@ -70,7 +107,8 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16.0,
                         mainAxisSpacing: 16.0,
@@ -92,18 +130,19 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         onItemTapped: (index) {
           if (index == 0) {
             Navigator.pushReplacementNamed(context, '/'); // Navigate to Home
-          } else if(index == 1){
+          } else if (index == 1) {
             Navigator.pushReplacementNamed(context, '/todays_activities');
-          }
-          else if (index == 3) {
-            Navigator.pushReplacementNamed(context, '/settings'); // Navigate to Settings
+          } else if (index == 3) {
+            Navigator.pushReplacementNamed(
+                context, '/settings'); // Navigate to Settings
           }
         },
       ),
     );
   }
 
-  Widget _buildAchievementCard({required String title, required String description}) {
+  Widget _buildAchievementCard(
+      {required String title, required String description}) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),

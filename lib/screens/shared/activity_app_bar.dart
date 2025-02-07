@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 AppBar activityAppBar(String title, Color backgroundColor, BuildContext context, bool activityCompleted, {Color? backButtonColor = Colors.white}) {
