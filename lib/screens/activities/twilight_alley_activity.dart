@@ -1,7 +1,7 @@
 import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'twilight_alley_intro.dart'; // Ensure the import path is correct
+// Ensure the import path is correct
 import '../../storage.dart';
 
 class TwilightAlleyActivity extends StatefulWidget {

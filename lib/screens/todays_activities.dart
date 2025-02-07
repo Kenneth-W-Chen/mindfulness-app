@@ -11,8 +11,6 @@ import 'activities/twilight_alley_intro.dart';
 import 'package:calm_quest/breathing_activity.dart';
 import 'package:calm_quest/screens/activities/Mood%20Journal/mood_selection_screen.dart';
 import 'package:timezone/timezone.dart';
-import 'package:timezone/data/latest_all.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 
 
 class TodaysActivitiesScreen extends StatefulWidget {
