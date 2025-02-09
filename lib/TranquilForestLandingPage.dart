@@ -5,6 +5,8 @@ import 'screens/activities/meditation_station.dart';
 import 'screens/activities/twilight_alley_intro.dart';
 import 'screens/activities/calmingcliffintro.dart';
 import 'screens/activities/Mood Journal/mood_selection_screen.dart';
+import 'screens/activities/mellowmazeintro.dart';
+
 
 class TranquilForestLandingPage extends StatelessWidget {
   const TranquilForestLandingPage({super.key});
@@ -103,7 +105,17 @@ class TranquilForestLandingPage extends StatelessWidget {
                   iconColor: Colors.white,
                   textColor: Colors.teal[700],
                   subTextColor: Colors.teal[600]),
-
+              
+              activityCard('Mellow Maze', context, Icons.blur_circular,
+                'Traverse the maze to clear your mind.',
+                builder: (context) => const MellowMazeIntro(),
+                cardColor: Colors.white.withOpacity(0.9),
+                shadowColor: Colors.black.withOpacity(0.3),
+                iconBackgroundColor: Colors.teal[700],
+                iconColor: Colors.white,
+                textColor: Colors.teal[700],
+                subTextColor: Colors.teal[600]),
+              
               activityCard('Postive Power Ups', context, Icons.book,
                   'Ground yourself with positive affirmations',
                   builder: (context) => QuoteScreen(),
