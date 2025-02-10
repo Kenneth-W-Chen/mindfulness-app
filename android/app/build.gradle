@@ -9,6 +9,7 @@ android {
     namespace = "com.example.mindfulness_app"
     compileSdk = 35
     ndkVersion = flutter.ndkVersion
+    compileSdkVersion = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
