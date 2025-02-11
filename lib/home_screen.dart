@@ -103,6 +103,22 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
+            _buildIslandTile(
+  title: 'Emotion Explorer',
+  icon: Icons.emoji_emotions,
+  description: 'Discover and track your emotions',
+  startColor: const Color(0xFFFFA726), // Orange
+  endColor: const Color(0xFFFFCC80),   // Light Orange
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EmotionExplorer(), // Navigate to Emotion Explorer
+      ),
+    );
+  },
+),
+
           ],
         ),
       ),
