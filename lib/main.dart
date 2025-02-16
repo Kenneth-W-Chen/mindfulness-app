@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'breathing_activity.dart';
 import 'achievements_screen.dart';
 import 'settings_screen.dart';
+import 'TranquilForestlandingpage.dart'; // Correct file name
+import 'serene_beach_page.dart';
+import 'placeholder_screen.dart';
+import 'home_screen.dart';
 
 void main() {
-  runApp(const CalmQuestApp());
+  runApp(const MyApp());
 }
 
-class CalmQuestApp extends StatelessWidget {
-  const CalmQuestApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark(),
+      debugShowCheckedModeBanner: false,
+      title: 'Mindfulness App',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+      ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(),
+        '/': (context) => HomeScreen(),
         '/achievements': (context) => const AchievementsScreen(),
         '/settings': (context) => const SettingsScreen(),
+        '/breathing_activity': (context) => const BreathingActivity(),
+        '/tranquil_forest': (context) => TranquilForestLandingPage(), // Correct reference
+        '/serene_beach': (context) =>  SereneBeachPage(),
+        '/placeholder': (context) => const PlaceholderScreen(
+              message: 'Feature Under Construction',
+            ),
       },
     );
   }

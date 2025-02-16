@@ -1,67 +1,118 @@
 import 'package:flutter/material.dart';
-import 'placeholder_screen.dart'; // Import placeholder screen
+import 'dart:math';
+import 'package:flutter/animation.dart';
+import 'serene_beach_page.dart';
+import 'placeholder_screen.dart';
+import 'TranquilForestlandingpage.dart';
+import 'custom_bottom_navigation_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late AnimationController _controller1;
+  late AnimationController _controller2;
+  late AnimationController _controller3;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller1 = _createFloatingAnimationController();
+    _controller2 = _createFloatingAnimationController();
+    _controller3 = _createFloatingAnimationController();
+  }
+
+  AnimationController _createFloatingAnimationController() {
+    return AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller1.dispose();
+    _controller2.dispose();
+    _controller3.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Explore CalmQuest Islands',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.black,
-      ),
+      backgroundColor: Colors.deepPurple[900],
       body: Column(
         children: [
-          _buildHeroBanner(),
+          const SizedBox(height: 50),
+          const Center(
+            child: Text(
+              'Welcome to CalmQuest',
+              style: TextStyle(
+                fontSize: 32,
+                fontFamily: 'Chewy',
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 50),
           Expanded(
-            child: ListView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildIslandTile(
+                _buildFloatingIslandTile(
                   title: 'Misty Mountain',
+                  description: 'Guided visualizations for calmness.',
+                  startColor: const Color(0xFF5E35B1),
+                  endColor: const Color(0xFF9575CD),
                   icon: Icons.terrain,
-                  description: 'Climb to new heights with breathing exercises.',
-                  startColor: const Color(0xFFD1C4E9),
-                  endColor: const Color(0xFFFFE0B2),
+                  controller: _controller1,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PlaceholderScreen(message: 'Misty Mountain - Island in Progress'),
+                        builder: (context) => const PlaceholderScreen(
+                          message: 'Misty Mountain - Feature Coming Soon!',
+                        ),
                       ),
                     );
                   },
                 ),
-                _buildIslandTile(
+                const SizedBox(height: 50),
+                _buildFloatingIslandTile(
                   title: 'Serene Beach',
+                  description: 'Let the waves guide you to peace.',
+                  startColor: const Color(0xFF039BE5),
+                  endColor: const Color(0xFF81D4FA),
                   icon: Icons.beach_access,
-                  description: 'Relax with guided visualizations.',
-                  startColor: const Color(0xFFFFE0B2),
-                  endColor: const Color(0xFFB2EBF2),
+                  controller: _controller2,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PlaceholderScreen(message: 'Serene Beach - Island in Progress'),
+                        builder: (context) => SereneBeachPage(),
                       ),
                     );
                   },
                 ),
-                _buildIslandTile(
+                const SizedBox(height: 50),
+                _buildFloatingIslandTile(
                   title: 'Tranquil Forest',
+                  description: 'Relax with soothing nature sounds.',
+                  startColor: const Color(0xFF388E3C),
+                  endColor: const Color(0xFF81C784),
                   icon: Icons.nature,
-                  description: 'Find calm with nature sounds.',
-                  startColor: const Color(0xFFB2EBF2),
-                  endColor: const Color(0xFFA5D6A7),
+                  controller: _controller3,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PlaceholderScreen(message: 'Tranquil Forest - Island in Progress'),
+                        builder: (context) => TranquilForestLandingPage(),
                       ),
                     );
                   },
@@ -71,25 +122,9 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.emoji_events),
-            label: 'Achievements',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        onTap: (index) {
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: 0,
+        onItemTapped: (index) {
           if (index == 1) {
             Navigator.pushNamed(context, '/achievements');
           } else if (index == 2) {
@@ -100,114 +135,72 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroBanner() {
-    return Container(
-      height: 150,
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.blueAccent, Colors.cyanAccent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Row(
-        children: [
-          Icon(
-            Icons.wb_sunny,
-            size: 60,
-            color: Colors.white,
+  Widget _buildFloatingIslandTile({
+    required String title,
+    required String description,
+    required Color startColor,
+    required Color endColor,
+    required IconData icon,
+    required AnimationController controller,
+    required VoidCallback onTap,
+  }) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, 10 * sin(controller.value * pi * 2)),
+          child: child,
+        );
+      },
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 140,
+          height: 140,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [startColor, endColor],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black54,
+                blurRadius: 20,
+                spreadRadius: 5,
+                offset: Offset(4, 8),
+              ),
+            ],
           ),
-          SizedBox(width: 16),
-          Expanded(
+          child: Center(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Icon(icon, size: 50, color: Colors.white),
+                const SizedBox(height: 8),
                 Text(
-                  'Welcome to CalmQuest!',
-                  style: TextStyle(
-                    fontSize: 24,
+                  title,
+                  style: const TextStyle(
+                    fontFamily: 'Chewy',
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
-                ),
-                Text(
-                  'Embark on a mindfulness journey!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
-                  ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIslandTile({
-    required String title,
-    required IconData icon,
-    required String description,
-    required Color startColor,
-    required Color endColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.all(8.0),
-        padding: const EdgeInsets.all(16.0),
-        height: 120,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [startColor, endColor],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              offset: Offset(4, 4),
-              blurRadius: 8,
-              color: Colors.black26,
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 50, color: Colors.white),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
   }
 }
+
+
+
+
+
+
+
