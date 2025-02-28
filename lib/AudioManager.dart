@@ -56,7 +56,7 @@ class AudioManager {
   }
   
   bool isMusicFile(String audioFile){
-      return audioFile.startsWith('assets/audio/activity_one');
+      return audioFile.startsWith('audio/activity_one');
   }
 
   Future<void> pauseAudio() async {
