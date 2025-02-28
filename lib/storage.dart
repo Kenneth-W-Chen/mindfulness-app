@@ -29,7 +29,7 @@ class Storage {
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-      version: 3, // Updated version for schema changes
+      version: 4, // Updated version for schema changes
       onConfigure: _configureDb,
       onCreate: _initDb,
       onUpgrade: _updateDb
@@ -491,6 +491,10 @@ Future<void> insertSession(int sessionId, String name) async {
       batch.insert(_activityTable, {'name': 'calming_cliffs'},conflictAlgorithm: ConflictAlgorithm.ignore);
       batch.insert(_activityTable, {'name': 'mood_journal'},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
+    if(oldVersion < 4){
+      batch.insert(_preferencesTable, {'name':'notifs', 'value':'1'}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_preferencesTable, {'name':'theme', 'value':'0'}, conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
     await batch.commit(noResult: true);
   }
 
@@ -542,7 +546,9 @@ enum PreferenceName {
   all(-1, -1),
   master_volume(0, 100),
   music_volume(1, 100),
-  sound_fx_volume(2, 100);
+  sound_fx_volume(2, 100),
+  notifs(3,1),
+  theme(4,0);
 
   final int value;
   final int defaultValue;
