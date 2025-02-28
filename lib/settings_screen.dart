@@ -1,4 +1,7 @@
+import 'package:calm_quest/notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart';
 import 'Custom_Bottom_Navigation_Bar.dart';
 import 'storage.dart';
 import 'placeholder_screen.dart'; // Import placeholder screen
@@ -56,6 +59,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _rescheduleNotifications() async {
+    if(!await notifications.isScheduled(NotificationIds.dailyReset)) return;
+    TZDateTime tomorrow = TZDateTime.now(notifications.timezone).add(const Duration(days:1));
+    notifications.schedule(NotificationIds.dailyReset.value, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.local(tomorrow.year,tomorrow.month,tomorrow.day,10), matchDateTimeComponents: DateTimeComponents.time);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,15 +103,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       'App Preferences',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    
+
                     SwitchListTile(
                       title: const Text('Enable Notifications'),
-                      value: (preferences?[PreferenceName.master_volume] ?? 0) > 50, 
-                      onChanged: (bool value) {
-                        _updatePreferences(PreferenceName.master_volume, value ? 100 : 0);
+                      value: (preferences?[PreferenceName.notifs] as int) == 0,
+                      onChanged: (bool value) async {
+                        _updatePreferences(PreferenceName.notifs, value ? 1 : 0);
+                        if(value){
+                         await _rescheduleNotifications();
+                        }
+                        else {
+                          await notifications.plugin.cancelAll();
+                        }
                       },
                     ),
-                    
+
                     ListTile(
                       leading: const Icon(Icons.palette),
                       title: const Text('Theme'),
@@ -115,7 +130,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: _toggleTheme,
                       ),
                     ),
-                    
+
                     const Divider(),
                     const SizedBox(height: 10),
 
@@ -123,22 +138,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       'Sound & Music',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    
-                    SwitchListTile(
+                    ListTile(
+                        leading: const Icon(Icons.volume_up),
+                        title: const Text('Master Volume'),
+                        subtitle: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                                flex: 80,
+                                child: Slider(
+                                  value: (preferences?[PreferenceName.master_volume] as int).toDouble(),
+                                  max: 10,
+                                  divisions: 10,
+                                  onChanged: (double val){
+                                    _updatePreferences(PreferenceName.master_volume, val.round());
+                                  },
+                                )
+                            ),
+                            Expanded(
+                                flex: 20,
+                                child: Text(
+                                    (preferences?[PreferenceName.master_volume] as int).toString(),
+                                    textAlign: TextAlign.right
+                                )
+                            )
+                          ],
+                        )
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.music_note),
                       title: const Text('Background Music'),
-                      value: (preferences?[PreferenceName.music_volume] ?? 0) > 50, 
-                      onChanged: (bool value) {
-                        _updatePreferences(PreferenceName.music_volume, value ? 100 : 0);
-                      },
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 80,
+                            child: Slider(
+                              value: (preferences?[PreferenceName.music_volume] as int).toDouble(),
+                              max: 10,
+                              divisions: 10,
+                              onChanged: (double val){
+                                _updatePreferences(PreferenceName.music_volume, val.round());
+                              },
+                            )
+                          ),
+                          Expanded(
+                              flex: 20,
+                              child: Text(
+                                (preferences?[PreferenceName.music_volume] as int).toString(),
+                                textAlign: TextAlign.right
+                              )
+                          )
+                        ],
+                      )
                     ),
-                    
-                    SwitchListTile(
-                      title: const Text('Sound Effects'),
-                      value: (preferences?[PreferenceName.sound_fx_volume] ?? 0) > 50, 
-                      onChanged: (bool value) {
-                        _updatePreferences(PreferenceName.sound_fx_volume, value ? 100 : 0);
-                      },
+                    ListTile(
+                        leading: const Icon(Icons.graphic_eq),
+                        title: const Text('Sound Effects'),
+                        subtitle: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                                flex: 80,
+                                child: Slider(
+                                  value: (preferences?[PreferenceName.sound_fx_volume] as int).toDouble(),
+                                  max: 10,
+                                  divisions: 10,
+                                  onChanged: (double val){
+                                    _updatePreferences(PreferenceName.sound_fx_volume, val.round());
+                                  },
+                                )
+                            ),
+                            Expanded(
+                                flex: 20,
+                                child: Text(
+                                    (preferences?[PreferenceName.sound_fx_volume] as int).toString(),
+                                    textAlign: TextAlign.right
+                                )
+                            )
+                          ],
+                        )
                     ),
+
                     const Divider(),
                     const SizedBox(height: 10),
 
