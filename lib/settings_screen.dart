@@ -16,7 +16,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   late Storage storage;
   Map<PreferenceName, int>? preferences;
-  String _selectedTheme = 'Dark'; // Default theme is Dark
 
   @override
   void initState() {
@@ -43,22 +42,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  void _toggleTheme(String? theme) {
-    if (theme == 'Light') {
-      _selectedTheme = 'Light';
-      // Switch to light theme
-      setState(() {
-        // Implement light theme logic here
-      });
-    } else {
-      _selectedTheme = 'Dark';
-      // Switch to dark theme
-      setState(() {
-        // Implement dark theme logic here
-      });
+  void _toggleTheme(Themes? theme) {
+    _updatePreferences(PreferenceName.theme, theme!.index);
+    switch(theme){
+      case Themes.light:
+      // Implement light theme logic here
+        break;
+      case Themes.dark:
+      // Implement dark theme logic here
+        break;
+      default:
+        break;
     }
   }
-
+  
   Future<void> _rescheduleNotifications() async {
     if(!await notifications.isScheduled(NotificationIds.dailyReset)) return;
     TZDateTime tomorrow = TZDateTime.now(notifications.timezone).add(const Duration(days:1));
@@ -121,11 +118,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       leading: const Icon(Icons.palette),
                       title: const Text('Theme'),
-                      trailing: DropdownButton<String>(
-                        value: _selectedTheme,
+                      trailing: DropdownButton<Themes>(
+                        value: Themes.values[preferences![PreferenceName.theme]!],
                         items: const [
-                          DropdownMenuItem(value: 'Light', child: Text('Light')),
-                          DropdownMenuItem(value: 'Dark', child: Text('Dark')),
+                          DropdownMenuItem(value: Themes.light, child: Text('Light')),
+                          DropdownMenuItem(value: Themes.dark, child: Text('Dark')),
                         ],
                         onChanged: _toggleTheme,
                       ),
@@ -269,4 +266,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+}
+
+enum Themes{
+  light,
+  dark;
 }
