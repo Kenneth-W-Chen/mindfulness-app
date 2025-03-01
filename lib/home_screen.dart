@@ -3,7 +3,7 @@ import 'serene_beach_page.dart';
 import 'placeholder_screen.dart';
 import 'TranquilForestlandingpage.dart';
 import 'custom_bottom_navigation_bar.dart'; // Correct import for the navigation bar
-
+import './screens/emotion_explorer.dart'
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -43,7 +43,10 @@ class HomeScreen extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF80D8FF), Color(0xFF40C4FF)], // Light blue gradient
+              colors: [
+                Color(0xFF80D8FF),
+                Color(0xFF40C4FF)
+              ], // Light blue gradient
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -54,7 +57,8 @@ class HomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Spread out the tiles
+          mainAxisAlignment:
+              MainAxisAlignment.spaceEvenly, // Spread out the tiles
           children: [
             _buildIslandTile(
               title: 'Misty Mountain',
@@ -99,6 +103,22 @@ class HomeScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => TranquilForestLandingPage(),
+                  ),
+                );
+              },
+            ),
+            _buildIslandTile(
+              title: 'Emotion Explorer',
+              icon: Icons.emoji_emotions,
+              description: 'Discover and track your emotions',
+              startColor: const Color(0xFFFFA726), // Orange
+              endColor: const Color(0xFFFFCC80), // Light Orange
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EmotionExplorer(), // Navigate to Emotion Explorer
                   ),
                 );
               },
