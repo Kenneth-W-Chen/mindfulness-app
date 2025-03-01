@@ -6,7 +6,7 @@ class AudioManager {
   final AudioPlayer audioPlayer = AudioPlayer();
   final Storage storage;  // Made public by removing the underscore
   bool loop = false;
-  double volume = 1.0;
+  double masterVolume = 1.0, musicVolume = 1.0, soundFxVolume = 1.0;
 
   // Constructor with initialization logic
   AudioManager(this.storage) {
@@ -17,12 +17,14 @@ class AudioManager {
   Future<void> _initializeAudio() async {
     try {
       // Fetch volume preference from storage
-      Map<PreferenceName, int>? preferences = await storage.getPreferences([PreferenceName.master_volume]);
+      Map<PreferenceName, int>? preferences = await storage.getPreferences([PreferenceName.master_volume, PreferenceName.music_volume, PreferenceName.sound_fx_volume]);
       if (preferences != null && preferences.containsKey(PreferenceName.master_volume)) {
-        volume = preferences[PreferenceName.master_volume]! / 100.0; // Assuming volume is stored as an integer percentage
+        masterVolume = preferences[PreferenceName.master_volume]! / 10.0;
+        musicVolume = preferences[PreferenceName.music_volume]! / 10.0;
+        soundFxVolume = preferences[PreferenceName.sound_fx_volume]! /10.0;
       }
       if (kDebugMode) {
-        debugPrint("Audio Manager initialized with volume: $volume");
+        debugPrint("Audio Manager initialized with volume: $masterVolume");
       }
     } catch (error) {
       debugPrint("Error initializing audio preferences: $error");
@@ -38,7 +40,7 @@ class AudioManager {
   }
 
   Future<void> playAudio(String audioFile, {bool loop = false}) async {
-    await audioPlayer.setVolume(volume);
+    await audioPlayer.setVolume(masterVolume * (isMusicFile(audioFile)? musicVolume: soundFxVolume));
 
     // Set the audio source as an asset file
     await audioPlayer.setSource(AssetSource(audioFile));
@@ -51,6 +53,10 @@ class AudioManager {
     if (kDebugMode) {
       debugPrint("Playing audio: $audioFile with loop set to $loop");
     }
+  }
+  
+  bool isMusicFile(String audioFile){
+      return audioFile.startsWith('audio/activity_one');
   }
 
   Future<void> pauseAudio() async {
@@ -75,13 +81,13 @@ class AudioManager {
   }
 
   Future<void> adjustVolume(double level) async {
-    volume = level.clamp(0.0, 1.0);
-    await audioPlayer.setVolume(volume);
+    masterVolume = level.clamp(0.0, 1.0);
+    await audioPlayer.setVolume(masterVolume);
     try {
       // Save volume preference in storage
-      await storage.updatePreferences({PreferenceName.master_volume: (volume * 100).round()});
+      await storage.updatePreferences({PreferenceName.master_volume: (masterVolume * 100).round()});
       if (kDebugMode) {
-        debugPrint("Volume set to ${(volume * 100).toStringAsFixed(0)}% and saved to preferences.");
+        debugPrint("Volume set to ${(masterVolume * 100).toStringAsFixed(0)}% and saved to preferences.");
       }
     } catch (error) {
       debugPrint("Error saving volume preference: $error");

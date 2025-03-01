@@ -29,7 +29,7 @@ class Storage {
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-      version: 3, // Updated version for schema changes
+      version: 4, // Updated version for schema changes
       onConfigure: _configureDb,
       onCreate: _initDb,
       onUpgrade: _updateDb
@@ -387,7 +387,6 @@ Future<void> insertSession(int sessionId, String name) async {
   /// Initializes the database and tables when first creating the database
   static Future<void> _initDb(Database db, int version) async {
     Batch batch = db.batch();
-
     // Create preferences table
     batch.execute('CREATE TABLE $_preferencesTable ('
         'id INTEGER PRIMARY KEY NOT NULL,'
@@ -486,12 +485,21 @@ Future<void> insertSession(int sessionId, String name) async {
   }
 
   static Future<void> _updateDb(Database db, int oldVersion, int newVersion) async{
+    debugPrint('DB: Version updated to $newVersion from $oldVersion');
     Batch batch = db.batch();
     if(oldVersion < 3){
+      debugPrint('DB: Running v3 updates');
       batch.insert(_activityTable, {'name': 'calming_cliffs'},conflictAlgorithm: ConflictAlgorithm.ignore);
       batch.insert(_activityTable, {'name': 'mood_journal'},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
+    if(oldVersion < 4){
+      debugPrint('DB: Running v4 updates');
+      batch.insert(_preferencesTable, {'name':'notifs', 'value':'1'}, conflictAlgorithm: ConflictAlgorithm.replace);
+      batch.insert(_preferencesTable, {'name':'theme', 'value':'0'}, conflictAlgorithm: ConflictAlgorithm.replace);
+      batch.update(_preferencesTable, {'value':'10'}, where: "id in (1,2,3)", conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
     await batch.commit(noResult: true);
+    debugPrint('DB: Finished updating DB');
   }
 
   /// Configures the database
@@ -540,9 +548,11 @@ extension ListExplode on Database {
 // Enum definitions
 enum PreferenceName {
   all(-1, -1),
-  master_volume(0, 100),
-  music_volume(1, 100),
-  sound_fx_volume(2, 100);
+  master_volume(0, 10),
+  music_volume(1, 10),
+  sound_fx_volume(2, 10),
+  notifs(3,1),
+  theme(4,0);
 
   final int value;
   final int defaultValue;
