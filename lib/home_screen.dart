@@ -3,7 +3,7 @@ import 'serene_beach_page.dart';
 import 'placeholder_screen.dart';
 import 'TranquilForestlandingpage.dart';
 import 'custom_bottom_navigation_bar.dart'; // Correct import for the navigation bar
-import './screens/emotion_explorer.dart'
+import './screens/emotion_explorer.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
