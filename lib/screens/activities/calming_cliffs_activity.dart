@@ -137,7 +137,8 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          //** Fix: Return false when back button is pressed to avoid null value error.
+          onPressed: () => Navigator.pop(context, false),
         ),
       ),
       body: AnimatedBuilder(
@@ -170,7 +171,6 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
                   AnimatedBuilder(
                     animation: _breathingController,
                     builder: (context, child) {
-                      // Use sine function for smooth pulsing.
                       double scale =
                           1.0 + 0.1 * sin(2 * pi * _breathingController.value);
                       return Transform.scale(
@@ -188,9 +188,9 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
                     animation: _progressController,
                     builder: (context, child) {
                       int remainingMillis =
-                          (60000 * (1 - _progressController.value)).round();
+                      (60000 * (1 - _progressController.value)).round();
                       Duration remaining =
-                          Duration(milliseconds: remainingMillis);
+                      Duration(milliseconds: remainingMillis);
                       int minutes = remaining.inMinutes;
                       int seconds = remaining.inSeconds % 60;
                       String timeStr =
@@ -198,7 +198,7 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
                       return Text(
                         timeStr,
                         style:
-                            const TextStyle(color: Colors.white, fontSize: 20),
+                        const TextStyle(color: Colors.white, fontSize: 20),
                       );
                     },
                   ),
@@ -238,7 +238,7 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
                       ),
                     ),
                     const SizedBox(height: 40),
-                    // Hollow square with tracing ball.
+                    // Hollow square with the tracing ball.
                     Container(
                       width: 200,
                       height: 200,
@@ -250,7 +250,7 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
                             [_breathingController, _ballGradientController]),
                         builder: (context, child) {
                           Alignment ballAlignment =
-                              getSquareAlignment(_breathingController.value);
+                          getSquareAlignment(_breathingController.value);
                           return Align(
                             alignment: ballAlignment,
                             child: AnimatedBuilder(
@@ -258,9 +258,9 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
                               builder: (context, child) {
                                 double t = _ballGradientController.value;
                                 Color startColor =
-                                    Color.lerp(Colors.yellow, Colors.white, t)!;
+                                Color.lerp(Colors.yellow, Colors.white, t)!;
                                 Color endColor =
-                                    Color.lerp(Colors.white, Colors.yellow, t)!;
+                                Color.lerp(Colors.white, Colors.yellow, t)!;
                                 return Container(
                                   width: 30,
                                   height: 30,
@@ -292,7 +292,7 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
                       value: _progressAnimation.value,
                       backgroundColor: Colors.white.withOpacity(0.3),
                       valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.white),
+                      const AlwaysStoppedAnimation<Color>(Colors.white),
                     );
                   },
                 ),
@@ -304,4 +304,3 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
     );
   }
 }
-
