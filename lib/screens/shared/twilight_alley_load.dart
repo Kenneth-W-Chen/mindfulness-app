@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class TwilightAlleyLoad extends StatefulWidget {
-  const TwilightAlleyLoad({Key? key}) : super(key: key);
+  const TwilightAlleyLoad({super.key});
 
   @override
   _TwilightAlleyLoadState createState() => _TwilightAlleyLoadState();
 }
 
-class _TwilightAlleyLoadState extends State<TwilightAlleyLoad> with SingleTickerProviderStateMixin {
+class _TwilightAlleyLoadState extends State<TwilightAlleyLoad>
+    with SingleTickerProviderStateMixin {
   late AnimationController _textController;
   late Animation<double> _textOpacity;
 
@@ -55,13 +56,13 @@ class _TwilightAlleyLoadState extends State<TwilightAlleyLoad> with SingleTicker
         ),
         child: Stack(
           children: [
-            Positioned(
+            const Positioned(
               top: 100,
               left: 50,
               right: 50,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: const [
+                children: [
                   Icon(Icons.star, color: Colors.white, size: 30),
                   Icon(Icons.star, color: Colors.white, size: 24),
                   Icon(Icons.nightlight_round, color: Colors.white, size: 60),
@@ -74,9 +75,10 @@ class _TwilightAlleyLoadState extends State<TwilightAlleyLoad> with SingleTicker
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
+                  const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    strokeWidth: 8.0, // Increased stroke width for a bolder look
+                    strokeWidth:
+                        8.0, // Increased stroke width for a bolder look
                   ),
                   const SizedBox(height: 30),
                   FadeTransition(
@@ -85,7 +87,8 @@ class _TwilightAlleyLoadState extends State<TwilightAlleyLoad> with SingleTicker
                       'Loading, please wait...',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 24, // Increased font size for better visibility
+                        fontSize:
+                            24, // Increased font size for better visibility
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -93,13 +96,13 @@ class _TwilightAlleyLoadState extends State<TwilightAlleyLoad> with SingleTicker
                 ],
               ),
             ),
-            Positioned(
+            const Positioned(
               bottom: 50,
               left: 0,
               right: 0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: const [
+                children: [
                   Icon(Icons.star, color: Colors.white, size: 20),
                   Icon(Icons.nightlight_round, color: Colors.white, size: 50),
                   Icon(Icons.star, color: Colors.white, size: 20),

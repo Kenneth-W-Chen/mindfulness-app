@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
 
 // Method to create activity cards with placeholders for future functionality
-Widget activityCard(String activityName, BuildContext context, IconData icon, String description,
-    {
-      Widget Function(BuildContext buildcontext)? builder = null,
-      Color? cardColor, Color? shadowColor, Color? textColor, Color? subTextColor, Color? iconColor, Color? iconBackgroundColor,
-      Function(dynamic)? onPop
-    }
-    ) {
+Widget activityCard(String activityName, BuildContext context, IconData icon,
+    String description,
+    {Widget Function(BuildContext buildcontext)? builder,
+    Color? cardColor,
+    Color? shadowColor,
+    Color? textColor,
+    Color? subTextColor,
+    Color? iconColor,
+    Color? iconBackgroundColor,
+    Function(dynamic)? onPop}) {
   return GestureDetector(
-    onTap: builder == null? () {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$activityName feature is under construction!'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }:() {
-      if(onPop == null) {
+    onTap: builder == null
+        ? () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('$activityName feature is under construction!'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        : () {
+            if (onPop == null) {
               Navigator.push(context, MaterialPageRoute(builder: builder));
-            } else{
-        Navigator.push(context,MaterialPageRoute(builder:builder)).then(onPop);
-      }
+            } else {
+              Navigator.push(context, MaterialPageRoute(builder: builder))
+                  .then(onPop);
+            }
           },
     child: Card(
       color: cardColor,
@@ -34,7 +40,7 @@ Widget activityCard(String activityName, BuildContext context, IconData icon, St
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: iconBackgroundColor,
-          child: Icon(icon, color:iconColor, size: 32),
+          child: Icon(icon, color: iconColor, size: 32),
         ),
         title: Text(
           activityName,

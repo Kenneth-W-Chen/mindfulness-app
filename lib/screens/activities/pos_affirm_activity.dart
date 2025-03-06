@@ -2,13 +2,15 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(QuoteApp());
+  runApp(const QuoteApp());
 }
 
 class QuoteApp extends StatelessWidget {
+  const QuoteApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Positive Power-Ups',
       home: QuoteScreen(),
     );
@@ -16,6 +18,8 @@ class QuoteApp extends StatelessWidget {
 }
 
 class QuoteScreen extends StatefulWidget {
+  const QuoteScreen({super.key});
+
   @override
   _QuoteScreenState createState() => _QuoteScreenState();
 }
@@ -71,18 +75,18 @@ class _QuoteScreenState extends State<QuoteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Positive Power-Ups'),
+        title: const Text('Positive Power-Ups'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Navigate back to the previous screen
           },
         ),
         backgroundColor:
-            Color.fromARGB(255, 98, 28, 111), // Solid color for AppBar
+            const Color.fromARGB(255, 98, 28, 111), // Solid color for AppBar
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
               Color.fromARGB(255, 98, 28, 111),
@@ -101,24 +105,25 @@ class _QuoteScreenState extends State<QuoteScreen> {
                 Text(
                   '"$currentQuote"',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontStyle: FontStyle.italic,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 ElevatedButton(
                   onPressed: refreshQuote,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0x682861),
+                    backgroundColor: const Color(0x00682861),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Reveal an affirmation',
                     style: TextStyle(
                       fontSize: 14,

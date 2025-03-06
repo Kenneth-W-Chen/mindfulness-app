@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart'; // Import path for file path handling in tests
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // Import sqflite_common_ffi for desktop testing
-import '../lib/storage.dart'; // Import your storage class to test its functionality
+import 'package:calm_quest/storage.dart'; // Import your storage class to test its functionality
 
-void main(){
+void main() {
   //Desktop setup
   setUpAll(() {
     sqfliteFfiInit();
@@ -16,10 +16,8 @@ void main(){
     await deleteDatabase(dbPath);
   });
 
-
   //Creation operation and close operation
   test('BLACKBOX TEST 1: CREATION AND CLOSE TEST', () async {
-
     String dbPath = join(await getDatabasesPath(), 'test_storage.db');
 
     Storage storage = await Storage.create(dbName: dbPath);
@@ -29,13 +27,10 @@ void main(){
     expect(dbPath.contains('test_storage.db'), true);
 
     storage.close();
-
-
   });
 
 // Test 2: Create two entries in each table, print the contents, delete the entries, and print again
   test('BLACKBOX TEST 2: Create, Print, Delete, Print', () async {
-
     String dbPath = join(await getDatabasesPath(), 'test_storage.db');
     Storage storage = await Storage.create(dbName: dbPath);
 
@@ -44,10 +39,8 @@ void main(){
     storage.addActivityLog(ActivityName.breathe, "Second breathe activity");
 
     // Add two entries to the preferences table
-    storage.updatePreferences({
-      PreferenceName.master_volume: 50,
-      PreferenceName.music_volume: 70
-    });
+    storage.updatePreferences(
+        {PreferenceName.master_volume: 50, PreferenceName.music_volume: 70});
 
     // Mark two achievements as completed
     storage.setAchievementCompleted(Achievement.all);
@@ -85,7 +78,9 @@ void main(){
 
     // Ensure the activity exists in the activities table
     var result = await storage.testDb.query('activities',
-        columns: ['id'], where: 'name = ?', whereArgs: [ActivityName.breathe.name]);
+        columns: ['id'],
+        where: 'name = ?',
+        whereArgs: [ActivityName.breathe.name]);
 
     if (result.isEmpty) {
       print('No activity found for ${ActivityName.breathe.name}');
@@ -129,7 +124,6 @@ void main(){
     storage.close();
   });
 
-
   test('WHITEBOX TEST 4: Validate Activity Logs JOIN', () async {
     String dbPath = join(await getDatabasesPath(), 'test_storage.db');
     Storage storage = await Storage.create(dbName: dbPath);
@@ -140,31 +134,30 @@ void main(){
     // Directly execute the query you want to validate
     var result = await storage.testDb.rawQuery(
         'SELECT activities.name, activity_logs.completion_date FROM activities '
-            'INNER JOIN activity_logs ON activities.id = activity_logs.activity_id '
-            'WHERE activities.name = ?', [ActivityName.breathe.name]);
+        'INNER JOIN activity_logs ON activities.id = activity_logs.activity_id '
+        'WHERE activities.name = ?',
+        [ActivityName.breathe.name]);
 
     // Expected result for comparison
-    expect(result.length, 1, reason: "Expected exactly one log entry for 'breathe' activity");
-    expect(result[0]['name'], "breathe", reason: "Expected 'breathe' activity name in the result");
-    expect(result[0]['completion_date'], isNotNull, reason: "Completion date should not be null");
+    expect(result.length, 1,
+        reason: "Expected exactly one log entry for 'breathe' activity");
+    expect(result[0]['name'], "breathe",
+        reason: "Expected 'breathe' activity name in the result");
+    expect(result[0]['completion_date'], isNotNull,
+        reason: "Completion date should not be null");
 
     // Cleanup
     await storage.deleteActivityLog(ActivityName.breathe);
     storage.close();
   });
 
-
-
-
-
 //END OF TEST SUITE*****************8
 }
 
-
-
 /// Prints the activities table using the existing method
 Future<void> printActivitiesTable(Storage storage) async {
-  var activityLogs = await storage.getActivityLogs([ActivityName.breathe, ActivityName.all]);
+  var activityLogs =
+      await storage.getActivityLogs([ActivityName.breathe, ActivityName.all]);
   print('Activities Table:');
   activityLogs.forEach((activity, details) {
     print('$activity -> $details');
@@ -191,11 +184,10 @@ Future<void> printPreferencesTable(Storage storage) async {
 
 /// Prints the achievements table
 Future<void> printAchievementsTable(Storage storage) async {
-  var achievements = await storage.getAchievementsCompletionDate([Achievement.all]);
+  var achievements =
+      await storage.getAchievementsCompletionDate([Achievement.all]);
   print('Achievements Table:');
   achievements.forEach((achievement, date) {
     print('$achievement -> $date');
   });
 }
-
-

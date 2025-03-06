@@ -10,10 +10,7 @@ import 'package:path/path.dart' as path;
 
 class AudioPlayerScreen extends StatefulWidget {
   const AudioPlayerScreen(
-      {Key? key,
-      required String this.audioFilePath,
-      required Storage this.storage})
-      : super(key: key);
+      {super.key, required this.audioFilePath, required this.storage});
   final String audioFilePath;
   final Storage storage;
 
@@ -29,8 +26,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   bool _activityCompleted = false;
   final String audioFilePath;
 
-  _AudioPlayerScreenState(
-      {required Storage this.storage, required String this.audioFilePath});
+  _AudioPlayerScreenState({required this.storage, required this.audioFilePath});
 
   late Timer completionTimer;
 
@@ -42,19 +38,19 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   }
 
   Future<void> asyncInit() async {
-    DateTime? completion_date = (await storage.getActivityLogs(
+    DateTime? completionDate = (await storage.getActivityLogs(
             [ActivityName.values[1]]))[ActivityName.values[1]]![0]
         ['completion_date'] as DateTime?;
     DateTime now = DateTime.now().toUtc();
     now = DateTime.utc(now.year, now.month, now.day);
-    if (completion_date == null || now.isAfter(completion_date)) {
-      completionTimer = Timer(Duration(seconds: 30), () {
+    if (completionDate == null || now.isAfter(completionDate)) {
+      completionTimer = Timer(const Duration(seconds: 30), () {
         _activityCompleted = true;
         storage.addActivityLog(ActivityName.values[1], audioFilePath);
         setState(() {});
       });
-    } else{
-      completionTimer = Timer(Duration(seconds: 30), () {
+    } else {
+      completionTimer = Timer(const Duration(seconds: 30), () {
         _activityCompleted = true;
         setState(() {});
       });
@@ -146,6 +142,7 @@ class _MeditationStationState extends State<MeditationStation> {
       appBar: activityAppBar('Meditation Station', Colors.deepPurple[800]!,
           context, _activityCompleted),
       body: Container(
+        decoration: BoxDecoration(color: Colors.deepPurple[600]),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -184,7 +181,7 @@ class _MeditationStationState extends State<MeditationStation> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
@@ -204,7 +201,6 @@ class _MeditationStationState extends State<MeditationStation> {
             ],
           ),
         ),
-        decoration: BoxDecoration(color: Colors.deepPurple[600]),
       ),
     );
   }

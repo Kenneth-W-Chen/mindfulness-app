@@ -4,7 +4,7 @@ import 'dart:async';
 import 'calming_cliffs_activity.dart'; // Correct relative path to the activity
 
 class CalmingCliffsIntro extends StatefulWidget {
-  const CalmingCliffsIntro({Key? key}) : super(key: key);
+  const CalmingCliffsIntro({super.key});
 
   @override
   _CalmingCliffsIntroState createState() => _CalmingCliffsIntroState();
@@ -75,8 +75,8 @@ class _CalmingCliffsIntroState extends State<CalmingCliffsIntro>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: activityAppBar(
-          'Calming Cliffs', Colors.deepOrange[800]!, context, _activityCompleted),
+      appBar: activityAppBar('Calming Cliffs', Colors.deepOrange[800]!, context,
+          _activityCompleted),
       body: Container(
         width: double.infinity,
         height: double.infinity,

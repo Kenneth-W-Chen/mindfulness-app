@@ -30,10 +30,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
             icon: Icon(Icons.sailing), // Use the sailing icon
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: 'Daily Activities'
-          ),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today), label: 'Daily Activities'),
           // Custom treasure chest icon
           BottomNavigationBarItem(
             icon: Image.asset(
