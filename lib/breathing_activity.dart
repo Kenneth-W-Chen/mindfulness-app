@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class BreathingActivity extends StatefulWidget {
-  const BreathingActivity({Key? key}) : super(key: key);
+  const BreathingActivity({super.key});
 
   @override
   _BreathingActivityState createState() => _BreathingActivityState();
@@ -33,7 +33,7 @@ class _BreathingActivityState extends State<BreathingActivity>
         curve: Curves.easeInOut,
       ),
     );
-    completionTimer = Timer(Duration(seconds: 30), () {
+    completionTimer = Timer(const Duration(seconds: 30), () {
       _activityCompleted = true;
       setState(() {});
     });

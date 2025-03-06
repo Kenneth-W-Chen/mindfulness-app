@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 /// Uses concentric rings with a ripple effect.
 /// ------------------
 class BreathingMinigame extends StatefulWidget {
-  const BreathingMinigame({Key? key}) : super(key: key);
+  const BreathingMinigame({super.key});
 
   @override
   _BreathingMinigameState createState() => _BreathingMinigameState();
@@ -91,7 +91,7 @@ class _BreathingMinigameState extends State<BreathingMinigame>
 /// Uses a custom painter to draw expanding, fading ripple circles.
 /// ------------------
 class RippleMinigame extends StatefulWidget {
-  const RippleMinigame({Key? key}) : super(key: key);
+  const RippleMinigame({super.key});
 
   @override
   _RippleMinigameState createState() => _RippleMinigameState();

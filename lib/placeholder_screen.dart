@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class PlaceholderScreen extends StatelessWidget {
   final String message;
 
-  const PlaceholderScreen({Key? key, required this.message}) : super(key: key);
+  const PlaceholderScreen({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('CalmQuest Placeholder'),
+        title: const Text('CalmQuest Placeholder'),
       ),
       body: Center(
         child: Text(

@@ -8,11 +8,11 @@ class JournalPromptScreen extends StatefulWidget {
   final Storage storage; // Added the storage instance
 
   const JournalPromptScreen({
-    Key? key,
+    super.key,
     required this.mood,
     required this.intensity,
     required this.storage, // Added the storage instance
-  }) : super(key: key);
+  });
 
   @override
   _JournalPromptScreenState createState() => _JournalPromptScreenState();
@@ -85,9 +85,14 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
             ),
             const Spacer(),
             ElevatedButton(
-              onPressed:  () async {
+              onPressed: () async {
                 await saveEntry();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> JournalListScreen(storage: widget.storage)), result: true);
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            JournalListScreen(storage: widget.storage)),
+                    result: true);
               },
               child: const Text('Save Entry'),
             ),

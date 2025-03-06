@@ -1,3 +1,4 @@
+import 'package:calm_quest/MistyMountainLandingPage.dart';
 import 'package:flutter/material.dart';
 import 'serene_beach_page.dart';
 import 'placeholder_screen.dart';
@@ -43,7 +44,10 @@ class HomeScreen extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF80D8FF), Color(0xFF40C4FF)], // Light blue gradient
+              colors: [
+                Color(0xFF80D8FF),
+                Color(0xFF40C4FF)
+              ], // Light blue gradient
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -54,7 +58,8 @@ class HomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Spread out the tiles
+          mainAxisAlignment:
+              MainAxisAlignment.spaceEvenly, // Spread out the tiles
           children: [
             _buildIslandTile(
               title: 'Misty Mountain',
@@ -66,9 +71,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const PlaceholderScreen(
-                      message: 'Misty Mountain - Feature Coming Soon!',
-                    ),
+                    builder: (context) => const MistyMountainLandingPage(),
                   ),
                 );
               },
@@ -83,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SereneBeachPage(),
+                    builder: (context) => const SereneBeachPage(),
                   ),
                 );
               },
@@ -98,7 +101,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TranquilForestLandingPage(),
+                    builder: (context) => const TranquilForestLandingPage(),
                   ),
                 );
               },
@@ -142,11 +145,11 @@ class HomeScreen extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 10,
-              offset: const Offset(4, 4),
+              offset: Offset(4, 4),
             ),
           ],
         ),

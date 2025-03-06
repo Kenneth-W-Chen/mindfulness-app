@@ -1,12 +1,8 @@
 import 'package:calm_quest/screens/activities/pos_affirm_activity.dart';
 import 'package:flutter/material.dart';
 import 'screens/shared/activity_widget.dart';
-import 'screens/activities/meditation_station.dart';
-import 'screens/activities/twilight_alley_intro.dart';
-import 'screens/activities/calmingcliffintro.dart';
 import 'screens/activities/Mood Journal/mood_selection_screen.dart';
 import 'screens/activities/mellowmazeintro.dart';
-
 
 class TranquilForestLandingPage extends StatelessWidget {
   const TranquilForestLandingPage({super.key});
@@ -58,43 +54,6 @@ class TranquilForestLandingPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
-
-              // Activity for Meditation Station
-              activityCard('Meditation Station', context, Icons.headset,
-                  'Listen to calming sounds and nature noises.',
-                  builder: (context) => const MeditationStation(),
-                  // colors
-                  cardColor: Colors.white.withOpacity(0.9),
-                  shadowColor: Colors.black.withOpacity(0.3),
-                  iconBackgroundColor: Colors.teal[700],
-                  iconColor: Colors.white,
-                  textColor: Colors.teal[700],
-                  subTextColor: Colors.teal[600]),
-
-              // Activity for Goal Setting
-              activityCard('Twilight Alley', context, Icons.flag,
-                  'Journal some of your thoughts and track your mood.',
-                  builder: (context) => const TwilightAlleyIntro(),
-                  // colors
-                  cardColor: Colors.white.withOpacity(0.9),
-                  shadowColor: Colors.black.withOpacity(0.3),
-                  iconBackgroundColor: Colors.teal[700],
-                  iconColor: Colors.white,
-                  textColor: Colors.teal[700],
-                  subTextColor: Colors.teal[600]),
-
-              // Activity for calming visualization
-              activityCard('Calming Cliff', context, Icons.landscape,
-                  'Calm yourself and realize that there is so much out there.',
-                  builder: (context) => const CalmingCliffsIntro(),
-                  // colors
-                  cardColor: Colors.white.withOpacity(0.9),
-                  shadowColor: Colors.black.withOpacity(0.3),
-                  iconBackgroundColor: Colors.teal[700],
-                  iconColor: Colors.white,
-                  textColor: Colors.teal[700],
-                  subTextColor: Colors.teal[600]),
-
               activityCard('Mood Journal', context, Icons.book,
                   'Talk about how you feel today',
                   builder: (context) => MoodSelectionScreen(),
@@ -105,20 +64,18 @@ class TranquilForestLandingPage extends StatelessWidget {
                   iconColor: Colors.white,
                   textColor: Colors.teal[700],
                   subTextColor: Colors.teal[600]),
-              
               activityCard('Mellow Maze', context, Icons.blur_circular,
-                'Traverse the maze to clear your mind.',
-                builder: (context) => const MellowMazeIntro(),
-                cardColor: Colors.white.withOpacity(0.9),
-                shadowColor: Colors.black.withOpacity(0.3),
-                iconBackgroundColor: Colors.teal[700],
-                iconColor: Colors.white,
-                textColor: Colors.teal[700],
-                subTextColor: Colors.teal[600]),
-              
+                  'Traverse the maze to clear your mind.',
+                  builder: (context) => const MellowMazeIntro(),
+                  cardColor: Colors.white.withOpacity(0.9),
+                  shadowColor: Colors.black.withOpacity(0.3),
+                  iconBackgroundColor: Colors.teal[700],
+                  iconColor: Colors.white,
+                  textColor: Colors.teal[700],
+                  subTextColor: Colors.teal[600]),
               activityCard('Postive Power Ups', context, Icons.book,
                   'Ground yourself with positive affirmations',
-                  builder: (context) => QuoteScreen(),
+                  builder: (context) => const QuoteScreen(),
                   // colors
                   cardColor: Colors.white.withOpacity(0.9),
                   shadowColor: Colors.black.withOpacity(0.3),

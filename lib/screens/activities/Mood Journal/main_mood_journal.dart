@@ -14,7 +14,7 @@ void main() async {
 class MoodJournal extends StatelessWidget {
   final Storage storage;
 
-  const MoodJournal({Key? key, required this.storage}) : super(key: key);
+  const MoodJournal({super.key, required this.storage});
 
   @override
   Widget build(BuildContext context) {

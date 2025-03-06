@@ -6,11 +6,14 @@ import 'journal_prompt_screen.dart';
 class MoodSelectionScreen extends StatefulWidget {
   late Storage storage; // Accept the storage instance as a parameter
 
-  MoodSelectionScreen({Key? key}) : super(key: key){asyncInit();}
+  MoodSelectionScreen({super.key}) {
+    asyncInit();
+  }
 
-  Future<void> asyncInit()  async {
+  Future<void> asyncInit() async {
     storage = await Storage.create();
   }
+
   @override
   _MoodSelectionScreenState createState() => _MoodSelectionScreenState();
 }
@@ -31,7 +34,8 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: activityAppBar('Select Your Mood', Colors.white, context, false, backButtonColor: null),
+      appBar: activityAppBar('Select Your Mood', Colors.white, context, false,
+          backButtonColor: null),
       body: Column(
         children: [
           const SizedBox(height: 20),
@@ -61,7 +65,9 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue.shade100 : Colors.grey.shade200,
+                      color: isSelected
+                          ? Colors.blue.shade100
+                          : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(15),
                       border: Border.all(
                         color: isSelected ? Colors.blue : Colors.transparent,

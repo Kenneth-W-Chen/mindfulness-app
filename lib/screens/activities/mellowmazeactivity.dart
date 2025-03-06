@@ -8,7 +8,7 @@ import 'mellowmazemini.dart'; // Import the minigame widgets
 enum MazeStage { introduction, questions, reflection }
 
 class MellowMazeActivity extends StatefulWidget {
-  const MellowMazeActivity({Key? key}) : super(key: key);
+  const MellowMazeActivity({super.key});
 
   @override
   _MellowMazeActivityState createState() => _MellowMazeActivityState();
@@ -74,12 +74,12 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _healthAnimation = Tween<double>(begin: _concentration, end: _concentration)
-        .animate(
+    _healthAnimation =
+        Tween<double>(begin: _concentration, end: _concentration).animate(
       CurvedAnimation(parent: _healthController, curve: Curves.easeInOut),
     )..addListener(() {
-      setState(() {});
-    });
+            setState(() {});
+          });
   }
 
   @override
@@ -147,8 +147,8 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
         ).animate(
           CurvedAnimation(parent: _healthController, curve: Curves.easeInOut),
         )..addListener(() {
-          setState(() {});
-        });
+            setState(() {});
+          });
         _healthController.forward(from: 0);
       });
       if (_wrongAnswersCount >= 3) {
@@ -170,16 +170,16 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
           ];
           final random = Random();
           final chosenMinigame =
-          minigameWidgets[random.nextInt(minigameWidgets.length)];
+              minigameWidgets[random.nextInt(minigameWidgets.length)];
           Navigator.push(
             context,
             PageRouteBuilder(
               transitionDuration: const Duration(milliseconds: 800),
               pageBuilder: (context, animation, secondaryAnimation) =>
                   FadeTransition(
-                    opacity: animation,
-                    child: chosenMinigame,
-                  ),
+                opacity: animation,
+                child: chosenMinigame,
+              ),
               reverseTransitionDuration: const Duration(milliseconds: 800),
             ),
           ).then((value) {
@@ -233,12 +233,11 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
                 ),
                 const SizedBox(height: 20),
                 ...level.keyPointers.map(
-                      (pointer) => Padding(
+                  (pointer) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 5.0),
                     child: Text(
                       "• $pointer",
-                      style:
-                      const TextStyle(fontSize: 18, color: Colors.white),
+                      style: const TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
                 ),
@@ -266,8 +265,7 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
   Widget _buildQuestion() {
     final currentQuestion = level.questions[_currentQuestionIndex];
     double screenHeight = MediaQuery.of(context).size.height -
-        (AppBar().preferredSize.height +
-            MediaQuery.of(context).padding.top);
+        (AppBar().preferredSize.height + MediaQuery.of(context).padding.top);
 
     return SingleChildScrollView(
       child: ConstrainedBox(
@@ -279,10 +277,10 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
               animation: _topGradientController,
               builder: (context, child) {
                 double hue = 180 + (_topGradientController.value * 120);
-                Color color1 =
-                HSLColor.fromAHSL(1.0, hue, 0.7, 0.5).toColor();
+                Color color1 = HSLColor.fromAHSL(1.0, hue, 0.7, 0.5).toColor();
                 Color color2 =
-                HSLColor.fromAHSL(1.0, (hue + 60) % 360, 0.7, 0.5).toColor();
+                    HSLColor.fromAHSL(1.0, (hue + 60) % 360, 0.7, 0.5)
+                        .toColor();
                 return Container(
                   height: screenHeight * 0.4,
                   width: double.infinity,
@@ -345,7 +343,7 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
                     value: _healthAnimation.value,
                     backgroundColor: Colors.white.withOpacity(0.5),
                     valueColor:
-                    const AlwaysStoppedAnimation<Color>(Colors.teal),
+                        const AlwaysStoppedAnimation<Color>(Colors.teal),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -443,8 +441,8 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
 class ReflectionContent extends StatefulWidget {
   final String reflection;
   final VoidCallback onFinish;
-  const ReflectionContent({required this.reflection, required this.onFinish, Key? key})
-      : super(key: key);
+  const ReflectionContent(
+      {required this.reflection, required this.onFinish, super.key});
 
   @override
   _ReflectionContentState createState() => _ReflectionContentState();
@@ -463,14 +461,14 @@ class _ReflectionContentState extends State<ReflectionContent>
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-            CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _slideAnimation = Tween<Offset>(
+            begin: const Offset(0, 0.3), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _fadeAnimation =
         Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-          parent: _controller,
-          curve: Curves.easeIn,
-        ));
+      parent: _controller,
+      curve: Curves.easeIn,
+    ));
     _controller.forward();
   }
 

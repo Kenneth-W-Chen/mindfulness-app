@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'breathing_activity.dart'; // Importing the Breathing Activity Page
 
 class SereneBeachPage extends StatelessWidget {
-  const SereneBeachPage({Key? key}) : super(key: key);
+  const SereneBeachPage({super.key});
 
   @override
   Widget build(BuildContext context) {

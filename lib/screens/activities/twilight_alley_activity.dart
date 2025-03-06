@@ -5,7 +5,7 @@ import 'dart:async';
 import '../../storage.dart';
 
 class TwilightAlleyActivity extends StatefulWidget {
-  const TwilightAlleyActivity({Key? key}) : super(key: key);
+  const TwilightAlleyActivity({super.key});
 
   @override
   _TwilightAlleyActivityState createState() => _TwilightAlleyActivityState();
@@ -130,10 +130,10 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
             title: const Text("Session Complete"),
             content: Text(
               "Your responses:\n"
-                  "${_userResponses.join("\n")}\n"
-                  "${_emojiResponses.join("\n")}\n\n"
-                  "$pointsMessage\n"
-                  "Sad Emoji Selected: ${_sadEmojiSelected ? 'Yes' : 'No'}",
+              "${_userResponses.join("\n")}\n"
+              "${_emojiResponses.join("\n")}\n\n"
+              "$pointsMessage\n"
+              "Sad Emoji Selected: ${_sadEmojiSelected ? 'Yes' : 'No'}",
             ),
             actions: [
               TextButton(
@@ -229,8 +229,8 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: activityAppBar('Twilight Alley', Colors.deepPurple[800]!,
-          context, _activityCompleted),
+      appBar: activityAppBar('Twilight Alley', Colors.deepPurple[800]!, context,
+          _activityCompleted),
       body: Container(
         width: double.infinity, // Ensures the container covers full width
         height: double.infinity, // Ensures the container covers full height
@@ -275,11 +275,11 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
               ),
             ),
             const SizedBox(width: 20),
-            AnimatedScale(
+            const AnimatedScale(
               scale: 1.2,
-              duration: const Duration(seconds: 1),
+              duration: Duration(seconds: 1),
               curve: Curves.easeInOut,
-              child: const Icon(
+              child: Icon(
                 Icons.nightlight_round,
                 color: Colors.white,
                 size: 80,
