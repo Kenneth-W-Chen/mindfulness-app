@@ -103,7 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     SwitchListTile(
                       title: const Text('Enable Notifications'),
-                      value: (preferences?[PreferenceName.notifs] as int) == 0,
+                      value: (preferences?[PreferenceName.notifs] as int) == 1,
                       onChanged: (bool value) async {
                         _updatePreferences(PreferenceName.notifs, value ? 1 : 0);
                         if(value){
