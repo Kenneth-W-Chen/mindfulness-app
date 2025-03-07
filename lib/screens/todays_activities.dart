@@ -86,6 +86,8 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
 
     setState(() {});
     // Set up notifications
+    // Don't schedule notifs if notifs are disabled
+    if((await storage.getPreferences([PreferenceName.notifs]))![PreferenceName.notifs] as int == 0) return;
     // if the program is being debugged, schedules a notification to occur 30 seconds from now daily (e.g., always at 10:00:30 everyday)
     if (kDebugMode) {
       print('Adding notification');
@@ -94,7 +96,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
           'New daily activities are ready',
           'New daily activities are ready.',
           TZDateTime.now(notifications.timezone)
-              .add(const Duration(seconds: 30)),
+              .add(const Duration(seconds: 3)),
           matchDateTimeComponents: DateTimeComponents.time);
     } else {
       // schedule a notification to occur every day at 10am
