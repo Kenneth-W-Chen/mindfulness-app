@@ -1,4 +1,5 @@
 import 'package:calm_quest/notifications.dart';
+import 'package:calm_quest/screens/user_stats.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart';
@@ -89,6 +90,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const PlaceholderScreen(message: 'Change Avatar - Feature in Progress'),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.bar_chart),
+                      title: const Text('Usage Statistics'),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserStats(storage: storage),
                           ),
                         );
                       },
