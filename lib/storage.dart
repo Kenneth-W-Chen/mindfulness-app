@@ -111,6 +111,10 @@ class Storage {
     await _db.delete(_achievementsTable, where: 'name = ?', whereArgs: [achievement.name]);
   }
 
+  Future<int> achievementCount() async{
+    return (await _db.rawQuery('SELECT COUNT(id) as count FROM $_achievementsTable WHERE completion_date IS NOT NULL'))[0]['count'] as int;
+  }
+  
   /** Activity log functions
    *
    **/

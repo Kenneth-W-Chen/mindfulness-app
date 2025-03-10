@@ -72,7 +72,7 @@ flutter:
   assets:
     - assets/audio/activity_one/
     - assets/images/
-    - assets/icons/treasure.png
+    - assets/icons/
   fonts:
     - family: Chewy
       fonts:

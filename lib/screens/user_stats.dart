@@ -20,6 +20,8 @@ class _UserStatsState extends State<UserStats> {
   final TextStyle _fontColorLight = const TextStyle(color:Colors.black);
   final TextStyle _fontColorDark = const TextStyle(color:Colors.white);
 
+  String achiementsCompleted = "0";
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +30,7 @@ class _UserStatsState extends State<UserStats> {
 
   Future<void> asyncInitState() async {
     theme = (await widget.storage.getPreferences([PreferenceName.theme]))![PreferenceName.theme] as int;
+    achiementsCompleted = '${await widget.storage.achievementCount()}';
     setState(() {
 
     });
@@ -38,13 +41,14 @@ class _UserStatsState extends State<UserStats> {
     return Scaffold(
       backgroundColor: theme == 1 ? Colors.grey[500] : Colors.lightBlue[500],
       appBar: AppBar(
-        title: Text('Settings',style: theme == 1 ? _fontColorDark : _fontColorLight,),
+        title: Text('Stats',style: _getTextStyle(),),
         centerTitle: true,
         backgroundColor: theme == 1 ? Colors.grey[900] : Colors.lightBlue[700]
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          // Total days since first app open
           Card(
             color: theme == 1 ? _cardColorDark : _cardColorLight,
             clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -62,14 +66,50 @@ class _UserStatsState extends State<UserStats> {
                   color: Colors.transparent,
                   child: Text(
                       "You've been on your quest for ? days.",
-                      style: theme == 1 ? _fontColorDark : _fontColorLight,
+                      style: _getTextStyle(),
                   ),
                 )
               ],
             )
+          ),
+          Row(
+            children:[
+              Card(
+                color: theme == 1 ? _cardColorDark : _cardColorLight,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
+                        Padding(
+                            padding: const EdgeInsets.only(bottom: 40.0),
+                            child: Text(
+                              achiementsCompleted,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            )
+                        )
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text('Achievements Completed', style: _getTextStyle()),
+                    )
+                  ],
+                ),
+              ),
+            ]
           )
         ],
       )
     );
   }
+
+  TextStyle _getTextStyle() => theme == 1 ? _fontColorDark : _fontColorLight;
 }
