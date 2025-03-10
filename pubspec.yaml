@@ -71,7 +71,7 @@ flutter:
 
   assets:
     - assets/audio/activity_one/
-    - assets/images/serene_beach_page.png # Example of your image assets
+    - assets/images/
     - assets/icons/treasure.png
   fonts:
     - family: Chewy
