@@ -21,6 +21,8 @@ class _UserStatsState extends State<UserStats> {
   final TextStyle _fontColorDark = const TextStyle(color:Colors.white);
 
   String achiementsCompleted = "0";
+  String dailiesCompleted = "0";
+  String favoriteActivity = "Meditation Station";
 
   @override
   void initState() {
@@ -31,6 +33,9 @@ class _UserStatsState extends State<UserStats> {
   Future<void> asyncInitState() async {
     theme = (await widget.storage.getPreferences([PreferenceName.theme]))![PreferenceName.theme] as int;
     achiementsCompleted = '${await widget.storage.achievementCount()}';
+    dailiesCompleted = '${await widget.storage.getDailyActivityCompletionCount()}';
+    var activityLogCounts = await widget.storage.getActivityLogCount();
+    favoriteActivity = ActivityName.values[activityLogCounts[0]['activity_id'] as int].toString();
     setState(() {
 
     });
@@ -48,7 +53,7 @@ class _UserStatsState extends State<UserStats> {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          // Total days since first app open
+          // Stat: Total days since first app open
           Card(
             color: theme == 1 ? _cardColorDark : _cardColorLight,
             clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -72,39 +77,155 @@ class _UserStatsState extends State<UserStats> {
               ],
             )
           ),
+          // Second row of stats
           Row(
             children:[
-              Card(
-                color: theme == 1 ? _cardColorDark : _cardColorLight,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
+              // Stat: Number of achievements completed
+              Expanded(
+                child: Card(
+                  color: theme == 1 ? _cardColorDark : _cardColorLight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
+                          Padding(
+                              padding: const EdgeInsets.only(bottom: 40.0),
+                              child: Text(
+                                achiementsCompleted,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              )
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('Achievements Completed', style: _getTextStyle()),
+                      )
+                    ],
+                  ),
+                )
+              ),
+              // Stat: Favorite Activity todo
+              Expanded(
+                  child: Card(
+                    color: theme == 1 ? _cardColorDark : _cardColorLight,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
-                        Padding(
-                            padding: const EdgeInsets.only(bottom: 40.0),
-                            child: Text(
-                              achiementsCompleted,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
+                            Padding(
+                                padding: const EdgeInsets.only(bottom: 40.0),
+                                child: Text(
+                                  achiementsCompleted,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                )
                             )
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text('Achievements Completed', style: _getTextStyle()),
                         )
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text('Achievements Completed', style: _getTextStyle()),
-                    )
-                  ],
-                ),
+                  )
               ),
             ]
+          ),
+          // Third row of stats
+          Row(
+            children: [
+              // Stat: Times all daily activities have been completed
+              Expanded(
+                child: Card(
+                  color: theme == 1 ? _cardColorDark : _cardColorLight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text("You've completed your daily activities", textAlign: TextAlign.center, style: _getTextStyle()),
+                      ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
+                          Padding(
+                              padding: const EdgeInsets.only(bottom: 40.0),
+                              child: Text(
+                                dailiesCompleted,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              )
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('times', style: _getTextStyle()),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              // Stat: Longest daily activity completion streak todo
+              Expanded(
+                child: Card(
+                  color: theme == 1 ? _cardColorDark : _cardColorLight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text("You've completed your daily activities", textAlign: TextAlign.center, style: _getTextStyle()),
+                      ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
+                          Padding(
+                              padding: const EdgeInsets.only(bottom: 40.0),
+                              child: Text(
+                                achiementsCompleted,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              )
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('times', style: _getTextStyle()),
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
           )
         ],
       )

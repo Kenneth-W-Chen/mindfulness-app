@@ -202,6 +202,26 @@ class Storage {
     await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
   }
 
+  /// Counts the number of activity logs.
+  /// Use 'activity_id' and 'cnt' to get each row's activity id and count, respectively.
+  Future<List<Map<String, Object?>>> getActivityLogCount({bool groupByActivity = true, bool sortDescending = true, int limit = 0}) async{
+    String query = "SELECT activity_id, COUNT(id) AS cnt FROM $_activityLogTable ";
+    if(groupByActivity) {
+      query += "GROUP BY activity_id ";
+    }
+    query += "ORDER BY cnt ";
+    if(sortDescending){
+      query += "DESC ";
+    } else {
+      query += "ASC ";
+    }
+    if(limit > 0){
+      query += "LIMIT $limit";
+    }
+
+    return (await _db.rawQuery(query));
+  }
+
   /// Inserts a new mood journal entry into the database
 /// 
 /// Parameters:
@@ -345,6 +365,11 @@ Future<List<Map<String, dynamic>>> getAllMoodJournalEntries() async {
     int completionInfo = row['activity_completed'] as int;
     completionInfo |= (1 << (activityNumber-1));
     await _db.update(_dailyResetTable, {'activity_completed': completionInfo}, where: 'id == ?', whereArgs: [row['id']]);
+  }
+
+  /// Retrieves the number of daily activities completed in total.
+  Future<int> getDailyActivityCompletionCount() async{
+    return (await _db.rawQuery("SELECT COUNT(id) as count FROM $_dailyResetTable WHERE activity_completed = 7"))[0]['count'] as int;
   }
 
   /// Retrieves all cues for a specific session ID
