@@ -166,7 +166,7 @@ class _UserStatsState extends State<UserStats> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
+                          const Image(image: AssetImage('assets/icons/calendar.png'), width: 150,),
                           Padding(
                               padding: const EdgeInsets.only(bottom: 40.0),
                               child: Text(
