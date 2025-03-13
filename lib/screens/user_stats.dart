@@ -161,26 +161,58 @@ class _UserStatsState extends State<UserStats> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Text("You've completed your daily activities", textAlign: TextAlign.center, style: _getTextStyle()),
+                        child: Text("You've completed your", textAlign: TextAlign.center, style: _getTextStyle()),
                       ),
                       Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          const Image(image: AssetImage('assets/icons/calendar.png'), width: 150,),
-                          Padding(
-                              padding: const EdgeInsets.only(bottom: 40.0),
-                              child: Text(
-                                dailiesCompleted,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              )
-                          )
-                        ],
-                      ),
-                      Padding(
+                          alignment: Alignment.center,
+                          children: [
+                            const Image(
+                              image: AssetImage('assets/icons/calendar.png'),
+                              width: 150,
+                            ),
+                            Container(
+                                alignment: Alignment.center,
+                                width: 150,
+                                height: 150,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+
+                                  children: [
+                                    const Expanded(
+                                        flex: 2,
+                                        child: Padding(
+                                            padding: EdgeInsets.only(
+                                                top: 7),
+                                            child: Text(
+                                              "Dailies",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                                color: Colors.white
+                                              ),
+                                            )
+                                        )
+                                    ),
+                                    Expanded(
+                                        flex: 8,
+                                        child: Align(
+                                            child: Text(
+                                              dailiesCompleted,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                              ),
+                                            )
+                                        ),
+                                    )
+                                  ],
+                                )
+                            )
+                          ],
+                        ),
+                        Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Text('times', style: _getTextStyle()),
                       )
