@@ -214,7 +214,7 @@ class _UserStatsState extends State<UserStats> {
                         ),
                         Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Text('times', style: _getTextStyle()),
+                        child: Text(int.parse(dailiesCompleted) == 1 ? 'time':'times', style: _getTextStyle()),
                       )
                     ],
                   ),
