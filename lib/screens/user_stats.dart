@@ -26,6 +26,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
   String favoriteActivity = "You haven't completed any activities yet.";
   String favoriteActivitySubtext = "Keep playing to find out what your favorite activity is.";
   String favoriteActivityCount = "?";
+  String longestStreak = "0";
 
   late AnimationController _animationController;
   late Animation<double> _growAnimation;
@@ -53,6 +54,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
 
     achiementsCompleted = '${await widget.storage.achievementCount()}';
     dailiesCompleted = '${await widget.storage.getDailyActivityCompletionCount()}';
+    longestStreak = '${await widget.storage.getLongestDailyCompletionStreak()}';
     var activityLogCounts = await widget.storage.getActivityLogCount();
     var activityLogCount = activityLogCounts[0]['cnt'] as int;
     hasActivityLogs = activityLogCount > 0;
@@ -118,7 +120,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text('\r'), // added to force card heights to match... intrinsic height increases the height by 20 pixels
+                          const Text('\n'), // added to force card heights to match... intrinsic height increases the height by 20 pixels
                           Stack(
                             alignment: Alignment.center,
                             children: [
@@ -185,7 +187,15 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                               )
                             ],
                           ),
-                          Text(favoriteActivitySubtext, style: _getTextStyle(), textAlign: TextAlign.center,),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              favoriteActivitySubtext,
+                              style: _getTextStyle(),
+                              textAlign: TextAlign.center,
+                            ),
+
+                          )
                         ],
                       ),
                     )
@@ -264,7 +274,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              // Stat: Longest daily activity completion streak todo
+              // Stat: Longest daily activity completion streak
               Expanded(
                 child: Card(
                   color: _getCardColor(),
@@ -273,17 +283,22 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text("You've completed your daily activities", textAlign: TextAlign.center, style: _getTextStyle()),
+                        padding: const EdgeInsets.only(
+                            top: 22.5,
+                            bottom: 22.5,
+                            left: 10.0,
+                            right: 10.0
+                        ),
+                        child: Text("Longest daily activity streak", textAlign: TextAlign.center, style: _getTextStyle()),
                       ),
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Image(image: AssetImage('assets/icons/trophy.png'), width: 150,),
+                          const Image(image: AssetImage('assets/icons/flame.png'), width: 150,),
                           Padding(
-                              padding: const EdgeInsets.only(bottom: 40.0),
+                              padding: const EdgeInsets.only(top: 65.0),
                               child: Text(
-                                achiementsCompleted,
+                                longestStreak,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -293,10 +308,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                           )
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text('times', style: _getTextStyle()),
-                      )
+                      Padding(padding: const EdgeInsets.only(bottom: 25.0))
                     ],
                   ),
                 ),

@@ -372,6 +372,29 @@ Future<List<Map<String, dynamic>>> getAllMoodJournalEntries() async {
     return (await _db.rawQuery("SELECT COUNT(id) as count FROM $_dailyResetTable WHERE activity_completed = 7"))[0]['count'] as int;
   }
 
+  /// Gets the number of the longest consecutive completion of daily activities
+  Future<int> getLongestDailyCompletionStreak() async{
+    List<Map<String, Object?>> q = await _db.rawQuery('SELECT date FROM $_dailyResetTable WHERE activity_completed = 7 ORDER BY date ASC');
+    // return 1 or 0 depending on if there's only 1 or no daily activities completed
+    if(q.length < 2) return q.length;
+
+    // the minimum streak will be 1
+    int highest = 1, current = 1;
+    for(int i = 1; i < q.length; i++){
+      if(((q[i-1]['date'] as int) + 1) != (q[i]['date'] as int)){
+        if(current > highest){
+          highest = current;
+        }
+        current = 1;
+      }
+      current++;
+    }
+    if(current > highest) {
+      return current;
+    }
+    return highest;
+  }
+
   /// Retrieves all cues for a specific session ID
 Future<List<Map<String, dynamic>>> getCuesForSession(int sessionId) async {
   return await _db.query(
