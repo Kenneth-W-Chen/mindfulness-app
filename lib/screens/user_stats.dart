@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gif/gif.dart';
 import '../storage.dart';
-import 'package:lottie/lottie.dart';
 
 class UserStats extends StatefulWidget {
   Storage storage;
@@ -24,8 +23,8 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
   String achiementsCompleted = "0";
   String dailiesCompleted = "0";
   bool hasActivityLogs = true;
-  String favoriteActivity = "You haven't completed any activities yet.";
-  String favoriteActivitySubtext = "Keep playing to find out what your favorite activity is.";
+  String favoriteActivity = "";
+  String favoriteActivitySubtext = "Keep playing to find your favorite activity.";
   String favoriteActivityCount = "?";
   String longestStreak = "0";
 
@@ -57,17 +56,20 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
     dailiesCompleted = '${await widget.storage.getDailyActivityCompletionCount()}';
     longestStreak = '${await widget.storage.getLongestDailyCompletionStreak()}';
     var activityLogCounts = await widget.storage.getActivityLogCount();
-    var activityLogCount = activityLogCounts[0]['cnt'] as int;
-    hasActivityLogs = activityLogCount > 0;
+    hasActivityLogs = activityLogCounts.isNotEmpty;
     if(hasActivityLogs) {
-      favoriteActivity = "Your favorite activity is ${ActivityName.values[activityLogCounts[0]['activity_id'] as int].toString()}.";
-      favoriteActivitySubtext = "You've completed it $activityLogCount time";
-      if(activityLogCount>1){
-        favoriteActivitySubtext += 's';
+      var activityLogCount = activityLogCounts[0]['cnt'] as int;
+      hasActivityLogs = activityLogCount > 0;
+      if (hasActivityLogs) {
+        favoriteActivity =
+            "Your favorite activity is ${ActivityName.values[activityLogCounts[0]['activity_id'] as int].toString()}.";
+        favoriteActivitySubtext = "You've completed it $activityLogCount time";
+        if (activityLogCount > 1) {
+          favoriteActivitySubtext += 's';
+        }
+        favoriteActivitySubtext += '.';
+        favoriteActivityCount = activityLogCount.toString();
       }
-      favoriteActivitySubtext += '.';
-      favoriteActivityCount = activityLogCount.toString();
-
     }
     setState(() {
 
@@ -93,7 +95,17 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Lottie.asset('assets/images/user_stats_1_light.json'),
+                Gif(
+                  image: AssetImage(
+                      theme == 1 ? 'user_stats_1_dark.png' : 'assets/images/user_stats_1_light.gif'
+                  ),
+                  autostart: Autostart.loop,
+                  placeholder: (BuildContext c){
+                    return Image.asset(
+                      theme == 1 ? 'user_stats_1_dark.png' : 'assets/images/user_stats_1_light.png'
+                    );
+                  }
+                ),
                 Container(
                   padding: const EdgeInsets.all(2.0),
                   constraints: const BoxConstraints(minHeight: 50.0),
