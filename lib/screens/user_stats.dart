@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../storage.dart';
+import 'package:lottie/lottie.dart';
 
 class UserStats extends StatefulWidget {
   Storage storage;
@@ -92,10 +93,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image(
-                    image: AssetImage(theme == 1 ? 'assets/images/user_stats_1_dark.png':'assets/images/user_stats_1_light.png'),
-                    fit: BoxFit.fitWidth,
-                  ),
+                Lottie.asset('assets/images/user_stats_1_light.json'),
                 Container(
                   padding: const EdgeInsets.all(2.0),
                   constraints: const BoxConstraints(minHeight: 50.0),
@@ -308,7 +306,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                           )
                         ],
                       ),
-                      Padding(padding: const EdgeInsets.only(bottom: 25.0))
+                      const Padding(padding: EdgeInsets.only(bottom: 25.0))
                     ],
                   ),
                 ),

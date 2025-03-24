@@ -45,6 +45,7 @@ dependencies:
   flutter_timezone: ^4.0.0
   timezone: any
   collection: any
+  lottie: ^3.3.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
