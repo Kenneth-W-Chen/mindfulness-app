@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../shared/activity_app_bar.dart';
 import 'mellowmazeEngine.dart';
 import 'mellowmazemini.dart'; // Import the minigame widgets
 
@@ -378,7 +379,7 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
             child: ReflectionContent(
               reflection: level.reflection,
               onFinish: () {
-                Navigator.pop(context);
+                Navigator.pop(context,true);
               },
             ),
           ),
@@ -403,10 +404,11 @@ class _MellowMazeActivityState extends State<MellowMazeActivity>
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Mellow Maze Adventure"),
-        backgroundColor: Colors.teal[800],
-        elevation: 0,
+      appBar: activityAppBar(
+        'Mellow Maze Adventure',
+        Colors.teal[800]!,
+        context,
+        _minigamePlayed
       ),
       body: AnimatedBuilder(
         animation: _backgroundAnimation,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import '../../storage.dart';
+
 class CalmingCliffsActivity extends StatefulWidget {
   const CalmingCliffsActivity({Key? key}) : super(key: key);
 
@@ -43,6 +45,8 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
     "The pale blue dot is our only home.",
     "Among billions of galaxies, we share this moment.",
   ];
+
+  late final Storage _storage;
 
   @override
   void initState() {
@@ -87,7 +91,8 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
       duration: const Duration(seconds: 60),
       vsync: this,
     );
-    _progressController.forward().then((_) {
+    _progressController.forward().then((_) async {
+      await _storage.addActivityLog(ActivityName.calming_cliffs, '');
       Navigator.pop(context, true);
     });
     _progressAnimation =

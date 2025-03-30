@@ -1,6 +1,7 @@
 import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../../storage.dart';
 import 'calming_cliffs_activity.dart'; // Correct relative path to the activity
 
 class CalmingCliffsIntro extends StatefulWidget {
@@ -70,6 +71,11 @@ class _CalmingCliffsIntroState extends State<CalmingCliffsIntro>
   Future<void> setActivityCompleted(Future<dynamic> val) async {
     _activityCompleted = (await val) as bool;
     setState(() {});
+    if(_activityCompleted){
+      var s = await Storage.create();
+      s.addActivityLog(ActivityName.calming_cliffs, '');
+    }
+
   }
 
   @override

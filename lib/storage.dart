@@ -16,6 +16,7 @@ class Storage {
   static const _achievementsTable = 'achievements';
   static const _dailyResetTable = 'last_daily_reset';
   static const _moodJournalsTable = 'mood_journals';
+  static const int databaseVersion = 5;
 
   Storage._create(Database db) {
     _db = db;
@@ -29,7 +30,7 @@ class Storage {
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-      version: 4, // Updated version for schema changes
+      version: databaseVersion, // Updated version for schema changes
       onConfigure: _configureDb,
       onCreate: _initDb,
       onUpgrade: _updateDb
@@ -111,6 +112,10 @@ class Storage {
     await _db.delete(_achievementsTable, where: 'name = ?', whereArgs: [achievement.name]);
   }
 
+  Future<int> achievementCount() async{
+    return (await _db.rawQuery('SELECT COUNT(id) as count FROM $_achievementsTable WHERE completion_date IS NOT NULL'))[0]['count'] as int;
+  }
+  
   /** Activity log functions
    *
    **/
@@ -196,6 +201,26 @@ class Storage {
   Future<void> deleteActivityLog(ActivityName activityName) async {
     int activityId = await getActivityId(activityName);
     await _db.delete(_activityLogTable, where: 'activity_id = ?', whereArgs: [activityId]);
+  }
+
+  /// Counts the number of activity logs.
+  /// Use 'activity_id' and 'cnt' to get each row's activity id and count, respectively.
+  Future<List<Map<String, Object?>>> getActivityLogCount({bool groupByActivity = true, bool sortDescending = true, int limit = 0}) async{
+    String query = "SELECT activity_id, COUNT(id) AS cnt FROM $_activityLogTable ";
+    if(groupByActivity) {
+      query += "GROUP BY activity_id ";
+    }
+    query += "ORDER BY cnt ";
+    if(sortDescending){
+      query += "DESC ";
+    } else {
+      query += "ASC ";
+    }
+    if(limit > 0){
+      query += "LIMIT $limit";
+    }
+
+    return (await _db.rawQuery(query));
   }
 
   /// Inserts a new mood journal entry into the database
@@ -343,6 +368,34 @@ Future<List<Map<String, dynamic>>> getAllMoodJournalEntries() async {
     await _db.update(_dailyResetTable, {'activity_completed': completionInfo}, where: 'id == ?', whereArgs: [row['id']]);
   }
 
+  /// Retrieves the number of daily activities completed in total.
+  Future<int> getDailyActivityCompletionCount() async{
+    return (await _db.rawQuery("SELECT COUNT(id) as count FROM $_dailyResetTable WHERE activity_completed = 7"))[0]['count'] as int;
+  }
+
+  /// Gets the number of the longest consecutive completion of daily activities
+  Future<int> getLongestDailyCompletionStreak() async{
+    List<Map<String, Object?>> q = await _db.rawQuery('SELECT date FROM $_dailyResetTable WHERE activity_completed = 7 ORDER BY date ASC');
+    // return 1 or 0 depending on if there's only 1 or no daily activities completed
+    if(q.length < 2) return q.length;
+
+    // the minimum streak will be 1
+    int highest = 1, current = 1;
+    for(int i = 1; i < q.length; i++){
+      if(((q[i-1]['date'] as int) + 1) != (q[i]['date'] as int)){
+        if(current > highest){
+          highest = current;
+        }
+        current = 1;
+      }
+      current++;
+    }
+    if(current > highest) {
+      return current;
+    }
+    return highest;
+  }
+
   /// Retrieves all cues for a specific session ID
 Future<List<Map<String, dynamic>>> getCuesForSession(int sessionId) async {
   return await _db.query(
@@ -487,16 +540,24 @@ Future<void> insertSession(int sessionId, String name) async {
   static Future<void> _updateDb(Database db, int oldVersion, int newVersion) async{
     debugPrint('DB: Version updated to $newVersion from $oldVersion');
     Batch batch = db.batch();
+    // Add calming cliffs and mood journal activities to activities table
     if(oldVersion < 3){
       debugPrint('DB: Running v3 updates');
       batch.insert(_activityTable, {'name': 'calming_cliffs'},conflictAlgorithm: ConflictAlgorithm.ignore);
       batch.insert(_activityTable, {'name': 'mood_journal'},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
+    // Add notifications and theme to preferences table; update default volume preference value
     if(oldVersion < 4){
       debugPrint('DB: Running v4 updates');
       batch.insert(_preferencesTable, {'name':'notifs', 'value':'1'}, conflictAlgorithm: ConflictAlgorithm.replace);
       batch.insert(_preferencesTable, {'name':'theme', 'value':'0'}, conflictAlgorithm: ConflictAlgorithm.replace);
       batch.update(_preferencesTable, {'value':'10'}, where: "id in (1,2,3)", conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
+    // Add mellow maze and positive affirmations to activities table
+    if(oldVersion < 5){
+      debugPrint('DB: running v5 updates');
+      batch.insert(_activityTable,{'name':'mellow_maze'}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_activityTable,{'name':'positive_affirmations'}, conflictAlgorithm: ConflictAlgorithm.ignore);
     }
     await batch.commit(noResult: true);
     debugPrint('DB: Finished updating DB');
@@ -566,7 +627,9 @@ enum ActivityName {
   twilight_alley(1),
   breathe(2),
   calming_cliffs(3),
-  mood_journal(4);
+  mood_journal(4),
+  mellow_maze(5),
+  positive_affirmations(6);
   final int value;
 
   const ActivityName(this.value);

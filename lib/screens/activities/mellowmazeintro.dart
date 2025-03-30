@@ -1,6 +1,7 @@
 import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../../storage.dart';
 import 'mellowmazeactivity.dart'; // Correct relative path to the activity
 
 class MellowMazeIntro extends StatefulWidget {
@@ -69,7 +70,12 @@ class _MellowMazeIntroState extends State<MellowMazeIntro>
 
   Future<void> setActivityCompleted(Future<dynamic> val) async {
     _activityCompleted = (await val) as bool;
+    print(_activityCompleted);
     setState(() {});
+    if(_activityCompleted){
+      var s = await Storage.create();
+      s.addActivityLog(ActivityName.mellow_maze, '');
+    }
   }
 
   @override

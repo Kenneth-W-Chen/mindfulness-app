@@ -45,6 +45,7 @@ dependencies:
   flutter_timezone: ^4.0.0
   timezone: any
   collection: any
+  gif: ^2.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -71,8 +72,8 @@ flutter:
 
   assets:
     - assets/audio/activity_one/
-    - assets/images/serene_beach_page.png # Example of your image assets
-    - assets/icons/treasure.png
+    - assets/images/
+    - assets/icons/
   fonts:
     - family: Chewy
       fonts:
