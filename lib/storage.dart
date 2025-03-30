@@ -16,6 +16,7 @@ class Storage {
   static const _achievementsTable = 'achievements';
   static const _dailyResetTable = 'last_daily_reset';
   static const _moodJournalsTable = 'mood_journals';
+  static const int databaseVersion = 5;
 
   Storage._create(Database db) {
     _db = db;
@@ -29,7 +30,7 @@ class Storage {
   static Future<Storage> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
-      version: 4, // Updated version for schema changes
+      version: databaseVersion, // Updated version for schema changes
       onConfigure: _configureDb,
       onCreate: _initDb,
       onUpgrade: _updateDb
@@ -539,16 +540,24 @@ Future<void> insertSession(int sessionId, String name) async {
   static Future<void> _updateDb(Database db, int oldVersion, int newVersion) async{
     debugPrint('DB: Version updated to $newVersion from $oldVersion');
     Batch batch = db.batch();
+    // Add calming cliffs and mood journal activities to activities table
     if(oldVersion < 3){
       debugPrint('DB: Running v3 updates');
       batch.insert(_activityTable, {'name': 'calming_cliffs'},conflictAlgorithm: ConflictAlgorithm.ignore);
       batch.insert(_activityTable, {'name': 'mood_journal'},conflictAlgorithm: ConflictAlgorithm.ignore);
     }
+    // Add notifications and theme to preferences table; update default volume preference value
     if(oldVersion < 4){
       debugPrint('DB: Running v4 updates');
       batch.insert(_preferencesTable, {'name':'notifs', 'value':'1'}, conflictAlgorithm: ConflictAlgorithm.replace);
       batch.insert(_preferencesTable, {'name':'theme', 'value':'0'}, conflictAlgorithm: ConflictAlgorithm.replace);
       batch.update(_preferencesTable, {'value':'10'}, where: "id in (1,2,3)", conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
+    // Add mellow maze and positive affirmations to activities table
+    if(oldVersion < 5){
+      debugPrint('DB: running v5 updates');
+      batch.insert(_activityTable,{'name':'mellow_maze'}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_activityTable,{'name':'positive_affirmations'}, conflictAlgorithm: ConflictAlgorithm.ignore);
     }
     await batch.commit(noResult: true);
     debugPrint('DB: Finished updating DB');
@@ -618,7 +627,9 @@ enum ActivityName {
   twilight_alley(1),
   breathe(2),
   calming_cliffs(3),
-  mood_journal(4);
+  mood_journal(4),
+  mellow_maze(5),
+  positive_affirmations(6);
   final int value;
 
   const ActivityName(this.value);

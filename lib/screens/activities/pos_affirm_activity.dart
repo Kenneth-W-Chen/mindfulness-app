@@ -1,5 +1,9 @@
 //import 'package:calm_quest/screens/shared/activity_app_bar.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import '../../storage.dart';
 
 void main() {
   runApp(const QuoteApp());
@@ -62,6 +66,26 @@ class _QuoteScreenState extends State<QuoteScreen> {
   String currentQuote =
       "Feeling overwhelmed? Tap to explore some positive affirmations to ground yourself.";
 
+  late final Timer _completionTimer;
+  bool _activityCompleted = false;
+
+  @override
+  void initState(){
+    super.initState();
+    _completionTimer = Timer(const Duration(seconds: 30), () async {
+      _activityCompleted = true;
+      setState(() {});
+      var s = await Storage.create();
+      s.addActivityLog(ActivityName.positive_affirmations, '');
+    });
+  }
+
+  @override
+  void dispose(){
+    _completionTimer.cancel();
+    super.dispose();
+  }
+
   void refreshQuote() {
     setState(() {
       currentQuote = quotes[(quotes.length *
@@ -79,7 +103,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen
+            Navigator.pop(context, _activityCompleted); // Navigate back to the previous screen
           },
         ),
         backgroundColor:

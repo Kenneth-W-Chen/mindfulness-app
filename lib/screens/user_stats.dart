@@ -1,12 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gif/gif.dart';
 import '../storage.dart';
 
 class UserStats extends StatefulWidget {
-  Storage storage;
+  final Storage storage;
 
-  UserStats({super.key, required this.storage});
+  const UserStats({super.key, required this.storage});
 
   @override
   State<StatefulWidget> createState() => _UserStatsState();
@@ -20,7 +19,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
   final TextStyle _fontColorLight = const TextStyle(color:Colors.black);
   final TextStyle _fontColorDark = const TextStyle(color:Colors.white);
 
-  String achiementsCompleted = "0";
+  String achievementsCompleted = "0";
   String dailiesCompleted = "0";
   bool hasActivityLogs = true;
   String favoriteActivity = "";
@@ -52,7 +51,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
 
     });
 
-    achiementsCompleted = '${await widget.storage.achievementCount()}';
+    achievementsCompleted = '${await widget.storage.achievementCount()}';
     dailiesCompleted = '${await widget.storage.getDailyActivityCompletionCount()}';
     longestStreak = '${await widget.storage.getLongestDailyCompletionStreak()}';
     var activityLogCounts = await widget.storage.getActivityLogCount();
@@ -97,12 +96,12 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
               children: [
                 Gif(
                   image: AssetImage(
-                      theme == 1 ? 'user_stats_1_dark.png' : 'assets/images/user_stats_1_light.gif'
+                      theme == 1 ? 'assets/images/user_stats_1_dark.gif' : 'assets/images/user_stats_1_light.gif'
                   ),
                   autostart: Autostart.loop,
                   placeholder: (BuildContext c){
                     return Image.asset(
-                      theme == 1 ? 'user_stats_1_dark.png' : 'assets/images/user_stats_1_light.png'
+                      theme == 1 ? 'assets/images/user_stats_1_dark.png' : 'assets/images/user_stats_1_light.png'
                     );
                   }
                 ),
@@ -138,7 +137,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                               Padding(
                                   padding: const EdgeInsets.only(bottom:40.0),
                                   child: Text(
-                                    achiementsCompleted,
+                                    achievementsCompleted,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -293,12 +292,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(
-                            top: 22.5,
-                            bottom: 22.5,
-                            left: 10.0,
-                            right: 10.0
-                        ),
+                        padding: const EdgeInsets.all(10.0),
                         child: Text("Longest daily activity streak", textAlign: TextAlign.center, style: _getTextStyle()),
                       ),
                       Stack(
@@ -318,7 +312,10 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                           )
                         ],
                       ),
-                      const Padding(padding: EdgeInsets.only(bottom: 25.0))
+                      const Padding(
+                        padding: EdgeInsets.all(14.0),
+                        child: const Text('\r'),
+                      )
                     ],
                   ),
                 ),

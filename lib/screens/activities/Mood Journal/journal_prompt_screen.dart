@@ -41,8 +41,9 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
       widget.intensity.toInt(),
       _controller.text,
     );
+    await widget.storage.addActivityLog(ActivityName.mood_journal, widget.mood['label']);
     // Navigate back or to another screen after saving
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   @override

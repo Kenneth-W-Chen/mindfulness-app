@@ -1,3 +1,4 @@
+import 'package:calm_quest/storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -33,9 +34,11 @@ class _BreathingActivityState extends State<BreathingActivity>
         curve: Curves.easeInOut,
       ),
     );
-    completionTimer = Timer(const Duration(seconds: 30), () {
+    completionTimer = Timer(const Duration(seconds: 30), () async {
       _activityCompleted = true;
       setState(() {});
+      var s = await Storage.create();
+      s.addActivityLog(ActivityName.breathe, '');
     });
     _startBreathingSequence();
   }
@@ -80,6 +83,7 @@ class _BreathingActivityState extends State<BreathingActivity>
   void dispose() {
     _controller.dispose();
     _breathingTimer.cancel();
+    completionTimer.cancel();
     super.dispose();
   }
 
