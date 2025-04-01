@@ -60,6 +60,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
       var activityLogCount = activityLogCounts[0]['cnt'] as int;
       hasActivityLogs = activityLogCount > 0;
       if (hasActivityLogs) {
+
         favoriteActivity =
             "Your favorite activity is ${ActivityName.values[activityLogCounts[0]['activity_id'] as int].toString()}.";
         favoriteActivitySubtext = "You've completed it $activityLogCount time";
@@ -129,7 +130,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text('\n'), // added to force card heights to match... intrinsic height increases the height by 20 pixels
+                          Text('\n${hasActivityLogs? '\n' : ''}'), // added to force card heights to match... intrinsic height increases the height by 20 pixels
                           Stack(
                             alignment: Alignment.center,
                             children: [
