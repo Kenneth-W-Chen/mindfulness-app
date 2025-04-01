@@ -1,4 +1,6 @@
 import 'package:calm_quest/notifications.dart';
+import 'package:calm_quest/screens/activities/mellowmazeintro.dart';
+import 'package:calm_quest/screens/activities/pos_affirm_activity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../custom_bottom_navigation_bar.dart';
@@ -28,7 +30,9 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     ActivityName.twilight_alley: TwilightAlleyIntro.new,
     ActivityName.breathe: BreathingActivity.new,
     ActivityName.calming_cliffs: CalmingCliffsIntro.new,
-    ActivityName.mood_journal: MoodSelectionScreen.new
+    ActivityName.mood_journal: MoodSelectionScreen.new,
+    ActivityName.mellow_maze: MellowMazeIntro.new,
+    ActivityName.positive_affirmations: QuoteScreen.new,
   };
 
   static const Map<ActivityName, IconData> activityNameIcons = {
@@ -36,7 +40,9 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     ActivityName.twilight_alley: Icons.flag,
     ActivityName.breathe: Icons.phone_in_talk,
     ActivityName.calming_cliffs: Icons.landscape,
-    ActivityName.mood_journal: Icons.book
+    ActivityName.mood_journal: Icons.book,
+    ActivityName.mellow_maze: Icons.blur_circular,
+    ActivityName.positive_affirmations: Icons.book,
   };
 
   static const Map<ActivityName, String> activityNameDescription = {
@@ -47,6 +53,8 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     ActivityName.calming_cliffs:
         'Calm yourself and realize that there is so much out there.',
     ActivityName.mood_journal: 'Talk about how you feel today',
+    ActivityName.mellow_maze: "Traverse the maze to clear your mind.",
+    ActivityName.positive_affirmations: "Ground yourself with positive affirmations",
   };
 
   List<bool> dayCompletedList = List<bool>.filled(7, false);
