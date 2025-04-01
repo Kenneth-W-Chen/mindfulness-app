@@ -6,7 +6,7 @@ import '../shared/twilight_alley_load.dart'; // Correct relative path to the loa
 import 'twilight_alley_activity.dart'; // Correct relative path to the activity
 
 class TwilightAlleyIntro extends StatefulWidget {
-  const TwilightAlleyIntro({super.key});
+  const TwilightAlleyIntro({Key? key}) : super(key: key);
 
   @override
   _TwilightAlleyIntroState createState() => _TwilightAlleyIntroState();
@@ -57,8 +57,7 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
       vsync: this,
     )..repeat(reverse: true);
 
-    _fadeAnimation =
-        Tween<double>(begin: 0.3, end: 1.0).animate(_fadeController);
+    _fadeAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(_fadeController);
   }
 
   @override
@@ -69,16 +68,18 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
     super.dispose();
   }
 
-  Future<void> setActivityCompleted(Future<dynamic> val) async {
-    _activityCompleted = (await val) as bool;
-    setState(() {});
+  // Modified: Accept a nullable bool and default to false if null.
+  void setActivityCompleted(bool? completed) {
+    setState(() {
+      _activityCompleted = completed ?? false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: activityAppBar('Twilight Alley', Colors.deepPurple[800]!, context,
-          _activityCompleted),
+      appBar: activityAppBar(
+          'Twilight Alley', Colors.deepPurple[800]!, context, _activityCompleted),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -167,15 +168,15 @@ class _TwilightAlleyIntroState extends State<TwilightAlleyIntro>
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const TwilightAlleyLoad()),
+                  MaterialPageRoute(builder: (context) => const TwilightAlleyLoad()),
                 );
                 Timer(const Duration(milliseconds: 3500), () {
-                  setActivityCompleted(Navigator.pushReplacement(
+                  // Directly set the flag to true instead of passing a Future.
+                  setActivityCompleted(true);
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const TwilightAlleyActivity()),
-                  ));
+                    MaterialPageRoute(builder: (context) => const TwilightAlleyActivity()),
+                  );
                 });
               },
               child: const Text('Start'),
