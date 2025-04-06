@@ -72,8 +72,7 @@ class _CalmingCliffsIntroState extends State<CalmingCliffsIntro>
     _activityCompleted = (await val) as bool;
     setState(() {});
     if(_activityCompleted){
-      var s = await Storage.create();
-      s.addActivityLog(ActivityName.calming_cliffs, '');
+      Storage.storage.addActivityLog(ActivityName.calming_cliffs, '');
     }
 
   }

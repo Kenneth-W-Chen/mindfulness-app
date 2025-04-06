@@ -10,35 +10,32 @@ import 'package:path/path.dart' as path;
 
 class AudioPlayerScreen extends StatefulWidget {
   const AudioPlayerScreen(
-      {super.key, required this.audioFilePath, required this.storage});
+      {super.key, required this.audioFilePath});
   final String audioFilePath;
-  final Storage storage;
 
   @override
   _AudioPlayerScreenState createState() =>
-      _AudioPlayerScreenState(storage: storage, audioFilePath: audioFilePath);
+      _AudioPlayerScreenState();
 }
 
 class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   late AudioManager _audioManager;
-  final Storage storage;
   bool isPlaying = false;
   bool _activityCompleted = false;
-  final String audioFilePath;
 
-  _AudioPlayerScreenState({required this.storage, required this.audioFilePath});
+  _AudioPlayerScreenState();
 
   late Timer completionTimer;
 
   @override
   void initState() {
     super.initState();
-    _audioManager = AudioManager(storage);
+    _audioManager = AudioManager(Storage.storage);
     asyncInit();
   }
 
   Future<void> asyncInit() async {
-    DateTime? completionDate = (await storage.getActivityLogs(
+    DateTime? completionDate = (await Storage.storage.getActivityLogs(
             [ActivityName.values[1]]))[ActivityName.values[1]]![0]
         ['completion_date'] as DateTime?;
     DateTime now = DateTime.now().toUtc();
@@ -46,7 +43,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     if (completionDate == null || now.isAfter(completionDate)) {
       completionTimer = Timer(const Duration(seconds: 30), () {
         _activityCompleted = true;
-        storage.addActivityLog(ActivityName.values[1], audioFilePath);
+        Storage.storage.addActivityLog(ActivityName.values[1], widget.audioFilePath);
         setState(() {});
       });
     } else {
@@ -55,7 +52,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         setState(() {});
       });
     }
-    _audioManager.playAudio(audioFilePath, loop: true);
+    _audioManager.playAudio(widget.audioFilePath, loop: true);
   }
 
   @override
@@ -110,7 +107,6 @@ class MeditationStation extends StatefulWidget {
 
 class _MeditationStationState extends State<MeditationStation> {
   late String _dropdownValue;
-  late Storage storage;
   List<String>? audioList;
   bool _activityCompleted = false;
 
@@ -132,7 +128,6 @@ class _MeditationStationState extends State<MeditationStation> {
       audioList![i] = audioList![i].replaceAll('assets/', '');
     }
     _dropdownValue = audioList![0];
-    storage = await Storage.create();
     setState(() {});
   }
 
@@ -189,7 +184,6 @@ class _MeditationStationState extends State<MeditationStation> {
                     MaterialPageRoute(
                         builder: (context) => AudioPlayerScreen(
                               audioFilePath: _dropdownValue,
-                              storage: storage,
                             )),
                   ).then((value) {
                     _activityCompleted = value as bool || _activityCompleted;

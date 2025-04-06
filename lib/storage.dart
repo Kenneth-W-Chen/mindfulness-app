@@ -18,6 +18,8 @@ class Storage {
   static const _moodJournalsTable = 'mood_journals';
   static const int databaseVersion = 5;
 
+  static late Storage storage;
+
   Storage._create(Database db) {
     _db = db;
   }
@@ -27,7 +29,7 @@ class Storage {
   /// ```dart
   /// Storage storage = await Storage.create();
   /// ```
-  static Future<Storage> create({String dbName = 'storage.db'}) async {
+  static Future<void> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
       version: databaseVersion, // Updated version for schema changes
@@ -35,7 +37,7 @@ class Storage {
       onCreate: _initDb,
       onUpgrade: _updateDb
     );
-    return Storage._create(db);
+    storage = Storage._create(db);
   }
 
   /// Closes the database connection. Only use if the `Storage` object won't be used again afterwards (i.e., app close or reset)

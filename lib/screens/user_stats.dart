@@ -3,9 +3,8 @@ import 'package:gif/gif.dart';
 import '../storage.dart';
 
 class UserStats extends StatefulWidget {
-  final Storage storage;
 
-  const UserStats({super.key, required this.storage});
+  const UserStats({super.key});
 
   @override
   State<StatefulWidget> createState() => _UserStatsState();
@@ -41,20 +40,20 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
   @override
   void dispose(){
     _animationController.dispose();
+
     super.dispose();
   }
 
   Future<void> asyncInitState() async {
-    theme = (await widget.storage.getPreferences([PreferenceName.theme]))![PreferenceName.theme] as int;
+    theme = (await Storage.storage.getPreferences([PreferenceName.theme]))![PreferenceName.theme] as int;
     // doing a setState here since fetching the other data can take a while
     setState(() {
 
     });
-
-    achievementsCompleted = '${await widget.storage.achievementCount()}';
-    dailiesCompleted = '${await widget.storage.getDailyActivityCompletionCount()}';
-    longestStreak = '${await widget.storage.getLongestDailyCompletionStreak()}';
-    var activityLogCounts = await widget.storage.getActivityLogCount();
+    achievementsCompleted = '${await Storage.storage.achievementCount()}';
+    dailiesCompleted = '${await Storage.storage.getDailyActivityCompletionCount()}';
+    longestStreak = '${await Storage.storage.getLongestDailyCompletionStreak()}';
+    var activityLogCounts = await Storage.storage.getActivityLogCount();
     hasActivityLogs = activityLogCounts.isNotEmpty;
     if(hasActivityLogs) {
       var activityLogCount = activityLogCounts[0]['cnt'] as int;

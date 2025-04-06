@@ -22,7 +22,6 @@ class TodaysActivitiesScreen extends StatefulWidget {
 }
 
 class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
-  late Storage storage;
 
   static const Map<ActivityName, StatefulWidget Function()>
       activityNameToFunction = {
@@ -74,13 +73,12 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
   }
 
   Future<void> asyncInit() async {
-    storage = await Storage.create();
 
     // Set up daily activities
-    activities = await storage.dailyReset();
+    activities = await Storage.storage.dailyReset();
 
     // set up completion indicator
-    List<Map<String, Object>?> completionInfo = await storage.getDailyResetInfo(
+    List<Map<String, Object>?> completionInfo = await Storage.storage.getDailyResetInfo(
         startDate: DateTime.now().subtract(Duration(days: todayWeekday)));
 
     for (int i = 0; i < completionInfo.length; i++) {
@@ -95,7 +93,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     setState(() {});
     // Set up notifications
     // Don't schedule notifs if notifs are disabled
-    if((await storage.getPreferences([PreferenceName.notifs]))![PreferenceName.notifs] as int == 0) return;
+    if((await Storage.storage.getPreferences([PreferenceName.notifs]))![PreferenceName.notifs] as int == 0) return;
     // if the program is being debugged, schedules a notification to occur 30 seconds from now daily (e.g., always at 10:00:30 everyday)
     if (kDebugMode) {
       print('Adding notification');
@@ -191,7 +189,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
                     subTextColor: Colors.amber[800],
                     onPop: (value) {
                       if (value as bool) {
-                        storage.setDailyCompleted(index + 1);
+                        Storage.storage.setDailyCompleted(index + 1);
                         activities[index]['completed'] = value;
                       }
                       debugPrint(

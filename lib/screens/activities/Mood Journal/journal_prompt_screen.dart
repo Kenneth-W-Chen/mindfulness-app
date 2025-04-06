@@ -5,13 +5,11 @@ import '../../../storage.dart';
 class JournalPromptScreen extends StatefulWidget {
   final Map<String, String> mood;
   final double intensity;
-  final Storage storage; // Added the storage instance
 
   const JournalPromptScreen({
     super.key,
     required this.mood,
     required this.intensity,
-    required this.storage, // Added the storage instance
   });
 
   @override
@@ -35,13 +33,13 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
 
   Future<void> saveEntry() async {
     final date = DateTime.now().toIso8601String();
-    await widget.storage.insertMoodJournal(
+    await Storage.storage.insertMoodJournal(
       date,
       widget.mood['label']!,
       widget.intensity.toInt(),
       _controller.text,
     );
-    await widget.storage.addActivityLog(ActivityName.mood_journal, widget.mood['label']);
+    await Storage.storage.addActivityLog(ActivityName.mood_journal, widget.mood['label']);
     // Navigate back or to another screen after saving
     Navigator.pop(context, true);
   }
@@ -92,7 +90,7 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            JournalListScreen(storage: widget.storage)),
+                            JournalListScreen()),
                     result: true);
               },
               child: const Text('Save Entry'),

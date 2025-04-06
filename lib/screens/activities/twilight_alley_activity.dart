@@ -112,7 +112,6 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
       });
     } else {
       _activityCompleted = true;
-      var storage = await Storage.create();
 
       // Prepare the points message
       String pointsMessage = _totalEmojiPoints < 13
@@ -120,7 +119,7 @@ class _TwilightAlleyActivityState extends State<TwilightAlleyActivity>
           : 'Total Emoji Points: $_totalEmojiPoints';
 
       // Save the activity log as before
-      var future = storage.addActivityLog(
+      var future = Storage.storage.addActivityLog(
         ActivityName.twilight_alley,
         [
           ..._userResponses,

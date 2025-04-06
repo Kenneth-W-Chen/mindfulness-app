@@ -75,8 +75,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
     _completionTimer = Timer(const Duration(seconds: 30), () async {
       _activityCompleted = true;
       setState(() {});
-      var s = await Storage.create();
-      s.addActivityLog(ActivityName.positive_affirmations, '');
+      Storage.storage.addActivityLog(ActivityName.positive_affirmations, '');
     });
   }
 

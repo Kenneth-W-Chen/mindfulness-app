@@ -21,9 +21,8 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
 
   Future<void> _loadAchievements() async {
     try {
-      Storage storage = await Storage.create(); // Initialize storage
       Map<Achievement, DateTime?> achievementsData =
-          await storage.getAchievementsCompletionDate([Achievement.all]);
+          await Storage.storage.getAchievementsCompletionDate([Achievement.all]);
 
       List<Map<String, String>> loadedAchievements =
           achievementsData.entries.map((entry) {

@@ -37,8 +37,7 @@ class _BreathingActivityState extends State<BreathingActivity>
     completionTimer = Timer(const Duration(seconds: 30), () async {
       _activityCompleted = true;
       setState(() {});
-      var s = await Storage.create();
-      s.addActivityLog(ActivityName.breathe, '');
+      Storage.storage.addActivityLog(ActivityName.breathe, '');
     });
     _startBreathingSequence();
   }
