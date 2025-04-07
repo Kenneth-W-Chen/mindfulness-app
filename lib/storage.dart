@@ -642,9 +642,11 @@ enum ActivityName {
 }
 
 enum Achievement {
-  all(-1);
+  all(-1, -1, false);
 
   final int value;
+  final int flagC;
+  final bool flagBitmask;
 
-  const Achievement(this.value);
+  const Achievement(this.value, this.flagC, this.flagBitmask);
 }
