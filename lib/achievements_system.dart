@@ -6,12 +6,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AchievementsSystem {
   static late final SharedPreferences prefs;
 
-  /// Initializes the achievements system
+  /// Initializes the achievements system. Should not be called outside of ``main.dart``.
   static Future<void> init() async {
     prefs = await SharedPreferences.getInstance();
   }
 
-  /// Use this to update and unlock achievements
+  /// Updates an achievement's conditional flag/value and marks the achievement as complete if its condition is met.
+  /// Usage:
+  /// ```dart
+  /// await AchievementsSystem.updateAchievementCondition(Achievement.{achievementName}, 1);
+  /// ```
+  ///
+  /// Example:
+  /// ```dart
+  /// await AchievementsSystem.updateAchievementCondition(Achievement.calm_shield, 1);
+  /// ```
   static Future<void> updateAchievementCondition(Achievement achievement, int value) async {
     assert(value > 0);
     if (achievement.flagBitmask) {
@@ -23,7 +32,7 @@ class AchievementsSystem {
 
   /// Private function for setting bitmask achievement unlock conditions
   static Future<void> _setFlag(Achievement achievement, int flag) async {
-    // get previous value prior to update
+    // get previous value prior
     int prevFlag = prefs.getInt(achievement.name) ?? 0;
     // calculate the new value
     int curFlag = prevFlag | flag;
@@ -41,15 +50,25 @@ class AchievementsSystem {
 
     // mark achievement as complete if all flags are set
     if (curFlag == expectedFlag) {
-      _completeAchievement(achievement);
+      await _completeAchievement(achievement);
     }
   }
 
   /// Private function for incrementing value-based achievement unlock conditions (e.g., do something x times)
   static Future<void> _incrementCondition(Achievement achievement, int value) async {
+    // get previous value
     int curConditionValue = prefs.getInt(achievement.name) ?? 0;
+    // stop function if condition was already met
     if(curConditionValue > achievement.flagC) return;
 
+    // increment value and update stored value
+    curConditionValue += value;
+    prefs.setInt(achievement.name, curConditionValue);
+
+    // mark achievement as complete if value met
+    if(curConditionValue >= achievement.flagC){
+      await _completeAchievement(achievement);
+    }
   }
 
   /// Private function to unlock an achievement without updating already unlocked achievements
