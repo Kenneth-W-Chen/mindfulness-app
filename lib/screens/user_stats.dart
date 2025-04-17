@@ -18,6 +18,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
   final TextStyle _fontColorLight = const TextStyle(color:Colors.black);
   final TextStyle _fontColorDark = const TextStyle(color:Colors.white);
 
+  String daysJourneying = "?";
   String achievementsCompleted = "0";
   String dailiesCompleted = "0";
   bool hasActivityLogs = true;
@@ -50,6 +51,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
     setState(() {
 
     });
+    daysJourneying = '${((await Storage.storage.getAchievementsCompletionDate([Achievement.Welcome_to_the_Cove]))[Achievement.Welcome_to_the_Cove]!.difference(DateTime.now())).inDays + 1}';
     achievementsCompleted = '${await Storage.storage.achievementCount()}';
     dailiesCompleted = '${await Storage.storage.getDailyActivityCompletionCount()}';
     longestStreak = '${await Storage.storage.getLongestDailyCompletionStreak()}';
@@ -111,7 +113,7 @@ class _UserStatsState extends State<UserStats>  with TickerProviderStateMixin {
                   alignment: Alignment.center,
                   color: Colors.transparent,
                   child: Text(
-                      "You've been on your quest for ? days.",
+                      "You've been on your quest for $daysJourneying days.",
                       style: _getTextStyle(),
                   ),
                 )
