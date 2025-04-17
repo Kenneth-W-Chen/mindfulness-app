@@ -71,17 +71,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child:/* GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16.0,
-                        mainAxisSpacing: 16.0,
-                      ),
-                      itemCount: achievements.length,
-                      itemBuilder: (context, index) {
-                        return _buildAchievementCard(achievements);
-                      },*/
-                    GridView(
+                    child: GridView(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16.0,
