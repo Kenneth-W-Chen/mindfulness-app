@@ -1,3 +1,4 @@
+import 'package:calm_quest/achievements_system.dart';
 import 'package:calm_quest/screens/activities/Mood%20Journal/journal_list_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../storage.dart';
@@ -40,6 +41,7 @@ class _JournalPromptScreenState extends State<JournalPromptScreen> {
       _controller.text,
     );
     await Storage.storage.addActivityLog(ActivityName.mood_journal, widget.mood['label']);
+    await AchievementsSystem.updateAchievementCondition(Achievement.Reflective_Mindset, 1);
     // Navigate back or to another screen after saving
     Navigator.pop(context, true);
   }

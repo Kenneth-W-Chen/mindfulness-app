@@ -1,3 +1,4 @@
+import 'package:calm_quest/achievements_system.dart';
 import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -73,6 +74,7 @@ class _CalmingCliffsIntroState extends State<CalmingCliffsIntro>
     setState(() {});
     if(_activityCompleted){
       Storage.storage.addActivityLog(ActivityName.calming_cliffs, '');
+      AchievementsSystem.updateAchievementCondition(Achievement.Calming_Shield, 1);
     }
 
   }

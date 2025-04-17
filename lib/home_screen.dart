@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MistyMountainLandingPage(),
+                    builder: (context) =>  MistyMountainLandingPage(),
                   ),
                 );
               },
@@ -86,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SereneBeachPage(),
+                    builder: (context) =>  SereneBeachPage(),
                   ),
                 );
               },
@@ -101,7 +101,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const TranquilForestLandingPage(),
+                    builder: (context) =>  TranquilForestLandingPage(),
                   ),
                 );
               },

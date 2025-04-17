@@ -1,3 +1,4 @@
+import 'package:calm_quest/achievements_system.dart';
 import 'package:calm_quest/notifications.dart';
 import 'package:calm_quest/screens/activities/mellowmazeintro.dart';
 import 'package:calm_quest/screens/activities/pos_affirm_activity.dart';
@@ -176,6 +177,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
                     debugPrint("Set activity $index completion to ${value ? 'true' : 'false'}");
                     if (activities.every((e) => e['completed'] == true)) {
                       dayCompletedList[todayWeekday] = true;
+                      updateStreakAchievement();
                     }
                     setState(() {});
                   }
@@ -211,5 +213,19 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
                 Text(day)
               ],
             )));
+  }
+
+  Future<void> updateStreakAchievement() async {
+    if(todayWeekday != 0){
+      if(!dayCompletedList[todayWeekday-1]){
+        AchievementsSystem.resetAchievementCondition(Achievement.Baby_Steps);
+      }
+    } else{
+      var yesterdayInfo = (await Storage.storage.getDailyResetInfo(startDate: DateTime.now().subtract(const Duration(days: 1))))[0];
+      if(yesterdayInfo != null && yesterdayInfo['activity_completed'] as int != 7){
+        AchievementsSystem.resetAchievementCondition(Achievement.Baby_Steps);
+      }
+    }
+    AchievementsSystem.updateAchievementCondition(Achievement.Baby_Steps, 1);
   }
 }

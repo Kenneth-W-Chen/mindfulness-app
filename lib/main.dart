@@ -1,5 +1,6 @@
 import 'package:calm_quest/notifications.dart';
 import 'package:calm_quest/storage.dart';
+import 'achievements_system.dart';
 import 'package:flutter/material.dart';
 import 'breathing_activity.dart';
 import 'achievements_screen.dart';
@@ -12,8 +13,14 @@ import 'home_screen.dart';
 
 void main() {
   runApp(const CalmQuestApp());
-  Storage.create();
+  initializeSystems();
+}
+
+void initializeSystems() async{
   notifications.init();
+  await Storage.create();
+  await AchievementsSystem.init();
+  AchievementsSystem.updateAchievementCondition(Achievement.Welcome_to_the_Cove, 1);
 }
 
 class CalmQuestApp extends StatelessWidget {

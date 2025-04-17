@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'Custom_Bottom_Navigation_Bar.dart';
 import 'storage.dart';
 
@@ -11,6 +12,7 @@ class AchievementsScreen extends StatefulWidget {
 
 class _AchievementsScreenState extends State<AchievementsScreen> {
   Map<Achievement, DateTime?> achievements = {};
+  final DateFormat formatter = DateFormat.yMMMd('en-US');
 
   @override
   void initState() {
@@ -120,7 +122,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            completionDate != null ? const Icon(Icons.star, size: 48, color: Colors.amber) : const Icon(Icons.star_border, size:48, color: Colors.grey),
+            completionDate != null ? const Icon(Icons.star, size: 48, color: Colors.amber) : Stack(children: [Icon(Icons.star, size:48, color:Colors.grey[300]), Icon(Icons.star_border, size:48, color: Colors.grey[400]),]),
             const SizedBox(height: 10),
             Text(
               achievement.name.replaceAll('_', ' '),
@@ -135,7 +137,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
             ),
             const SizedBox(height: 3),
             Text(
-              completionDate != null ? "Completed on $completionDate":'Not completed',
+              completionDate != null ? "Completed on ${formatter.format(completionDate)}":'Not completed',
               style: const TextStyle(fontSize: 10, color: Colors.grey),
               textAlign: TextAlign.center,
             ),

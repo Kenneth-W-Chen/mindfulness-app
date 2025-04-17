@@ -47,6 +47,7 @@ dependencies:
   timezone: any
   collection: any
   gif: ^2.3.0
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

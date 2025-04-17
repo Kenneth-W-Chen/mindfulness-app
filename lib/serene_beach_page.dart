@@ -1,8 +1,12 @@
+import 'package:calm_quest/achievements_system.dart';
+import 'package:calm_quest/storage.dart';
 import 'package:flutter/material.dart';
 import 'breathing_activity.dart'; // Importing the Breathing Activity Page
 
 class SereneBeachPage extends StatelessWidget {
-  const SereneBeachPage({super.key});
+  SereneBeachPage({super.key}){
+    AchievementsSystem.updateAchievementCondition(Achievement.Well_Rounded, 2);
+  }
 
   @override
   Widget build(BuildContext context) {

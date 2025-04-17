@@ -11,6 +11,10 @@ class AchievementsSystem {
     prefs = await SharedPreferences.getInstance();
   }
 
+  static int getAchievementCondition(Achievement achievement){
+    return prefs.getInt(achievement.name) ?? 0;
+  }
+
   /// Updates an achievement's conditional flag/value and marks the achievement as complete if its condition is met.
   /// Usage:
   /// ```dart
@@ -28,6 +32,10 @@ class AchievementsSystem {
     } else {
       await _incrementCondition(achievement, value);
     }
+  }
+
+  static void resetAchievementCondition(Achievement achievement) {
+    prefs.setInt(achievement.name, 0);
   }
 
   /// Private function for setting bitmask achievement unlock conditions

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:calm_quest/achievements_system.dart';
 import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -44,6 +45,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       completionTimer = Timer(const Duration(seconds: 30), () {
         _activityCompleted = true;
         Storage.storage.addActivityLog(ActivityName.values[1], widget.audioFilePath);
+        AchievementsSystem.updateAchievementCondition(Achievement.Breath_of_Fresh_Air, 1);
         setState(() {});
       });
     } else {

@@ -1,3 +1,4 @@
+import 'package:calm_quest/achievements_system.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -178,7 +179,7 @@ class Storage {
   /// ```
   Future<void> addActivityLog(ActivityName name, String? info) async {
     int activityId = await getActivityId(name);
-
+    AchievementsSystem.updateAchievementCondition(Achievement.Baby_Steps, 1);
     await _db.insert(
       _activityLogTable,
       {
