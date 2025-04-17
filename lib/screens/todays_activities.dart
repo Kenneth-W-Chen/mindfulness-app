@@ -23,8 +23,7 @@ class TodaysActivitiesScreen extends StatefulWidget {
 
 class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
 
-  static const Map<ActivityName, StatefulWidget Function()>
-      activityNameToFunction = {
+  static const Map<ActivityName, StatefulWidget Function()> activityNameToFunction = {
     ActivityName.meditation_station: MeditationStation.new,
     ActivityName.twilight_alley: TwilightAlleyIntro.new,
     ActivityName.breathe: BreathingActivity.new,
@@ -45,15 +44,13 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
   };
 
   static const Map<ActivityName, String> activityNameDescription = {
-    ActivityName.meditation_station:
-        'Listen to calming sounds and nature noises.',
+    ActivityName.meditation_station: 'Listen to calming sounds and nature noises.',
     ActivityName.twilight_alley: 'Journal some of your thoughts',
     ActivityName.breathe: 'Take a moment to recollect yourself',
-    ActivityName.calming_cliffs:
-        'Calm yourself and realize that there is so much out there.',
+    ActivityName.calming_cliffs: 'Calm yourself and realize that there is so much out there.',
     ActivityName.mood_journal: 'Talk about how you feel today',
-    ActivityName.mellow_maze: "Traverse the maze to clear your mind.",
-    ActivityName.positive_affirmations: "Ground yourself with positive affirmations",
+    ActivityName.mellow_maze: 'Traverse the maze to clear your mind.',
+    ActivityName.positive_affirmations: 'Ground yourself with positive affirmations',
   };
 
   List<bool> dayCompletedList = List<bool>.filled(7, false);
@@ -78,16 +75,13 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
     activities = await Storage.storage.dailyReset();
 
     // set up completion indicator
-    List<Map<String, Object>?> completionInfo = await Storage.storage.getDailyResetInfo(
-        startDate: DateTime.now().subtract(Duration(days: todayWeekday)));
+    List<Map<String, Object>?> completionInfo = await Storage.storage.getDailyResetInfo(startDate: DateTime.now().subtract(Duration(days: todayWeekday)));
 
     for (int i = 0; i < completionInfo.length; i++) {
-      if (completionInfo[i] == null ||
-          !completionInfo[i]!.containsKey('activity_completed')) continue;
+      if (completionInfo[i] == null || !completionInfo[i]!.containsKey('activity_completed')) continue;
       int dayCompletedIndex = (completionInfo[i]!['date']! as DateTime).weekday;
       if (dayCompletedIndex == 7) dayCompletedIndex = 0;
-      dayCompletedList[dayCompletedIndex] =
-          ((completionInfo[i]!['activity_completed'] as int) & 7) == 7;
+      dayCompletedList[dayCompletedIndex] = ((completionInfo[i]!['activity_completed'] as int) & 7) == 7;
     }
 
     setState(() {});
@@ -108,14 +102,8 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
       // schedule a notification to occur every day at 10am
       // don't reschedule it if it's already been scheduled
       if (!await notifications.isScheduled(NotificationIds.dailyReset)) return;
-      TZDateTime tomorrow =
-          TZDateTime.now(notifications.timezone).add(const Duration(days: 1));
-      notifications.schedule(
-          NotificationIds.dailyReset.value,
-          'New daily activities are ready',
-          'New daily activities are ready.',
-          TZDateTime.local(tomorrow.year, tomorrow.month, tomorrow.day, 10),
-          matchDateTimeComponents: DateTimeComponents.time);
+      TZDateTime tomorrow = TZDateTime.now(notifications.timezone).add(const Duration(days: 1));
+      notifications.schedule(NotificationIds.dailyReset.value, 'New daily activities are ready', 'New daily activities are ready.', TZDateTime.local(tomorrow.year, tomorrow.month, tomorrow.day, 10), matchDateTimeComponents: DateTimeComponents.time);
     }
   }
 
@@ -143,18 +131,19 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
             children: [
               Center(
                   child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  completionCard(dayCompletedList[0], 'Su'),
-                  completionCard(dayCompletedList[1], 'Mo'),
-                  completionCard(dayCompletedList[2], 'Tu'),
-                  completionCard(dayCompletedList[3], 'We'),
-                  completionCard(dayCompletedList[4], 'Th'),
-                  completionCard(dayCompletedList[5], 'Fr'),
-                  completionCard(dayCompletedList[6], 'Sa'),
-                ],
-              )),
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    completionCard(dayCompletedList[0], 'Su'),
+                    completionCard(dayCompletedList[1], 'Mo'),
+                    completionCard(dayCompletedList[2], 'Tu'),
+                    completionCard(dayCompletedList[3], 'We'),
+                    completionCard(dayCompletedList[4], 'Th'),
+                    completionCard(dayCompletedList[5], 'Fr'),
+                    completionCard(dayCompletedList[6], 'Sa'),
+                  ],
+                )
+              ),
               const Text(
                 "Here are the activities for today!",
                 style: TextStyle(
@@ -168,36 +157,29 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
               ...(List<Widget>.generate(activities.length, (int index) {
                 var activity = activities[index];
                 return activityCard(
-                    activity['activity'].toString(),
-                    context,
-                    (activity['completed'] as bool)
-                        ? Icons.check
-                        : activityNameIcons[activity['activity']]!,
-                    activityNameDescription[activity['activity']]! +
-                        ((activity['completed'] as bool)
-                            ? '\nYou already completed this activity today.'
-                            : ''),
-                    builder: (context) =>
-                        activityNameToFunction[activity['activity']]!(),
-                    cardColor: (activity['completed'] as bool)
-                        ? Colors.grey.withOpacity(0.9)
-                        : Colors.white.withOpacity(0.9),
-                    shadowColor: Colors.black.withOpacity(0.3),
-                    iconBackgroundColor: Colors.amber[700],
-                    iconColor: Colors.white,
-                    textColor: Colors.amber[900],
-                    subTextColor: Colors.amber[800],
-                    onPop: (value) {
-                      if (value as bool) {
-                        Storage.storage.setDailyCompleted(index + 1);
-                        activities[index]['completed'] = value;
-                      }
-                      debugPrint(
-                          "Set activity $index completion to ${value ? 'true' : 'false'}");
-                      if (activities.every((e) => e['completed'] == true))
-                        dayCompletedList[todayWeekday] = true;
-                      setState(() {});
-                    });
+                  activity['activity'].toString(),
+                  context,
+                  (activity['completed'] as bool) ? Icons.check : activityNameIcons[activity['activity']]!,
+                  activityNameDescription[activity['activity']]! + ((activity['completed'] as bool) ? '\nYou already completed this activity today.' : ''),
+                  builder: (context) => activityNameToFunction[activity['activity']]!(),
+                  cardColor: (activity['completed'] as bool) ? Colors.grey.withOpacity(0.9) : Colors.white.withOpacity(0.9),
+                  shadowColor: Colors.black.withOpacity(0.3),
+                  iconBackgroundColor: Colors.amber[700],
+                  iconColor: Colors.white,
+                  textColor: Colors.amber[900],
+                  subTextColor: Colors.amber[800],
+                  onPop: (value) {
+                    if (value as bool) {
+                      Storage.storage.setDailyCompleted(index + 1);
+                      activities[index]['completed'] = value;
+                    }
+                    debugPrint("Set activity $index completion to ${value ? 'true' : 'false'}");
+                    if (activities.every((e) => e['completed'] == true)) {
+                      dayCompletedList[todayWeekday] = true;
+                    }
+                    setState(() {});
+                  }
+                );
               }))
             ],
           ),
@@ -225,9 +207,7 @@ class _TodaysActivitiesScreenState extends State<TodaysActivitiesScreen> {
             padding: const EdgeInsets.all(4.0),
             child: Column(
               children: [
-                Icon(completed
-                    ? Icons.check_box_outlined
-                    : Icons.square_outlined),
+                Icon(completed ? Icons.check_box_outlined : Icons.square_outlined),
                 Text(day)
               ],
             )));
