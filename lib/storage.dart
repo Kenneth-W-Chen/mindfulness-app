@@ -1,3 +1,4 @@
+import 'package:calm_quest/achievements_system.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -16,7 +17,9 @@ class Storage {
   static const _achievementsTable = 'achievements';
   static const _dailyResetTable = 'last_daily_reset';
   static const _moodJournalsTable = 'mood_journals';
-  static const int databaseVersion = 5;
+  static const int databaseVersion = 6;
+
+  static late Storage storage;
 
   Storage._create(Database db) {
     _db = db;
@@ -27,7 +30,7 @@ class Storage {
   /// ```dart
   /// Storage storage = await Storage.create();
   /// ```
-  static Future<Storage> create({String dbName = 'storage.db'}) async {
+  static Future<void> create({String dbName = 'storage.db'}) async {
     var db = await openDatabase(
       join(await getDatabasesPath(), dbName),
       version: databaseVersion, // Updated version for schema changes
@@ -35,7 +38,7 @@ class Storage {
       onCreate: _initDb,
       onUpgrade: _updateDb
     );
-    return Storage._create(db);
+    storage = Storage._create(db);
   }
 
   /// Closes the database connection. Only use if the `Storage` object won't be used again afterwards (i.e., app close or reset)
@@ -115,7 +118,7 @@ class Storage {
   Future<int> achievementCount() async{
     return (await _db.rawQuery('SELECT COUNT(id) as count FROM $_achievementsTable WHERE completion_date IS NOT NULL'))[0]['count'] as int;
   }
-  
+
   /** Activity log functions
    *
    **/
@@ -176,7 +179,7 @@ class Storage {
   /// ```
   Future<void> addActivityLog(ActivityName name, String? info) async {
     int activityId = await getActivityId(name);
-
+    AchievementsSystem.updateAchievementCondition(Achievement.Baby_Steps, 1);
     await _db.insert(
       _activityLogTable,
       {
@@ -224,7 +227,7 @@ class Storage {
   }
 
   /// Inserts a new mood journal entry into the database
-/// 
+///
 /// Parameters:
 /// - `date`: The date of the journal entry as a `String` in ISO 8601 format.
 /// - `mood`: The mood selected by the user.
@@ -537,8 +540,9 @@ Future<void> insertSession(int sessionId, String name) async {
     await batch.commit(noResult: true);
   }
 
+  /// Updates the database. Should not be called outside of the initialization function.
   static Future<void> _updateDb(Database db, int oldVersion, int newVersion) async{
-    debugPrint('DB: Version updated to $newVersion from $oldVersion');
+    debugPrint('DB: Version updating to $newVersion from $oldVersion');
     Batch batch = db.batch();
     // Add calming cliffs and mood journal activities to activities table
     if(oldVersion < 3){
@@ -559,6 +563,19 @@ Future<void> insertSession(int sessionId, String name) async {
       batch.insert(_activityTable,{'name':'mellow_maze'}, conflictAlgorithm: ConflictAlgorithm.ignore);
       batch.insert(_activityTable,{'name':'positive_affirmations'}, conflictAlgorithm: ConflictAlgorithm.ignore);
     }
+    // Add achievements 0-7 to the achievement table
+    if(oldVersion < 6){
+      debugPrint('DB: running v6 updates');
+      batch.insert(_achievementsTable, {'name': 'Welcome_to_the_Cove', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_achievementsTable, {'name': 'Well_Rounded', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_achievementsTable, {'name': 'Baby_Steps', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_achievementsTable, {'name': 'Consistency_is_Key', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_achievementsTable, {'name': 'Peace_of_Mind', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_achievementsTable, {'name': 'Calming_Shield', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_achievementsTable, {'name': 'Reflective_Mindset', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(_achievementsTable, {'name': 'Breath_of_Fresh_Air', 'completion_date': null}, conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
+    // execute SQL
     await batch.commit(noResult: true);
     debugPrint('DB: Finished updating DB');
   }
@@ -640,9 +657,20 @@ enum ActivityName {
 }
 
 enum Achievement {
-  all(-1);
+  all(-1, -1, false, ''),
+  Welcome_to_the_Cove(0, 1, false, 'Open the app.'),
+  Well_Rounded(1, 3, true, 'Interact with all 3 terrains.'),
+  Baby_Steps(2, 1, false, 'Complete your first activity.'),
+  Consistency_is_Key(3, 14, false, 'Complete a 2 week streak.'),
+  Peace_of_Mind(4, 1, false, 'Use Positive Power Ups one time.'),
+  Calming_Shield(5, 1, false, 'Use Calming Cliffs one time.'),
+  Reflective_Mindset(6, 1, false, 'Write in the Mood Journal.'),
+  Breath_of_Fresh_Air(7, 1, false, 'Stop by the Meditation Station.');
 
   final int value;
+  final int flagC;
+  final bool flagBitmask;
+  final String description;
 
-  const Achievement(this.value);
+  const Achievement(this.value, this.flagC, this.flagBitmask, this.description);
 }

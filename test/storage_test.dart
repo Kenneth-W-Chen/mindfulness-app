@@ -20,64 +20,64 @@ void main() {
   test('BLACKBOX TEST 1: CREATION AND CLOSE TEST', () async {
     String dbPath = join(await getDatabasesPath(), 'test_storage.db');
 
-    Storage storage = await Storage.create(dbName: dbPath);
+    await Storage.create(dbName: dbPath);
 
-    expect(storage, isNotNull);
+    expect(Storage.storage, isNotNull);
 
     expect(dbPath.contains('test_storage.db'), true);
 
-    storage.close();
+    Storage.storage.close();
   });
 
 // Test 2: Create two entries in each table, print the contents, delete the entries, and print again
   test('BLACKBOX TEST 2: Create, Print, Delete, Print', () async {
     String dbPath = join(await getDatabasesPath(), 'test_storage.db');
-    Storage storage = await Storage.create(dbName: dbPath);
+    await Storage.create(dbName: dbPath);
 
     // Add two logs to the activity_logs table
-    storage.addActivityLog(ActivityName.breathe, "First breathe activity");
-    storage.addActivityLog(ActivityName.breathe, "Second breathe activity");
+    Storage.storage.addActivityLog(ActivityName.breathe, "First breathe activity");
+    Storage.storage.addActivityLog(ActivityName.breathe, "Second breathe activity");
 
     // Add two entries to the preferences table
-    storage.updatePreferences(
+    Storage.storage.updatePreferences(
         {PreferenceName.master_volume: 50, PreferenceName.music_volume: 70});
 
     // Mark two achievements as completed
-    storage.setAchievementCompleted(Achievement.all);
+    Storage.storage.setAchievementCompleted(Achievement.all);
 
     // Print all tables after creating the entries
     print('--- After adding two entries ---');
-    await printActivitiesTable(storage);
-    await printActivityLogsTable(storage);
-    await printPreferencesTable(storage);
-    await printAchievementsTable(storage);
+    await printActivitiesTable(Storage.storage);
+    await printActivityLogsTable(Storage.storage);
+    await printPreferencesTable(Storage.storage);
+    await printAchievementsTable(Storage.storage);
 
     // Delete the two entries from the activity logs and preferences tables
-    await storage.deleteActivityLog(ActivityName.breathe);
-    await storage.deleteActivityLog(ActivityName.breathe);
+    await Storage.storage.deleteActivityLog(ActivityName.breathe);
+    await Storage.storage.deleteActivityLog(ActivityName.breathe);
 
-    await storage.deletePreference(PreferenceName.master_volume);
-    await storage.deletePreference(PreferenceName.music_volume);
+    await Storage.storage.deletePreference(PreferenceName.master_volume);
+    await Storage.storage.deletePreference(PreferenceName.music_volume);
 
-    await storage.deleteAchievement(Achievement.all);
+    await Storage.storage.deleteAchievement(Achievement.all);
 
     // Print all tables again after deleting the entries
     print('--- After deleting the entries ---');
-    await printActivitiesTable(storage); // No deletion in activities table
-    await printActivityLogsTable(storage);
-    await printPreferencesTable(storage);
-    await printAchievementsTable(storage);
+    await printActivitiesTable(Storage.storage); // No deletion in activities table
+    await printActivityLogsTable(Storage.storage);
+    await printPreferencesTable(Storage.storage);
+    await printAchievementsTable(Storage.storage);
 
     // Close the storage connection
-    storage.close();
+    Storage.storage.close();
   });
 
   test('WHITEBOX TEST 3: Database Transaction Rollback Test', () async {
     String dbPath = join(await getDatabasesPath(), 'test_storage.db');
-    Storage storage = await Storage.create(dbName: dbPath);
+    await Storage.create(dbName: dbPath);
 
     // Ensure the activity exists in the activities table
-    var result = await storage.testDb.query('activities',
+    var result = await Storage.storage.testDb.query('activities',
         columns: ['id'],
         where: 'name = ?',
         whereArgs: [ActivityName.breathe.name]);
@@ -92,7 +92,7 @@ void main() {
 
       // Start a transaction that should roll back
       try {
-        await storage.testDb.transaction((txn) async {
+        await Storage.storage.testDb.transaction((txn) async {
           // Insert a valid activity log entry
           await txn.insert('activity_logs', {
             'activity_id': activityId,
@@ -116,23 +116,23 @@ void main() {
       }
 
       // Check that no entries were committed (rolled back)
-      var logs = await storage.getActivityLogs([ActivityName.breathe]);
+      var logs = await Storage.storage.getActivityLogs([ActivityName.breathe]);
       expect(logs[ActivityName.breathe]![0]['completion_date'], isNull,
           reason: "Expected no logs due to transaction rollback");
     }
 
-    storage.close();
+    Storage.storage.close();
   });
 
   test('WHITEBOX TEST 4: Validate Activity Logs JOIN', () async {
     String dbPath = join(await getDatabasesPath(), 'test_storage.db');
-    Storage storage = await Storage.create(dbName: dbPath);
+    await Storage.create(dbName: dbPath);
 
     // Insert test data and await the operation
-    await storage.addActivityLog(ActivityName.breathe, "Test breathe activity");
+    await Storage.storage.addActivityLog(ActivityName.breathe, "Test breathe activity");
 
     // Directly execute the query you want to validate
-    var result = await storage.testDb.rawQuery(
+    var result = await Storage.storage.testDb.rawQuery(
         'SELECT activities.name, activity_logs.completion_date FROM activities '
         'INNER JOIN activity_logs ON activities.id = activity_logs.activity_id '
         'WHERE activities.name = ?',
@@ -147,8 +147,8 @@ void main() {
         reason: "Completion date should not be null");
 
     // Cleanup
-    await storage.deleteActivityLog(ActivityName.breathe);
-    storage.close();
+    await Storage.storage.deleteActivityLog(ActivityName.breathe);
+    Storage.storage.close();
   });
 
 //END OF TEST SUITE*****************8

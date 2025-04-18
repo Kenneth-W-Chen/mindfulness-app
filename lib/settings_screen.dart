@@ -15,7 +15,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  late Storage storage;
   Map<PreferenceName, int>? preferences;
 
   @override
@@ -26,8 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadPreferences() async {
     try {
-      storage = await Storage.create();
-      preferences = await storage.getPreferences([PreferenceName.all]);
+      preferences = await Storage.storage.getPreferences([PreferenceName.all]);
       setState(() {});
     } catch (e) {
       setState(() {
@@ -37,7 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _updatePreferences(PreferenceName preference, int value) {
-    storage.updatePreferences({preference: value});
+    Storage.storage.updatePreferences({preference: value});
     setState(() {
       preferences![preference] = value;
     });
@@ -102,7 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => UserStats(storage: storage),
+                            builder: (context) => const UserStats(),
                           ),
                         );
                       },

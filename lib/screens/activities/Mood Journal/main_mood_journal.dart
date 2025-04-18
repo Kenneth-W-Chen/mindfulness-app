@@ -5,16 +5,12 @@ import 'mood_selection_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize the database storage
-  final storage = await Storage.create();
-
-  runApp(MoodJournal(storage: storage));
+  runApp(const MoodJournal());
 }
 
 class MoodJournal extends StatelessWidget {
-  final Storage storage;
 
-  const MoodJournal({super.key, required this.storage});
+  const MoodJournal({super.key});
 
   @override
   Widget build(BuildContext context) {
