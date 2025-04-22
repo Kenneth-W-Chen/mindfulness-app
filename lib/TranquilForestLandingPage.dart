@@ -43,15 +43,15 @@ class TranquilForestLandingPage extends StatelessWidget {
             letterSpacing: 1.2,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 98, 50, 130),
+        backgroundColor: const Color.fromARGB(255, 56, 130, 107),
         elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color.fromARGB(255, 65, 35, 94),
-              const Color.fromARGB(255, 150, 80, 180),
+              const Color.fromARGB(104, 7, 153, 87),
+              const Color.fromARGB(206, 0, 128, 128),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -94,7 +94,7 @@ class TranquilForestLandingPage extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage('assets/images/forest.png'),
+                              image: AssetImage('assets/images/mountain.png'),
                               fit: BoxFit.cover,
                               colorFilter: ColorFilter.mode(
                                 Colors.black.withOpacity(0.4),
@@ -120,7 +120,7 @@ class TranquilForestLandingPage extends StatelessWidget {
                             cardColor: Colors.transparent,
                             shadowColor: Colors.transparent,
                             iconBackgroundColor:
-                                const Color.fromARGB(255, 26, 9, 38),
+                                const Color.fromARGB(255, 7, 47, 16),
                             iconColor: Colors.white,
                             textColor: Colors.white,
                             subTextColor: Colors.white70,
