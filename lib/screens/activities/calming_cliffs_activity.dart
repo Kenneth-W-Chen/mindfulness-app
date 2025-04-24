@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-
 import '../../storage.dart';
 
 class CalmingCliffsActivity extends StatefulWidget {
@@ -12,25 +11,35 @@ class CalmingCliffsActivity extends StatefulWidget {
 
 class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
     with TickerProviderStateMixin {
-  late AnimationController _backgroundController;
-  late Animation<Color?> _backgroundAnimation;
+  // === LAYER ANIMATION CONTROLLERS ===
+  late AnimationController _cloud1Ctrl;    // CCM2
+  late AnimationController _cloud2Ctrl;    // CCM5
+  late AnimationController _mountainMidCtrl;  // CCM3
+  late AnimationController _mountainFrontCtrl; // CCM4
+
+  // === ALIGNMENT ANIMATIONS ===
+  late Animation<Alignment> _cloud1Align;
+  late Animation<Alignment> _cloud2Align;
+  late Animation<Alignment> _mountainMidAlign;
+  late Animation<Alignment> _mountainFrontAlign;
+
+  // === BREATHING & PROGRESS CONTROLLERS ===
   late AnimationController _breathingController;
   late AnimationController _progressController;
-  late Animation<double> _progressAnimation;
   late AnimationController _ballGradientController;
 
+  // For “Inhale/Hold/Exhale/Hold” steps
   int _currentBreathingIndex = 0;
+  // For rotating cosmic phrases
   int _currentPhraseIndex = 0;
+
   final List<String> _breathingSteps = ["Inhale", "Hold", "Exhale", "Hold"];
-
-  // Key positions along the square's border.
   final List<Alignment> _squarePositions = [
-    Alignment(0, -1), // top center
-    Alignment(1, 0),  // right center
-    Alignment(0, 1),  // bottom center
-    Alignment(-1, 0), // left center
+    Alignment(0, -1),
+    Alignment(1, 0),
+    Alignment(0, 1),
+    Alignment(-1, 0),
   ];
-
   final List<String> _calmingPhrases = [
     "You are a tiny part of an immense universe.",
     "The stars you see have shone for millions of years.",
@@ -51,19 +60,65 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
   void initState() {
     super.initState();
 
-    // Background gradient animation.
-    _backgroundController = AnimationController(
-      duration: const Duration(seconds: 10),
+    // === 1) Animation controllers for the layers that move ===
+    // CCM2 & CCM5 -> Cloud layers move left to right, same direction
+    _cloud1Ctrl = AnimationController(
       vsync: this,
+      duration: const Duration(seconds: 25),
     )..repeat(reverse: true);
-    _backgroundAnimation = _backgroundController.drive(
-      ColorTween(
-        begin: Colors.orangeAccent,
-        end: Colors.deepOrangeAccent,
-      ),
-    );
+    _cloud2Ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 25),
+    )..repeat(reverse: true);
 
-    // Breathing controller (16-second cycle).
+    // CCM3 (mid mountain): subtle side-to-side
+    _mountainMidCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 20),
+    )..repeat(reverse: true);
+
+    // CCM4 (foreground mountain): bigger side-to-side shift
+    _mountainFrontCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 15),
+    )..repeat(reverse: true);
+
+    // === 2) Define alignment tweens. Negative to positive for same direction
+    _cloud1Align = AlignmentTween(
+      begin: const Alignment(-0.2, 0),
+      end: const Alignment(0.2, 0),
+    ).animate(CurvedAnimation(
+      parent: _cloud1Ctrl,
+      curve: Curves.easeInOut,
+    ));
+
+    _cloud2Align = AlignmentTween(
+      begin: const Alignment(-0.2, 0),
+      end: const Alignment(0.2, 0),
+    ).animate(CurvedAnimation(
+      parent: _cloud2Ctrl,
+      curve: Curves.easeInOut,
+    ));
+
+    // ccm3: smaller motion range, so it looks behind ccm4
+    _mountainMidAlign = AlignmentTween(
+      begin: const Alignment(-0.1, 0),
+      end: const Alignment(0.1, 0),
+    ).animate(CurvedAnimation(
+      parent: _mountainMidCtrl,
+      curve: Curves.easeInOut,
+    ));
+
+    // ccm4 (front) -> bigger range
+    _mountainFrontAlign = AlignmentTween(
+      begin: const Alignment(-0.3, 0),
+      end: const Alignment(0.3, 0),
+    ).animate(CurvedAnimation(
+      parent: _mountainFrontCtrl,
+      curve: Curves.easeInOut,
+    ));
+
+    // === 3) Breathing steps (16s cycle) ===
     _breathingController = AnimationController(
       duration: const Duration(seconds: 16),
       vsync: this,
@@ -77,15 +132,14 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
           setState(() {
             _currentBreathingIndex = newIndex;
             if (newIndex == 0) {
-              _currentPhraseIndex =
-                  (_currentPhraseIndex + 1) % _calmingPhrases.length;
+              _currentPhraseIndex = (_currentPhraseIndex + 1) % _calmingPhrases.length;
             }
           });
         }
       })
       ..repeat();
 
-    // Overall progress (60-second activity).
+    // === 4) 60s progress controller ===
     _progressController = AnimationController(
       duration: const Duration(seconds: 60),
       vsync: this,
@@ -94,17 +148,28 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
       await Storage.storage.addActivityLog(ActivityName.calming_cliffs, '');
       Navigator.pop(context, true);
     });
-    _progressAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_progressController);
 
-    // Ball gradient animation (shifting between yellow and white).
+    // === 5) Ball color gradient animation
     _ballGradientController = AnimationController(
       duration: const Duration(seconds: 6),
       vsync: this,
     )..repeat(reverse: true);
   }
 
-  // Computes the ball's alignment along the square's border.
+  @override
+  void dispose() {
+    // Clean up
+    _cloud1Ctrl.dispose();
+    _cloud2Ctrl.dispose();
+    _mountainMidCtrl.dispose();
+    _mountainFrontCtrl.dispose();
+    _breathingController.dispose();
+    _progressController.dispose();
+    _ballGradientController.dispose();
+    super.dispose();
+  }
+
+  // The ball's alignment around the square
   Alignment getSquareAlignment(double t) {
     t = t % 1.0;
     if (t < 0.25) {
@@ -122,188 +187,221 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
     }
   }
 
-  @override
-  void dispose() {
-    _backgroundController.dispose();
-    _breathingController.dispose();
-    _progressController.dispose();
-    _ballGradientController.dispose();
-    super.dispose();
+  // == Helper: static layer (no movement) for CCM1 sky (since you don’t want it to move) ==
+  Widget buildSkyLayer() {
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage("assets/gamify/CCM1.png"),
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.none,
+          alignment: Alignment.center,
+        ),
+      ),
+    );
+  }
+
+  // == Helper: alignment-based layer for the others ==
+  Widget buildAlignLayer(
+      Animation<Alignment> align,
+      String asset, {
+        double opacity = 1.0,
+      }) {
+    return AnimatedBuilder(
+      animation: align,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(asset),
+              fit: BoxFit.cover,
+              alignment: align.value,
+              filterQuality: FilterQuality.none,
+            ),
+          ),
+          child: Container(color: Colors.black.withOpacity(1 - opacity)),
+          // above line can darken or lighten if you want, or remove
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      // Transparent AppBar with a quit button.
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
-          //** Fix: Return false when back button is pressed to avoid null value error.
           onPressed: () => Navigator.pop(context, false),
         ),
       ),
-      body: AnimatedBuilder(
-        animation: _backgroundAnimation,
-        builder: (context, child) {
-          return Container(
-            width: double.infinity,
-            height: double.infinity,
+      body: Stack(
+        children: [
+          // 1) CCM1 sky, no movement
+          buildSkyLayer(),
+
+          // 2) CCM2 (clouds) -> same direction as CCM5
+          buildAlignLayer(_cloud1Align, "assets/gamify/CCM2.png", opacity: 0.9),
+
+          // 3) CCM3 (mid mountain)
+          buildAlignLayer(_mountainMidAlign, "assets/gamify/CCM3.png", opacity: 0.85),
+
+          // 4) CCM5 (clouds or near-foreground) -> same direction as CCM2
+          buildAlignLayer(_cloud2Align, "assets/gamify/CCM5.png", opacity: 0.85),
+
+          // 5) CCM4 (foreground mountain) -> biggest shift
+          buildAlignLayer(_mountainFrontAlign, "assets/gamify/CCM4.png", opacity: 0.9),
+
+          // 6) Orange gradient overlay to unify the color scheme
+          Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  _backgroundAnimation.value ?? Colors.orangeAccent,
-                  Colors.deepOrangeAccent,
+                  // Darker warm orange at top
+                  const Color(0xFFFF6D00).withOpacity(0.4),
+                  // Lighter orange near bottom
+                  const Color(0xFFFFC107).withOpacity(0.2),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
-            child: child,
-          );
-        },
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Mountain icon pulsing with remaining time.
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AnimatedBuilder(
-                    animation: _breathingController,
-                    builder: (context, child) {
-                      double scale =
-                          1.0 + 0.1 * sin(2 * pi * _breathingController.value);
-                      return Transform.scale(
-                        scale: scale,
-                        child: const Icon(
-                          Icons.filter_hdr,
-                          size: 48,
-                          color: Colors.white,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  AnimatedBuilder(
-                    animation: _progressController,
-                    builder: (context, child) {
-                      int remainingMillis =
-                      (60000 * (1 - _progressController.value)).round();
-                      Duration remaining =
-                      Duration(milliseconds: remainingMillis);
-                      int minutes = remaining.inMinutes;
-                      int seconds = remaining.inSeconds % 60;
-                      String timeStr =
-                          "$minutes:${seconds.toString().padLeft(2, '0')}";
-                      return Text(
-                        timeStr,
-                        style:
-                        const TextStyle(color: Colors.white, fontSize: 20),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              // Main content: breathing text, calming phrase, and animated square.
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          ),
+
+          // 7) Main UI with breathing steps, phrases, ball, etc.
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Pulsing mountain icon + Timer
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Breathing prompt.
-                    AnimatedSwitcher(
-                      duration: const Duration(seconds: 1),
-                      child: Text(
-                        _breathingSteps[_currentBreathingIndex],
-                        key: ValueKey<int>(_currentBreathingIndex),
-                        style: const TextStyle(
-                          fontSize: 32,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    AnimatedBuilder(
+                      animation: _breathingController,
+                      builder: (context, child) {
+                        double scale = 1.0 + 0.1 * sin(2 * pi * _breathingController.value);
+                        return Transform.scale(
+                          scale: scale,
+                          child: const Icon(Icons.filter_hdr, size: 48, color: Colors.white),
+                        );
+                      },
                     ),
-                    const SizedBox(height: 20),
-                    // Calming phrase.
-                    AnimatedSwitcher(
-                      duration: const Duration(seconds: 1),
-                      child: Text(
-                        _calmingPhrases[_currentPhraseIndex],
-                        key: ValueKey<int>(_currentPhraseIndex),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    // Hollow square with the tracing ball.
-                    Container(
-                      width: 200,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: AnimatedBuilder(
-                        animation: Listenable.merge(
-                            [_breathingController, _ballGradientController]),
-                        builder: (context, child) {
-                          Alignment ballAlignment =
-                          getSquareAlignment(_breathingController.value);
-                          return Align(
-                            alignment: ballAlignment,
-                            child: AnimatedBuilder(
-                              animation: _ballGradientController,
-                              builder: (context, child) {
-                                double t = _ballGradientController.value;
-                                Color startColor =
-                                Color.lerp(Colors.yellow, Colors.white, t)!;
-                                Color endColor =
-                                Color.lerp(Colors.white, Colors.yellow, t)!;
-                                return Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      colors: [startColor, endColor],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
+                    const SizedBox(height: 8),
+                    AnimatedBuilder(
+                      animation: _progressController,
+                      builder: (context, child) {
+                        int remainingMillis =
+                        (60000 * (1 - _progressController.value)).round();
+                        Duration remaining = Duration(milliseconds: remainingMillis);
+                        String timeStr =
+                            "${remaining.inMinutes}:${(remaining.inSeconds % 60).toString().padLeft(2, '0')}";
+                        return Text(
+                          timeStr,
+                          style: const TextStyle(color: Colors.white, fontSize: 20),
+                        );
+                      },
                     ),
                   ],
                 ),
-              ),
-              // Progress bar.
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: AnimatedBuilder(
-                  animation: _progressAnimation,
-                  builder: (context, child) {
-                    return LinearProgressIndicator(
-                      value: _progressAnimation.value,
-                      backgroundColor: Colors.white.withOpacity(0.3),
-                      valueColor:
-                      const AlwaysStoppedAnimation<Color>(Colors.white),
-                    );
-                  },
+
+                // Middle content
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Breathing step
+                      AnimatedSwitcher(
+                        duration: const Duration(seconds: 1),
+                        child: Text(
+                          _breathingSteps[_currentBreathingIndex],
+                          key: ValueKey<int>(_currentBreathingIndex),
+                          style: const TextStyle(
+                            fontSize: 32,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Phrase
+                      AnimatedSwitcher(
+                        duration: const Duration(seconds: 1),
+                        child: Text(
+                          _calmingPhrases[_currentPhraseIndex],
+                          key: ValueKey<int>(_currentPhraseIndex),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+
+                      // The square with tracing ball
+                      Container(
+                        width: 200,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: AnimatedBuilder(
+                          animation: Listenable.merge(
+                            [_breathingController, _ballGradientController],
+                          ),
+                          builder: (context, child) {
+                            Alignment ballAlignment =
+                            getSquareAlignment(_breathingController.value);
+                            double t = _ballGradientController.value;
+                            Color startColor = Color.lerp(Colors.yellow, Colors.white, t)!;
+                            Color endColor = Color.lerp(Colors.white, Colors.yellow, t)!;
+
+                            return Align(
+                              alignment: ballAlignment,
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [startColor, endColor],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+
+                // Bottom progress bar
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: AnimatedBuilder(
+                    animation: _progressController,
+                    builder: (context, child) {
+                      return LinearProgressIndicator(
+                        value: _progressController.value,
+                        backgroundColor: Colors.white.withOpacity(0.3),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
