@@ -75,6 +75,8 @@ flutter:
     - assets/audio/activity_one/
     - assets/images/
     - assets/icons/
+    - assets/gamify/
+
   fonts:
     - family: Chewy
       fonts:
