@@ -1,3 +1,5 @@
+import 'package:calm_quest/achievements_system.dart';
+import 'package:calm_quest/storage.dart';
 import 'package:flutter/material.dart';
 import 'screens/shared/activity_widget.dart';
 import 'screens/activities/meditation_station.dart';
@@ -5,7 +7,9 @@ import 'screens/activities/twilight_alley_intro.dart';
 import 'screens/activities/calmingcliffintro.dart';
 
 class MistyMountainLandingPage extends StatelessWidget {
-  const MistyMountainLandingPage({super.key});
+  MistyMountainLandingPage({super.key}){
+    AchievementsSystem.updateAchievementCondition(Achievement.Well_Rounded, 1);
+  }
 
   @override
   Widget build(BuildContext context) {

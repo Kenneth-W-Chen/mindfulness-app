@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'Custom_Bottom_Navigation_Bar.dart';
 import 'storage.dart';
 
@@ -10,8 +11,8 @@ class AchievementsScreen extends StatefulWidget {
 }
 
 class _AchievementsScreenState extends State<AchievementsScreen> {
-  String storageStatusMessage = "Loading achievements...";
-  List<Map<String, String>> achievements = [];
+  Map<Achievement, DateTime?> achievements = {};
+  final DateFormat formatter = DateFormat.yMMMd('en-US');
 
   @override
   void initState() {
@@ -21,66 +22,38 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
 
   Future<void> _loadAchievements() async {
     try {
-      Storage storage = await Storage.create(); // Initialize storage
-      Map<Achievement, DateTime?> achievementsData =
-          await storage.getAchievementsCompletionDate([Achievement.all]);
-
-      List<Map<String, String>> loadedAchievements =
-          achievementsData.entries.map((entry) {
-        return {
-          'title': entry.key.name,
-          'description': entry.value != null
-              ? 'Completed on ${entry.value}'
-              : 'Not completed yet',
-        };
-      }).toList();
-
-      List<Map<String, String>> userAchievements = [
-        {
-          'title': 'Baby Steps',
-          'description': 'Complete your first activity. Completed on 2024-10-08'
-        },
-        {
-          'title': 'Peace of Mind',
-          'description':
-              'Use Positive Power Ups one time. Completed on 2024-10-23'
-        },
-        {
-          'title': 'Consistency is Key',
-          'description': 'Complete a 2 week streak. Completed on 2024-11-22'
-        },
-        {
-          'title': 'Calming Shield',
-          'description': 'Use Calming Cliffs one time. Completed on 2024-11-26'
-        },
-        {
-          'title': 'Well Rounded',
-          'description': 'Interact with all 3 terrains. Completed on 2025-1-01'
-        },
-        {
-          'title': 'Reflective Mindset',
-          'description': 'Write in the Mood Journal. Completed on 2025-1-15'
-        },
-        {
-          'title': 'Breath of Fresh Air',
-          'description': 'Stop by Meditation Station. Completed on 2025-10-02'
-        },
-        {
-          'title': 'Welcome to the Cove',
-          'description': 'Open the app. Completed on 2021-10-01'
-        },
-      ];
-
-      loadedAchievements.addAll(userAchievements);
+       achievements = await Storage.storage.getAchievementsCompletionDate([Achievement.all]);
 
       setState(() {
-        achievements = loadedAchievements;
-        storageStatusMessage =
-            "Achievements loaded successfully from the database!";
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Achievements loaded.', style: TextStyle(color: Colors.black)),
+              duration: const Duration(seconds: 5),
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              width: 280,
+              padding: const EdgeInsets.only(left: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              showCloseIcon: true,
+              closeIconColor: Colors.black38,
+            )
+        );
       });
     } catch (e) {
       setState(() {
-        storageStatusMessage = "Failed to load achievements from the database.";
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Failed to load achievements.', style: TextStyle(color: Colors.black)),
+              duration: const Duration(seconds: 5),
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              width: 280,
+              padding: const EdgeInsets.only(left: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              showCloseIcon: true,
+              closeIconColor: Colors.black38,
+            )
+        );
       });
     }
   }
@@ -93,33 +66,20 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
       ),
       body: Column(
         children: [
-          // Display the status of the storage operation
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              storageStatusMessage,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
           Expanded(
             child: achievements.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                    child: GridView(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16.0,
                         mainAxisSpacing: 16.0,
                       ),
-                      itemCount: achievements.length,
-                      itemBuilder: (context, index) {
-                        return _buildAchievementCard(
-                          title: achievements[index]['title']!,
-                          description: achievements[index]['description']!,
-                        );
-                      },
+                      children: Achievement.values.where((a)=> a.value > -1).map((Achievement a) {
+                        return _buildAchievementCard(a, achievements[a]);
+                      }).toList(growable: false),
                     ),
                   ),
           ),
@@ -141,8 +101,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     );
   }
 
-  Widget _buildAchievementCard(
-      {required String title, required String description}) {
+  Widget _buildAchievementCard(Achievement achievement, DateTime? completionDate) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -153,17 +112,23 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.star, size: 48, color: Colors.amber),
+            completionDate != null ? const Icon(Icons.star, size: 48, color: Colors.amber) : Stack(children: [Icon(Icons.star, size:48, color:Colors.grey[300]), Icon(Icons.star_border, size:48, color: Colors.grey[400]),]),
             const SizedBox(height: 10),
             Text(
-              title,
+              achievement.name.replaceAll('_', ' '),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 5),
             Text(
-              description,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              achievement.description,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400,color: Color(0xff434343)),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              completionDate != null ? "Completed on ${formatter.format(completionDate)}":'Not completed',
+              style: const TextStyle(fontSize: 10, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ],

@@ -1,11 +1,15 @@
+import 'package:calm_quest/achievements_system.dart';
 import 'package:calm_quest/screens/activities/pos_affirm_activity.dart';
+import 'package:calm_quest/storage.dart';
 import 'package:flutter/material.dart';
 import 'screens/shared/activity_widget.dart';
 import 'screens/activities/Mood Journal/mood_selection_screen.dart';
 import 'screens/activities/mellowmazeintro.dart';
 
 class TranquilForestLandingPage extends StatelessWidget {
-  const TranquilForestLandingPage({super.key});
+  TranquilForestLandingPage({super.key}){
+   AchievementsSystem.updateAchievementCondition(Achievement.Well_Rounded, 4);
+  }
 
   @override
   Widget build(BuildContext context) {

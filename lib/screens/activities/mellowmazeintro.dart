@@ -73,8 +73,7 @@ class _MellowMazeIntroState extends State<MellowMazeIntro>
     print(_activityCompleted);
     setState(() {});
     if(_activityCompleted){
-      var s = await Storage.create();
-      s.addActivityLog(ActivityName.mellow_maze, '');
+      Storage.storage.addActivityLog(ActivityName.mellow_maze, '');
     }
   }
 

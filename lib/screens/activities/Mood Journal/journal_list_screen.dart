@@ -5,9 +5,8 @@ import 'journal_prompt_screen.dart';
 import 'mood_trends_screen.dart';
 
 class JournalListScreen extends StatefulWidget {
-  final Storage storage;
 
-  const JournalListScreen({super.key, required this.storage});
+  const JournalListScreen({super.key});
 
   @override
   _JournalListScreenState createState() => _JournalListScreenState();
@@ -24,7 +23,7 @@ class _JournalListScreenState extends State<JournalListScreen> {
 
   Future<void> loadJournalEntries() async {
     try {
-      final entries = await widget.storage.getAllMoodJournalEntries();
+      final entries = await Storage.storage.getAllMoodJournalEntries();
       setState(() {
         journalEntries = entries;
       });
@@ -45,10 +44,9 @@ class _JournalListScreenState extends State<JournalListScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => JournalPromptScreen(
-                    mood: const {'label': 'Happy'}, // Example mood
+                  builder: (context) => const JournalPromptScreen(
+                    mood: {'label': 'Happy'}, // Example mood
                     intensity: 3.0, // Example intensity
-                    storage: widget.storage, // Pass the storage instance
                   ),
                 ),
               ).then((_) => loadJournalEntries());
@@ -61,7 +59,7 @@ class _JournalListScreenState extends State<JournalListScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          MoodTrendsScreen(storage: widget.storage)),
+                          MoodTrendsScreen(storage: Storage.storage)),
                 );
               }),
         ],

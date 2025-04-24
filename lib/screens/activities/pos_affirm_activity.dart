@@ -1,6 +1,7 @@
 //import 'package:calm_quest/screens/shared/activity_app_bar.dart';
 import 'dart:async';
 
+import 'package:calm_quest/achievements_system.dart';
 import 'package:flutter/material.dart';
 
 import '../../storage.dart';
@@ -75,8 +76,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
     _completionTimer = Timer(const Duration(seconds: 30), () async {
       _activityCompleted = true;
       setState(() {});
-      var s = await Storage.create();
-      s.addActivityLog(ActivityName.positive_affirmations, '');
+      Storage.storage.addActivityLog(ActivityName.positive_affirmations, '');
     });
   }
 
@@ -87,6 +87,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
   }
 
   void refreshQuote() {
+    AchievementsSystem.updateAchievementCondition(Achievement.Peace_of_Mind, 1);
     setState(() {
       currentQuote = quotes[(quotes.length *
               (DateTime.now().millisecondsSinceEpoch % 1000) ~/

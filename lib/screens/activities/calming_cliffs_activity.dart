@@ -55,7 +55,6 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
     "Among billions of galaxies, we share this moment.",
   ];
 
-  late final Storage _storage;
 
   @override
   void initState() {
@@ -146,8 +145,7 @@ class _CalmingCliffsActivityState extends State<CalmingCliffsActivity>
       vsync: this,
     );
     _progressController.forward().then((_) async {
-      _storage = await Storage.create();
-      await _storage.addActivityLog(ActivityName.calming_cliffs, '');
+      await Storage.storage.addActivityLog(ActivityName.calming_cliffs, '');
       Navigator.pop(context, true);
     });
 
