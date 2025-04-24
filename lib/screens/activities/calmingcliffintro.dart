@@ -129,7 +129,14 @@ class _CalmingCliffsIntroState extends State<CalmingCliffsIntro>
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white), // back arrow in white
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context, _activityCompleted);
+          },
+        ),
       ),
+
       body: Stack(
         children: [
           // Mountains BG
