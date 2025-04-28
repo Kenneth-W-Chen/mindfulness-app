@@ -3,6 +3,10 @@ import 'package:intl/intl.dart';
 import 'Custom_Bottom_Navigation_Bar.dart';
 import 'storage.dart';
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> local-version
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
 

@@ -30,7 +30,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+<<<<<<< HEAD
 
+=======
+  google_fonts: ^6.1.0
+  lottie: ^2.7.0
+  animate_do: ^3.0.2
+>>>>>>> local-version
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -48,6 +54,11 @@ dependencies:
   collection: any
   gif: ^2.3.0
   intl: any
+<<<<<<< HEAD
+=======
+  provider: ^6.1.0
+
+>>>>>>> local-version
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,6 +87,19 @@ flutter:
     - assets/audio/activity_one/
     - assets/images/
     - assets/icons/
+<<<<<<< HEAD
+=======
+    - assets/images/mistymount.png
+    - assets/images/beach.png
+    - assets/images/tranforest.png
+    - assets/animations/twinkle_stars.json
+    - assets/sounds/misty_mountain.mp3
+    - assets/sounds/serene_beach.mp3
+    - assets/sounds/tranquil_forest.mp3
+    - assets/animations/ripple_under_nav.json
+    - assets/images/serene_beach_background.png
+
+>>>>>>> local-version
   fonts:
     - family: Chewy
       fonts:
