@@ -4,7 +4,7 @@ import 'serene_beach_page.dart';
 import 'placeholder_screen.dart';
 import 'TranquilForestlandingpage.dart';
 import 'custom_bottom_navigation_bar.dart'; // Correct import for the navigation bar
-
+import './screens/emotion_explorer.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -102,6 +102,22 @@ class HomeScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>  TranquilForestLandingPage(),
+                  ),
+                );
+              },
+            ),
+            _buildIslandTile(
+              title: 'Emotion Explorer',
+              icon: Icons.emoji_emotions,
+              description: 'Discover and track your emotions',
+              startColor: const Color(0xFFFFA726), // Orange
+              endColor: const Color(0xFFFFCC80), // Light Orange
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EmotionExplorer(), // Navigate to Emotion Explorer
                   ),
                 );
               },
